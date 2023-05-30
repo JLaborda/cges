@@ -16,6 +16,8 @@ public class Resources {
     public static final DataSet EARTHQUAKE_DATASET = Utils.readData(EARTHQUAKE_BBDD_PATH);
 
     public static final String ALARM_BBDD_PATH = "./src/test/res/BBDD/alarm.xbif_.csv";
+    public static final String ALARM_NET_PATH = "./src/test/res/networks/alarm.xbif";
+
     // Variables of Earthquake's dataset
     public static final Node ALARM = EARTHQUAKE_DATASET.getVariable("Alarm");
     public static final Node MARYCALLS = EARTHQUAKE_DATASET.getVariable("MaryCalls");

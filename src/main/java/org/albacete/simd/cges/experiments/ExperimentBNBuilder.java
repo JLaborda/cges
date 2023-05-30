@@ -3,7 +3,6 @@ package org.albacete.simd.cges.experiments;
 import edu.cmu.tetrad.bayes.BayesPm;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
-import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag_n;
 import org.albacete.simd.cges.bnbuilders.GES_BNBuilder;
@@ -41,8 +40,6 @@ public class ExperimentBNBuilder {
     protected String databasePath;
     protected String netName;
     protected String databaseName;
-    protected String testDatabasePath;
-    protected DataSet testDataset;
 
     protected int numberOfThreads;
     protected int numberOfRealThreads;
@@ -62,7 +59,6 @@ public class ExperimentBNBuilder {
      */
     protected long elapsedTime;
     protected int numberOfIterations;
-    protected double LogLikelihoodScore;
 
 
     protected String log = "";
@@ -78,6 +74,31 @@ public class ExperimentBNBuilder {
         createBNBuilder();
     }
 
+    public ExperimentBNBuilder(BNBuilder algorithm, String netName, String netPath, String bbddPath) {
+        this.algorithm = algorithm;
+        this.netName = netName;
+        this.netPath = netPath;
+        this.databasePath = bbddPath;
+        this.algName = algorithm.getClass().getSimpleName();
+
+        Pattern pattern = Pattern.compile(".*/(.*).csv");
+        Matcher matcher = pattern.matcher(this.databasePath);
+        if (matcher.find()) {
+            databaseName = matcher.group(1);
+        }
+        this.numberOfThreads = Runtime.getRuntime().availableProcessors();
+        this.numberOfRealThreads = algorithm.getnThreads();
+        this.maxIterations = algorithm.getMaxIterations();
+        this.interleaving = algorithm.getItInterleaving();
+    }
+
+    public ExperimentBNBuilder(BNBuilder algorithm, String netName, String netPath, String bbddPath, long partition_seed) {
+        this(algorithm, netName, netPath, bbddPath);
+        this.seed = partition_seed;
+        Utils.setSeed(partition_seed);
+    }
+
+
     private void extractParametersForClusterExperiment(String[] parameters){
         System.out.println("Extracting parameters...");
         System.out.println("Number of hyperparams: " + parameters.length);
@@ -91,8 +112,6 @@ public class ExperimentBNBuilder {
         netPath = parameters[2];
         databasePath = parameters[3];
         databaseName = getDatabaseNameFromPattern();
-        testDatabasePath = parameters[4];
-        testDataset = Utils.readData(testDatabasePath);
 
         numberOfRealThreads = Integer.parseInt(parameters[5]);
         interleaving = Integer.parseInt(parameters[6]);
@@ -160,31 +179,6 @@ public class ExperimentBNBuilder {
         }
     }
 
-    public ExperimentBNBuilder(BNBuilder algorithm, String netName, String netPath, String bbddPath, String testDatabasePath) {
-        this.algorithm = algorithm;
-        this.netName = netName;
-        this.netPath = netPath;
-        this.databasePath = bbddPath;
-        this.testDatabasePath = testDatabasePath;
-        this.testDataset = Utils.readData(testDatabasePath);
-        this.algName = algorithm.getClass().getSimpleName();
-
-        Pattern pattern = Pattern.compile(".*/(.*).csv");
-        Matcher matcher = pattern.matcher(this.databasePath);
-        if (matcher.find()) {
-            databaseName = matcher.group(1);
-        }
-        this.numberOfThreads = Runtime.getRuntime().availableProcessors();
-        this.numberOfRealThreads = algorithm.getnThreads();
-        this.maxIterations = algorithm.getMaxIterations();
-        this.interleaving = algorithm.getItInterleaving();
-    }
-
-    public ExperimentBNBuilder(BNBuilder algorithm, String netName, String netPath, String bbddPath, String testDatabasePath, long partition_seed) {
-        this(algorithm, netName, netPath, bbddPath, testDatabasePath);
-        this.seed = partition_seed;
-        Utils.setSeed(partition_seed);
-    }
 
 
     public void runExperiment()
@@ -254,7 +248,6 @@ public class ExperimentBNBuilder {
         this.differencesOfMalkovsBlanket = Utils.avgMarkovBlanquetdif(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag());
         this.numberOfIterations = algorithm.getIterations();
         this.bdeuScore = GESThread.scoreGraph(algorithm.getCurrentDag(), algorithm.getProblem());
-        this.LogLikelihoodScore = Utils.LL(algorithm.getCurrentDag(), testDataset);
     }
 
     public void printResults() {
@@ -265,7 +258,6 @@ public class ExperimentBNBuilder {
         System.out.println(algorithm.getCurrentGraph().getNodes().size());
         System.out.println("-------------------------\nMetrics: ");
         System.out.println("SHD: "+ structuralHamiltonDistanceValue);
-        System.out.println("LLScore: " + this.LogLikelihoodScore);
         System.out.println("Final BDeu: " +this.bdeuScore);
         System.out.println("Total execution time (s): " + (double) elapsedTime/1000);
         System.out.println("Total number of Iterations: " + this.numberOfIterations);
@@ -326,7 +318,6 @@ public class ExperimentBNBuilder {
                 + this.interleaving + ","
                 + this.seed + ","
                 + this.structuralHamiltonDistanceValue + ","
-                + this.LogLikelihoodScore + ","
                 + this.bdeuScore + ","
                 + this.differencesOfMalkovsBlanket[0] + ","
                 + this.differencesOfMalkovsBlanket[1] + ","

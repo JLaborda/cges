@@ -81,7 +81,6 @@ public class LocalBNExperiments {
                     algorithm = new GES_BNBuilder(bbdd_path, true);
                     break;
 
-                    
                 case "circular_ges_c1":
                     clustering = new HierarchicalClustering();
                     algorithm = new CGES(bbdd_path, clustering, numberOfPGESThreads, interleaving, "c1");
@@ -117,7 +116,7 @@ public class LocalBNExperiments {
             }
 
             // Experiment
-            ExperimentBNBuilder experiment = new ExperimentBNBuilder(algorithm, net_name, net_path, bbdd_path, test_path);
+            ExperimentBNBuilder experiment = new ExperimentBNBuilder(algorithm, net_name, net_path, bbdd_path);
             experiment.algName = algName;
 
             experiment.runExperiment();

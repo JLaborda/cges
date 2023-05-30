@@ -2,7 +2,9 @@ package org.albacete.simd.cges.framework;
 
 import edu.cmu.tetrad.graph.Edge;
 import org.albacete.simd.cges.Resources;
-import org.albacete.simd.cges.bnbuilders.HillClimbingSearch;
+import org.albacete.simd.cges.bnbuilders.CGES;
+import org.albacete.simd.cges.clustering.Clustering;
+import org.albacete.simd.cges.clustering.RandomClustering;
 import org.albacete.simd.cges.utils.Problem;
 import org.albacete.simd.cges.utils.Utils;
 import org.junit.Before;
@@ -23,7 +25,8 @@ public class BNBuilderTest {
     @Test
     public void settersAndGettersTest(){
         String path = Resources.CANCER_BBDD_PATH;
-        BNBuilder algorithm = new HillClimbingSearch(path, 15, 5);
+        Clustering clustering = new RandomClustering();
+        BNBuilder algorithm = new CGES(path, clustering, 4, 100000, "c2");
         Problem problem = algorithm.getProblem();
         Set<Edge> arcs = Utils.calculateArcs(problem.getData());
 
@@ -42,7 +45,7 @@ public class BNBuilderTest {
         assertNull(algorithm.getCurrentGraph());
         assertEquals(1, algorithm.getIterations());
         assertEquals(problem, algorithm.getProblem());
-        assertEquals(0, algorithm.getnThreads());
+        assertEquals(4, algorithm.getnThreads());
 
 
     }

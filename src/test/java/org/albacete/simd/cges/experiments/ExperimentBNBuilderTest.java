@@ -2,7 +2,6 @@ package org.albacete.simd.cges.experiments;
 
 import org.albacete.simd.cges.Resources;
 import org.albacete.simd.cges.bnbuilders.CGES;
-import org.albacete.simd.cges.bnbuilders.PGESwithStages;
 import org.albacete.simd.cges.clustering.Clustering;
 import org.albacete.simd.cges.clustering.RandomClustering;
 import org.albacete.simd.cges.framework.BNBuilder;
@@ -24,8 +23,8 @@ public class ExperimentBNBuilderTest {
     int seed = 42;
     int maxIterations = 15;
     Clustering clustering = new RandomClustering();
-    BNBuilder algorithm = new CGES(Resources.CANCER_BBDD_PATH, clustering, nThreads, maxIterations, nItInterleaving, false, true, true);
-    ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "cancer", Resources.CANCER_NET_PATH, Resources.CANCER_BBDD_PATH, Resources.CANCER_TEST_PATH, seed);
+    BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2");
+    ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "cancer", Resources.CANCER_NET_PATH, Resources.CANCER_BBDD_PATH, seed);
 
 
     @Before
@@ -44,6 +43,8 @@ public class ExperimentBNBuilderTest {
 
     @Test
     public void runExperimentTest(){
+        BNBuilder algorithm = new CGES(Resources.CANCER_BBDD_PATH, clustering, 4, 100000, "c2");
+        ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "cancer", Resources.CANCER_NET_PATH, Resources.CANCER_BBDD_PATH, seed);
         exp.runExperiment();
 
         assertNotEquals(0.0, exp.getBdeuScore(), 0.000001);
@@ -51,25 +52,16 @@ public class ExperimentBNBuilderTest {
         assertNotEquals(0L,exp.getElapsedTimeMiliseconds());
         assertNotEquals(0,exp.getNumberOfIterations());
         assertNotEquals(Integer.MAX_VALUE,exp.getStructuralHamiltonDistanceValue());
-        assertEquals("PGESwithStages", exp.getAlgName());
-        //String results = "PGESwithStages,res/alarm,alarm.xbif50001_,2,5,42,18,-0.47065998245296453,-56422.320053854455,1.1891891891891893,8.0,36.0,10,3\n";
-        //System.out.println(exp.getResults());
-//        assertTrue(exp.getResults().contains("PGESwithStages,src/test/res/alarm,alarm.xbif_"));
-//
-//        System.out.println(exp);
-//        String exp_toString = "-----------------------\n" +
-//                "Experiment PGESwithStages\n" +
-//                "-----------------------\n" +
-//                "Net Name: src/test/res/alarm\tDatabase: alarm.xbif_\tThreads: 2\tInterleaving: 5\tMax. Iterations: 15\n";
-//        assertEquals(exp_toString, exp.toString());
-//        exp.printResults();
+        assertEquals("CGES", exp.getAlgName());
     }
-
-
+    
     @Test
     public void saveExperimentTest(){
-        String savePath = "./testBN.txt";
+        String savePath = "./src/test/res/testBN.txt";
         File file = new File(savePath);
+        Clustering clustering = new RandomClustering(42);
+        BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2");
+        ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH, seed);
         try {
             //Arrange: Creating Experiment and deleting previous file
             Files.deleteIfExists(file.toPath());

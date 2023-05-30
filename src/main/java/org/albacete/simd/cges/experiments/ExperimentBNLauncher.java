@@ -17,7 +17,6 @@ public class ExperimentBNLauncher {
     private String paramsFileName;
     private int threads;
     private ExperimentBNBuilder experiment;
-    private String savepath;
 
     public ExperimentBNLauncher(int index, String paramsFileName, int threads, String saveFolder){
         this.index = index;
