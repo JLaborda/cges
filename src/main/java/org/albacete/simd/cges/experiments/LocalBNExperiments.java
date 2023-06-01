@@ -9,9 +9,9 @@ import org.albacete.simd.cges.clustering.HierarchicalClustering;
 import org.albacete.simd.cges.framework.BNBuilder;
 
 import org.albacete.simd.cges.bnbuilders.CGES;
-import org.albacete.simd.cges.bnbuilders.Empty;
-import org.albacete.simd.cges.bnbuilders.Fges_BNBuilder;
-import org.albacete.simd.cges.bnbuilders.GES_BNBuilder;
+import org.albacete.simd.cges.bnbuilders.EmptyDag;
+import org.albacete.simd.cges.bnbuilders.FGES;
+import org.albacete.simd.cges.bnbuilders.GES;
 
 public class LocalBNExperiments {
     
@@ -75,10 +75,10 @@ public class LocalBNExperiments {
             switch(algName) {
 
                 case "ges":
-                    algorithm = new GES_BNBuilder(bbdd_path, false);
+                    algorithm = new GES(bbdd_path, false);
                     break;
                 case "ges parallel":
-                    algorithm = new GES_BNBuilder(bbdd_path, true);
+                    algorithm = new GES(bbdd_path, true);
                     break;
 
                 case "circular_ges_c1":
@@ -100,14 +100,14 @@ public class LocalBNExperiments {
 
 
                 case "fges":
-                    algorithm = new Fges_BNBuilder(bbdd_path, true, false);
+                    algorithm = new FGES(bbdd_path, true, false);
                     break;
                 case "fges-faithfulness":
-                    algorithm = new Fges_BNBuilder(bbdd_path, false, false);
+                    algorithm = new FGES(bbdd_path, false, false);
                     break;
                     
                 case "empty":
-                    algorithm = new Empty(bbdd_path);
+                    algorithm = new EmptyDag(bbdd_path);
                     break;
 
 

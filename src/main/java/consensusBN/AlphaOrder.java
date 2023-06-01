@@ -249,7 +249,7 @@ public void computeAlphaH2(){
 	}
 	
 	
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		
 //		ArrayList<Dag_n> dags = new ArrayList<Dag_n>();
 //		ArrayList<Node> alfa = new ArrayList<Node>();

@@ -7,7 +7,7 @@ import java.util.Objects;
 
 
 public class LocalScoreCacheConcurrent {
-    private ConcurrentHashMap<DualKey<Integer, Set<Node>>, Double> map = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<DualKey<Integer, Set<Node>>, Double> map = new ConcurrentHashMap<>();
 
     public LocalScoreCacheConcurrent() {
     }
@@ -59,9 +59,7 @@ public class LocalScoreCacheConcurrent {
         public boolean equals(Object other){
             if (other instanceof DualKey<?,?>){
                 DualKey<?,?> obj = (DualKey<?,?>)other;
-                if ( obj.getKey1().equals(this.key1) && obj.getKey2().equals(this.key2)){
-                    return true;
-                }
+                return obj.getKey1().equals(this.key1) && obj.getKey2().equals(this.key2);
             }
             return false;
         }

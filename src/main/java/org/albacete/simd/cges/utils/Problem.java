@@ -16,17 +16,17 @@ public class Problem {
     /**
      * Data of the problem
      */
-    private DataSet data;
+    private final DataSet data;
 
     /**
      * Array of variable names from the data set, in order.
      */
-    private String[] varNames;
+    private final String[] varNames;
 
     /**
      * List of variables in the data set, in order.
      */
-    private List<Node> variables;
+    private final List<Node> variables;
 
     /**
      * For discrete data scoring, the structure prior.

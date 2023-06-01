@@ -60,7 +60,7 @@ public final class Dag_n implements Graph {
      */
     private int size;
 
-    private Map<Node, Integer> nodesHash = new HashMap<>();
+    private final Map<Node, Integer> nodesHash = new HashMap<>();
     int n = 0;
 
     private boolean pag;

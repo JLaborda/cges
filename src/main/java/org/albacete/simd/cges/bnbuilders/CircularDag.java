@@ -133,10 +133,6 @@ public class CircularDag {
         return bdeu;
     }
 
-    public void setBDeu(double bdeu) {
-        this.bdeu = bdeu;
-    }
-
     public void setInputDag(Dag_n inputDag) {
         this.inputDag = inputDag;
     }

@@ -11,9 +11,9 @@ import java.util.Set;
 
 public class FESStage extends ForwardStage{
     
-    private boolean speedUp;
-    private boolean update;
-    private boolean parallel;
+    private final boolean speedUp;
+    private final boolean update;
+    private final boolean parallel;
 
     public FESStage(Problem problem, int nThreads, int itInterleaving, List<Set<Edge>> subsets, boolean speedUp, boolean update, boolean parallel) {
         super(problem, nThreads, itInterleaving, subsets);

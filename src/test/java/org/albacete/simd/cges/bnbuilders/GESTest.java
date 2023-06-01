@@ -22,26 +22,20 @@ public class GESTest {
 
     String path = Resources.CANCER_BBDD_PATH;
     DataSet dataSet = Utils.readData(path);
-    Clustering clustering = new RandomClustering();
 
-    @Before
-    public void restartMeans() {
-        BackwardStage.meanTimeTotal = 0;
-        ForwardStage.meanTimeTotal = 0;
-    }
 
     @Test
     public void testConstructor() {
-        BNBuilder alg1 = new GES_BNBuilder(dataSet, false);
-        BNBuilder alg2 = new GES_BNBuilder(path, false);
+        BNBuilder alg1 = new GES(dataSet, false);
+        BNBuilder alg2 = new GES(path, false);
 
         List<Node> nodes = Arrays.asList(Resources.CANCER, Resources.DYSPNOEA, Resources.POLLUTION, Resources.XRAY, Resources.SMOKER);
         Dag_n initialGraph = new Dag_n(nodes);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
-        BNBuilder alg3 = new GES_BNBuilder(initialGraph, Resources.CANCER_BBDD_PATH, false);
-        BNBuilder alg4 = new GES_BNBuilder(initialGraph, Resources.CANCER_DATASET, false);
+        BNBuilder alg3 = new GES(initialGraph, Resources.CANCER_BBDD_PATH, false);
+        BNBuilder alg4 = new GES(initialGraph, Resources.CANCER_DATASET, false);
 
 
         assertNotNull(alg1);
@@ -75,7 +69,7 @@ public class GESTest {
 
     @Test
     public void searchTest() {
-        BNBuilder ges = new GES_BNBuilder(Resources.CANCER_BBDD_PATH, false);
+        BNBuilder ges = new GES(Resources.CANCER_BBDD_PATH, false);
         Utils.setSeed(42);
 
         System.out.println("Searching...");
@@ -91,11 +85,11 @@ public class GESTest {
 
     @Test
     public void convergenceTest() {
-        BNBuilder alg = new GES_BNBuilder(Utils.readData(Resources.CANCER_BBDD_PATH), false);
+        BNBuilder alg = new GES(Utils.readData(Resources.CANCER_BBDD_PATH), false);
         alg.search();
 
         assertNotNull(alg.getCurrentGraph());
-        assertNotEquals(0, alg.getCurrentGraph().getEdges());
+        assertNotEquals(0, alg.getCurrentGraph().getEdges().size());
         assertTrue(alg.getCurrentGraph() instanceof Dag_n);
 
     }
@@ -107,7 +101,7 @@ public class GESTest {
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.DYSPNOEA);
         initialGraph.addDirectedEdge(Resources.CANCER, Resources.XRAY);
 
-        BNBuilder alg = new GES_BNBuilder(initialGraph, Resources.CANCER_DATASET, false);
+        BNBuilder alg = new GES(initialGraph, Resources.CANCER_DATASET, false);
 
         Dag_n result = alg.getCurrentDag();
         // Equals is never gonna work. Because tetrad doesn't have a proper equals

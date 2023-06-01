@@ -95,9 +95,6 @@ public abstract class ThreadStage extends Stage{
             //System.out.println("Graph of Thread " + (i +1) + ": \n" + gdag);
 
         }
-
-        // Calculating Timeout Stats
-        calculateStatsTimeTotal();
     }
 
 
@@ -123,9 +120,5 @@ public abstract class ThreadStage extends Stage{
         }
         return best;
     }
-
-    protected abstract void calculateStatsTimeTotal();
-
-
 
 }

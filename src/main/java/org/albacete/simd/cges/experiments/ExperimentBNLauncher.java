@@ -13,9 +13,9 @@ public class ExperimentBNLauncher {
     public static final int MAXITERATIONS = 100;
 
     private final String EXPERIMENTS_FOLDER;
-    private int index;
-    private String paramsFileName;
-    private int threads;
+    private final int index;
+    private final String paramsFileName;
+    private final int threads;
     private ExperimentBNBuilder experiment;
 
     public ExperimentBNLauncher(int index, String paramsFileName, int threads, String saveFolder){

@@ -10,13 +10,13 @@ import java.util.Set;
 
 public class Resources {
     // EARTHQUAKE
-    public static final String EARTHQUAKE_BBDD_PATH = "./src/test/res/BBDD/earthquake.xbif_.csv";
-    public static final String EARTHQUAKE_NET_PATH = "./src/test/res/networks/earthquake.xbif";
-    public static final String EARTHQUAKE_TEST_PATH = "./src/test/res/BBDD/tests/earthquake_test.csv";
+    public static final String EARTHQUAKE_BBDD_PATH = "./src/test/res/datasets/earthquake/earthquake.xbif_.csv";
+    public static final String EARTHQUAKE_NET_PATH = "./src/test/res/networks/earthquake/earthquake.xbif";
+    public static final String EARTHQUAKE_TEST_PATH = "./src/test/res/datasets/earthquake/earthquake_test.csv";
     public static final DataSet EARTHQUAKE_DATASET = Utils.readData(EARTHQUAKE_BBDD_PATH);
 
-    public static final String ALARM_BBDD_PATH = "./src/test/res/BBDD/alarm.xbif_.csv";
-    public static final String ALARM_NET_PATH = "./src/test/res/networks/alarm.xbif";
+    public static final String ALARM_BBDD_PATH = "./src/test/res/datasets/alarm/alarm.xbif_.csv";
+    public static final String ALARM_NET_PATH = "./src/test/res/networks/alarm/alarm.xbif";
 
     // Variables of Earthquake's dataset
     public static final Node ALARM = EARTHQUAKE_DATASET.getVariable("Alarm");
@@ -26,9 +26,9 @@ public class Resources {
     public static final Node JOHNCALLS = EARTHQUAKE_DATASET.getVariable("JohnCalls");
 
     // CANCER
-    public static final String CANCER_BBDD_PATH = "./src/test/res/BBDD/cancer.xbif_.csv";
-    public static final String CANCER_NET_PATH = "./src/test/res/networks/cancer.xbif";
-    public static final String CANCER_TEST_PATH = "./src/test/res/BBDD/tests/cancer_test.csv";
+    public static final String CANCER_BBDD_PATH = "./src/test/res/datasets/cancer/cancer.xbif_.csv";
+    public static final String CANCER_NET_PATH = "./src/test/res/networks/cancer/cancer.xbif";
+    public static final String CANCER_TEST_PATH = "./src/test/res/datasets/cancer/cancer_test.csv";
     public static final DataSet CANCER_DATASET = Utils.readData(CANCER_BBDD_PATH);
 
     // Variables of Cancer's dataset

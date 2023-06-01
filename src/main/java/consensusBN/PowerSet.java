@@ -10,10 +10,10 @@ import edu.cmu.tetrad.graph.Node;
 
 public class PowerSet implements Enumeration<SubSet> {
 	List<Node> nodes;
-	private List<SubSet> subSets;
+	private final List<SubSet> subSets;
 	private int index;
-	private int[] lista;
-	private HashMap<Integer,SubSet> hashMap;
+	private final int[] lista;
+	private final HashMap<Integer,SubSet> hashMap;
 	
 	
 	PowerSet(List<Node> nodes,int k) {

@@ -41,7 +41,7 @@ public final class HierarchicalAgglomerativeClustererBNs {
     double[] clusterComplexity = null;
     
     PairWiseConsensusBES[][] dissimilarityMatrix = null;
-	private int[][] clustersInsertedEdges;
+	private final int[][] clustersInsertedEdges;
    
     
     public HierarchicalAgglomerativeClustererBNs(ArrayList<Dag_n> setOfBNs, int maxSize) {
@@ -49,7 +49,7 @@ public final class HierarchicalAgglomerativeClustererBNs {
         this.clustersBN = new Dag_n[setOfBNs.size()][setOfBNs.size()];
         this.clustersIndexes = new boolean[setOfBNs.size()][setOfBNs.size()][setOfBNs.size()];
         for(int i=  0 ; i< setOfBNs.size(); i++){
-        	this.averageNEdges+=(double) setOfBNs.get(i).getNumEdges();
+        	this.averageNEdges+= setOfBNs.get(i).getNumEdges();
         }
         this.maxSize = maxSize;
         this.maxLevel = this.getSetOfBNs().size()-1;
@@ -65,7 +65,7 @@ public final class HierarchicalAgglomerativeClustererBNs {
         this.clustersBN = new Dag_n[setOfBNs.size()][setOfBNs.size()];
         this.clustersIndexes = new boolean[setOfBNs.size()][setOfBNs.size()][setOfBNs.size()];
         for(int i=  0 ; i< setOfBNs.size(); i++){
-        	this.averageNEdges+=(double) setOfBNs.get(i).getNumEdges();
+        	this.averageNEdges+= setOfBNs.get(i).getNumEdges();
         }
         this.maxLevel = this.getSetOfBNs().size()-1;
         this.averageNEdges/=setOfBNs.size();
@@ -300,12 +300,12 @@ public final class HierarchicalAgglomerativeClustererBNs {
     	
     	if (this.maxSize > 0 && (this.maxSize >= (this.clusterCardinalities[o1] + this.clusterCardinalities[o2]))|| level == 0){
     		PairWiseConsensusBES pairBNs = new PairWiseConsensusBES(this.clustersBN[o1][level],this.clustersBN[o2][level]);
-    		PairWiseConsensusBES pairDag= (PairWiseConsensusBES) pairBNs;
+    		PairWiseConsensusBES pairDag= pairBNs;
     		pairDag.getFusion();
     		return pairBNs;
     	}else if(this.maxSize == 0){
     			PairWiseConsensusBES pairBNs = new PairWiseConsensusBES(this.clustersBN[o1][level],this.clustersBN[o2][level]);
-    			PairWiseConsensusBES pairDag= (PairWiseConsensusBES) pairBNs;
+    			PairWiseConsensusBES pairDag= pairBNs;
     			pairDag.getFusion();
     			if((pairDag.getDagFusion().getNumEdges())/this.averageNEdges <= this.maxComplexityCluster|| level == 0)
     				return pairBNs;	

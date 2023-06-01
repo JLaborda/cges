@@ -43,13 +43,13 @@ public HeuristicConsensusMVoting(ArrayList<Dag_n> setOfdags, double percentage) 
 				Node n2 = e.getNode2();
 				if(e.isDirected()){
 					if(e.getEndpoint1() == Endpoint.ARROW){
-						this.weight[variables.indexOf(n2)][variables.indexOf(n1)]+= (double) (1.0/this.setOfdags.size());
+						this.weight[variables.indexOf(n2)][variables.indexOf(n1)]+= 1.0/this.setOfdags.size();
 					}else{
-						this.weight[variables.indexOf(n1)][variables.indexOf(n2)]+= (double) (1.0/this.setOfdags.size());
+						this.weight[variables.indexOf(n1)][variables.indexOf(n2)]+= 1.0/this.setOfdags.size();
 					}
 				}else{
-					this.weight[variables.indexOf(n2)][variables.indexOf(n1)]+= (double) (1.0/this.setOfdags.size());
-					this.weight[variables.indexOf(n1)][variables.indexOf(n2)]+= (double) (1.0/this.setOfdags.size());
+					this.weight[variables.indexOf(n2)][variables.indexOf(n1)]+= 1.0/this.setOfdags.size();
+					this.weight[variables.indexOf(n1)][variables.indexOf(n2)]+= 1.0/this.setOfdags.size();
 				}
 			}
 		}

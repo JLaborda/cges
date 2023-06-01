@@ -155,7 +155,7 @@ public class ConsensusBES implements Runnable {
 			}
 			if (x != null) {
 				System.out.println(" ");
-				System.out.println("DELETE " + graph.getEdge(x, y) + t.toString() + " (" +bestScore + ")");
+				System.out.println("DELETE " + graph.getEdge(x, y) + t + " (" +bestScore + ")");
 				System.out.println(" ");
 				delete(x, y, t, graph);
 				rebuildPattern(graph);
@@ -416,7 +416,7 @@ public class ConsensusBES implements Runnable {
     }
     
 	
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
 
 		System.out.println("Grafos de Partida:   ");

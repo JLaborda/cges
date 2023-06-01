@@ -5,7 +5,7 @@ import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag_n;
-import org.albacete.simd.cges.bnbuilders.GES_BNBuilder;
+import org.albacete.simd.cges.bnbuilders.GES;
 import org.albacete.simd.cges.bnbuilders.CGES;
 import org.albacete.simd.cges.clustering.Clustering;
 import org.albacete.simd.cges.clustering.HierarchicalClustering;
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.albacete.simd.cges.bnbuilders.Fges_BNBuilder;
+import org.albacete.simd.cges.bnbuilders.FGES;
 
 /*We are checking the following hyperparameters:
  * Threads: [1, 2, 4, 8, 16]
@@ -121,8 +121,7 @@ public class ExperimentBNBuilder {
     public boolean checkExistentFile(String savePath) throws IOException{
         File file = new File(savePath);
 
-        if(file.length() != 0) return true;
-        else return false;
+        return file.length() != 0;
     }
     
 
@@ -138,16 +137,13 @@ public class ExperimentBNBuilder {
 
     private void createBNBuilder() throws Exception {
         Clustering clustering;
-        
-        boolean speedUp = false;
-        boolean update = true;
-        boolean parallel = true;
+
         switch(algName) {
             case "ges":
-                algorithm = new GES_BNBuilder(databasePath, true);
+                algorithm = new GES(databasePath, true);
                 break;
             case "ges-noParallel":
-                algorithm = new GES_BNBuilder(databasePath, false);
+                algorithm = new GES(databasePath, false);
                 break;
             case "circular_ges_c1":
                 clustering = new HierarchicalClustering();
@@ -166,13 +162,13 @@ public class ExperimentBNBuilder {
                 algorithm = new CGES(databasePath, clustering, numberOfRealThreads, interleaving, "c4");
                 break;
             case "fges":
-                algorithm = new Fges_BNBuilder(databasePath, true, false);
+                algorithm = new FGES(databasePath, true, false);
                 break;
             case "fges-faithfulness":
-                algorithm = new Fges_BNBuilder(databasePath, false, false);
+                algorithm = new FGES(databasePath, false, false);
                 break;
             case "ges-tetrad":
-                algorithm = new Fges_BNBuilder(databasePath, true, true);
+                algorithm = new FGES(databasePath, true, true);
                 break;
             default:
                 throw new Exception("Error... Algoritmo incorrecto: " + algName);
@@ -324,6 +320,26 @@ public class ExperimentBNBuilder {
                 + this.differencesOfMalkovsBlanket[2] + ","
                 + this.numberOfIterations + ","
                 + (double) elapsedTime/1000 + "\n";//this.elapsedTime + "\n";
+    }
+
+    public BNBuilder getAlgorithm() {
+        return algorithm;
+    }
+
+    public String getNetPath() {
+        return netPath;
+    }
+
+    public String getDatabasePath() {
+        return databasePath;
+    }
+
+    public String getNetName() {
+        return netName;
+    }
+
+    public long getSeed() {
+        return seed;
     }
 
     @Override

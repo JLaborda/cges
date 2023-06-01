@@ -64,11 +64,6 @@ public class GESThreadTest {
      */
     final Set<Edge> subset2 = new HashSet<>();
 
-    @Before
-    public void restartMeans() {
-        BackwardStage.meanTimeTotal = 0;
-        ForwardStage.meanTimeTotal = 0;
-    }
 
     /**
      * Constructor of the test. It initializes the subsets

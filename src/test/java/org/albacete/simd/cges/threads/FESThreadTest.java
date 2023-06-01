@@ -71,12 +71,6 @@ public class FESThreadTest {
         initializeSubsets();
     }
 
-    @Before
-    public void restartMeans(){
-        BackwardStage.meanTimeTotal = 0;
-        ForwardStage.meanTimeTotal = 0;
-    }
-
     /**
      * Method used to remove inconsistencies in the graph passed as a parameter.
      * @param graph Graph that will have its inconsistencies removed
@@ -161,8 +155,6 @@ public class FESThreadTest {
      */
     @Test
     public void searchTwoThreadsTest() throws InterruptedException {
-        BackwardStage.meanTimeTotal = 0;
-        ForwardStage.meanTimeTotal = 0;
         // ThFES objects
         FESThread thread1 = new FESThread(problem, subset1, 15, false,true,true);
         FESThread thread2 = new FESThread(problem, subset2, 15, false,true,true);

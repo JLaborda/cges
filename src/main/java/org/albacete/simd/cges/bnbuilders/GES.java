@@ -15,93 +15,49 @@ import org.albacete.simd.cges.utils.Utils;
 import java.util.LinkedList;
 import java.util.Set;
 
-public class GES_BNBuilder extends BNBuilder {
-
-
+public class GES extends BNBuilder {
     private Graph initialDag;
-
-    private boolean fesFlag = false;
-    private boolean besFlag = false;
-    
     private final boolean parallel;
 
-
-    public GES_BNBuilder(DataSet data, boolean parallel) {
+    public GES(DataSet data, boolean parallel) {
         super(data, 1, -1, -1);
         initialDag = new EdgeListGraph(new LinkedList<>(problem.getVariables()));
         this.parallel = parallel;
     }
 
-    public GES_BNBuilder(String path, boolean parallel) {
+    public GES(String path, boolean parallel) {
         super(path, 1, -1, -1);
         initialDag = new EdgeListGraph(new LinkedList<>(problem.getVariables()));
         this.parallel = parallel;
     }
 
-    public GES_BNBuilder(Graph initialDag, DataSet data, boolean parallel) {
+    public GES(Graph initialDag, DataSet data, boolean parallel) {
         this(data, parallel);
         this.initialDag = new EdgeListGraph(initialDag);
         this.currentGraph = new EdgeListGraph(initialDag);
     }
 
-    public GES_BNBuilder(Graph initialDag, String path, boolean parallel) {
+    public GES(Graph initialDag, String path, boolean parallel) {
         this(path, parallel);
         this.initialDag = new EdgeListGraph(initialDag);
         this.currentGraph = new EdgeListGraph(initialDag);
     }
 
-    public GES_BNBuilder(Graph initialDag, Problem problem, Set<Edge> subsetEdges, boolean parallel) {
-        super(initialDag, problem, 1, -1,-1);
-        super.setOfArcs = subsetEdges;
-        this.initialDag = new EdgeListGraph(initialDag);
-        this.parallel = parallel;
-    }
-
-    @Override
-    public boolean convergence() {
-        // No changes in either fes or bes stages
-        return !(fesFlag || besFlag);
-    }
-
-    @Override
-    protected void initialConfig() {
-    }
-
-    @Override
-    protected void repartition() {
-
-    }
-
-    @Override
-    protected void forwardStage() throws InterruptedException {
-        ForwardStage.meanTimeTotal = 0;
+    private void forwardStage() throws InterruptedException {
         FESThread fes = new FESThread(problem, initialDag, setOfArcs, Integer.MAX_VALUE, false, false, parallel);
         fes.run();
         currentGraph = fes.getCurrentGraph();
-        fesFlag = fes.getFlag();
         score = fes.getScoreBDeu();
     }
 
-    @Override
-    protected void forwardFusion() throws InterruptedException {
-
-    }
-
-    @Override
-    protected void backwardStage() throws InterruptedException {
-        BackwardStage.meanTimeTotal = 0;
+    private void backwardStage() throws InterruptedException {
         BESThread bes = new BESThread(problem, currentGraph, setOfArcs);
         bes.run();
         currentGraph = bes.getCurrentGraph();
-        besFlag = bes.getFlag();
         score = bes.getScoreBDeu();
         currentGraph = Utils.removeInconsistencies(currentGraph);
     }
 
-    @Override
-    protected void backwardFusion() throws InterruptedException {
-
-    }
     @Override
     public Graph search(){
         try {
@@ -113,4 +69,5 @@ public class GES_BNBuilder extends BNBuilder {
         }
         return this.currentGraph;
     }
+
 }

@@ -153,40 +153,12 @@ public abstract class BNBuilder {
         }
     }
 
-    protected abstract boolean convergence();
 
-    protected abstract void initialConfig();
-
-    protected abstract void repartition();
-
-    protected abstract void forwardStage() throws InterruptedException;
-
-    protected abstract void forwardFusion() throws InterruptedException;
-
-    protected abstract void backwardStage() throws InterruptedException;
-
-    protected abstract void backwardFusion() throws InterruptedException;
-
-
-    public Graph search(){
-        initialConfig();
-        repartition();
-        do{
-            try{
-                forwardStage();
-                forwardFusion();
-                backwardStage();
-                backwardFusion();
-            } catch (InterruptedException e) {
-                System.err.println("Interrupted Exception");
-                e.printStackTrace();
-            }
-        }while(!convergence());
-
-        return this.currentGraph;
-    }
-
-
+    /**
+     * Search method for all BNBuilders
+     * @return Resulting graph (Bayesian Network) of performing the search with this BNBuilder algorithm.
+     */
+    public abstract Graph search();
 
     /**
      * Sets the seed for the random generator.

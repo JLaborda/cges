@@ -70,12 +70,6 @@ public class BESThreadTest {
         initializeSubsets();
     }
 
-    @Before
-    public void restartMeans(){
-        BackwardStage.meanTimeTotal = 0;
-        ForwardStage.meanTimeTotal = 0;
-    }
-
     /**
      * Method used to remove inconsistencies in the graph passed as a parameter.
      * @param graph Graph that will have its inconsistencies removed

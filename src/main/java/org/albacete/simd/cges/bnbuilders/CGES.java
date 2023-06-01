@@ -31,21 +31,19 @@ public class CGES extends BNBuilder {
     private CircularDag bestDag;
     private double lastBestBDeu = Double.NEGATIVE_INFINITY;
     private boolean convergence;
-    
-    public CGES(String path, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence) {
-        super(path, nThreads, -1, nItInterleaving);
-       
-        this.clustering = clustering;
-        this.circularFusionThreadsResults = new HashMap<>(nThreads);
-        this.typeConvergence = typeConvergence;
-    }
+
     
     public CGES(DataSet data, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence) {
         super(data, nThreads, -1, nItInterleaving);
 
         this.clustering = clustering;
+        clustering.setProblem(problem);
         this.circularFusionThreadsResults = new HashMap<>(nThreads);
         this.typeConvergence = typeConvergence;
+    }
+
+    public CGES(String path, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence) {
+        this(Utils.readData(path), clustering, nThreads, nItInterleaving, typeConvergence);
     }
     
     
@@ -69,15 +67,13 @@ public class CGES extends BNBuilder {
         
         return currentGraph;
     }
-    
-    @Override
+
     protected void initialConfig() {
         it = 0;
         repartition();
         initializeValuesInResultsMap();
     }
 
-    @Override
     protected void repartition() {
         // Splitting edges with the clustering algorithm and then adding them to its corresponding index
         clustering.setProblem(this.problem);
@@ -139,9 +135,8 @@ public class CGES extends BNBuilder {
                 bestDag = dag;
         }
     }
-    
-    @Override
-    protected boolean convergence() {
+
+    private boolean convergence() {
         switch (typeConvergence) {
             // When any DAG changues in the iteration
             case "c1":
@@ -180,7 +175,7 @@ public class CGES extends BNBuilder {
         } catch (InterruptedException ex) {}
     }
     
-    private void printResults() {
+    public void printResults() {
         String savePath = EXPERIMENTS_FOLDER + "results.csv";
         File file = new File(savePath);
         FileWriter csvWriter = null;
@@ -200,20 +195,5 @@ public class CGES extends BNBuilder {
             csvWriter.flush();
         } catch (IOException ex) {}
     }
-    
-    @Override
-    protected void forwardStage() throws InterruptedException {
-    }
 
-    @Override
-    protected void forwardFusion() throws InterruptedException {
-    }
-
-    @Override
-    protected void backwardStage() throws InterruptedException {
-    }
-
-    @Override
-    protected void backwardFusion() throws InterruptedException {
-    }
 }

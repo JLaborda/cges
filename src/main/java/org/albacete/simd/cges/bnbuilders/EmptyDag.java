@@ -8,15 +8,16 @@ import edu.cmu.tetrad.search.Fges;
 import java.util.LinkedList;
 
 import org.albacete.simd.cges.framework.BNBuilder;
+import org.albacete.simd.cges.utils.Utils;
 
-public class Empty extends BNBuilder {
+public class EmptyDag extends BNBuilder {
     
-    public Empty(DataSet data) {
+    public EmptyDag(DataSet data) {
         super(data, 1, -1, -1);
     }
 
-    public Empty(String path) {
-        super(path, 1, -1, -1);
+    public EmptyDag(String path) {
+        this(Utils.readData(path));
     }
 
     @Override
@@ -26,35 +27,6 @@ public class Empty extends BNBuilder {
         currentGraph = new EdgeListGraph(new LinkedList<>(problem.getVariables()));
         this.score = fges.scoreDag(currentGraph);
         return this.currentGraph;
-    }
-
-    @Override
-    protected boolean convergence() {
-        return true;
-    }
-
-    @Override
-    protected void initialConfig() {
-    }
-
-    @Override
-    protected void repartition() {
-    }
-
-    @Override
-    protected void forwardStage() throws InterruptedException {
-    }
-
-    @Override
-    protected void forwardFusion() throws InterruptedException {
-    }
-
-    @Override
-    protected void backwardStage() throws InterruptedException {
-    }
-
-    @Override
-    protected void backwardFusion() throws InterruptedException {
     }
 
 }

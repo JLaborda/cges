@@ -16,11 +16,6 @@ import static org.junit.Assert.*;
 
 public class BNBuilderTest {
 
-    @Before
-    public void restartMeans(){
-        BackwardStage.meanTimeTotal = 0;
-        ForwardStage.meanTimeTotal = 0;
-    }
 
     @Test
     public void settersAndGettersTest(){

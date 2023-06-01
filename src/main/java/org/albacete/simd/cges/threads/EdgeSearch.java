@@ -25,9 +25,7 @@ public class EdgeSearch implements Comparable<EdgeSearch> {
     public boolean equals(Object other) {
         if (other instanceof EdgeSearch) {
             EdgeSearch obj = (EdgeSearch) other;
-            if (obj.edge.equals(this.edge)) {
-                return true;
-            }
+            return obj.edge.equals(this.edge);
         }
         return false;
     }

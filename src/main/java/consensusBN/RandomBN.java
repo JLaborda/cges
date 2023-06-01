@@ -530,8 +530,8 @@ public RandomBN(int seed, int numNodes, int numEdges, int numBNs, int numIterati
 	 * disconnecting were it to be removed.
 	 */
 	private boolean isDisconnecting() {
-		boolean visited[] = new boolean[getNumNodes()];
-		int list[] = new int[getNumNodes()];
+		boolean[] visited = new boolean[getNumNodes()];
+		int[] list = new int[getNumNodes()];
 		int index = 0;
 		int lastIndex = 1;
 		list[0] = 0;
@@ -587,9 +587,9 @@ public RandomBN(int seed, int numNodes, int numEdges, int numBNs, int numIterati
 	 * an edge.
 	 */
 	private boolean isAcyclic() {
-		boolean visited[] = new boolean[getNumNodes()];
+		boolean[] visited = new boolean[getNumNodes()];
 		boolean noCycle = true;
-		int list[] = new int[getNumNodes() + 1];
+		int[] list = new int[getNumNodes() + 1];
 		int index = 0;
 		int lastIndex = 1;
 		list[0] = randomParent;
