@@ -1,7 +1,17 @@
 package org.albacete.simd.cges.utils;
 
+import edu.cmu.tetrad.graph.GraphNode;
+import edu.cmu.tetrad.graph.Node;
+import org.junit.Test;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class LocalScoreCacheConcurrentTest {
-/*
+
     @Test
     public void constructorTest(){
         LocalScoreCacheConcurrent cache = new LocalScoreCacheConcurrent();
@@ -13,7 +23,7 @@ public class LocalScoreCacheConcurrentTest {
         LocalScoreCacheConcurrent cache = new LocalScoreCacheConcurrent();
 
         // Adding new element into cache
-        int [] parents = {1,2,3,4,5};
+        Set<Node> parents = createParents(new int[]{1,2,3,4,5});
         cache.add(0, parents, 5);
         assertEquals(5, cache.get(0, parents),0.000001);
 
@@ -26,17 +36,21 @@ public class LocalScoreCacheConcurrentTest {
         assertEquals(7, cache.get(0, parents),0.000001);
 
         // Getting the same element, but with repeated parents
-        int [] parents2 = {1,1,2,3,4,5};
+        int [] parentsIndex2 = {1,1,2,3,4,5};
+        Set<Node> parents2 = createParents(parentsIndex2);
         assertEquals(7, cache.get(0, parents2),0.000001);
 
         // Adding new element with repeated parents and getting it with non-repeating parents
-        int [] parents3 = {1,2,3,3};
-        int [] parents4 = {1,2,3};
+        int [] parentsIndex3 = {1,2,3,3};
+        int [] parentsIndex4 = {1,2,3};
+        Set<Node> parents3 = createParents(parentsIndex3);
+        Set<Node> parents4 = createParents(parentsIndex4);
         cache.add(0, parents3, 5);
         assertEquals(5, cache.get(0, parents4),0.000001);
 
         // Getting an element with a new int[] with the same values.
-        int [] parents5 = {1,2,3};
+        int [] parentsIndex5 = {1,2,3};
+        Set<Node> parents5 = createParents(parentsIndex5);
         assertEquals(5, cache.get(0, parents5),0.000001);
 
 
@@ -45,7 +59,8 @@ public class LocalScoreCacheConcurrentTest {
     @Test
     public void clearTest(){
         LocalScoreCacheConcurrent cache = new LocalScoreCacheConcurrent();
-        int [] parents = {1,2,3,4,5};
+        int [] parentsIndex = {1,2,3,4,5};
+        Set<Node> parents = createParents(parentsIndex);
         cache.add(0, parents, 5);
 
         cache.clear();
@@ -58,7 +73,8 @@ public class LocalScoreCacheConcurrentTest {
     @Test
     public void toStringTest(){
         LocalScoreCacheConcurrent cache = new LocalScoreCacheConcurrent();
-        int [] parents = {1,2,3,4,5};
+        int [] parentsIndex = {1,2,3,4,5};
+        Set<Node> parents = createParents(parentsIndex);
         cache.add(0, parents, 5);
 
         String result = cache.toString();
@@ -66,6 +82,14 @@ public class LocalScoreCacheConcurrentTest {
 
         assertEquals(expected, result);
 
-    }*/
+    }
+
+    public Set<Node> createParents(int[] indexes){
+        Set<Node> parents = new HashSet<>();
+        for (int i = 0; i < indexes.length; i++) {
+            parents.add(new GraphNode(String.valueOf(indexes[i])));
+        }
+        return parents;
+    }
 
 }

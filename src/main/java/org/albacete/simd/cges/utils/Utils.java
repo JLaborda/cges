@@ -158,30 +158,6 @@ public class Utils {
         }
         return setOfArcs;
     }
-    
-    /**
-     * Calculates the amount of possible edges between the variables of the dataset and stores it.
-     *
-     * @param data DataSet used to calculate the edges between its columns (nodes).
-     */
-    public static Set<Edge> calculateEdges(DataSet data) {
-        //0. Accumulator
-        Set<Edge> setOfArcs = new HashSet<>(data.getNumColumns() * (data.getNumColumns() - 1));
-        //1. Get edges (variables)
-        List<Node> variables = data.getVariables();
-        //2. Iterate over variables and save pairs
-        for (int i = 0; i < data.getNumColumns() - 1; i++) {
-            for (int j = i + 1; j < data.getNumColumns(); j++) {
-                // Getting pair of variables (Each variable is different)
-                Node var_A = variables.get(i);
-                Node var_B = variables.get(j);
-
-                //3. Storing both pairs
-                setOfArcs.add(Edges.directedEdge(var_A, var_B));
-            }
-        }
-        return setOfArcs;
-    }
 
 
     /**
@@ -257,16 +233,6 @@ public class Utils {
         }
     }
 
-    public static int compare(Dag_n bn1, Dag_n bn2){
-        ArrayList<Dag_n> dags = new ArrayList<>();
-        dags.add(bn1);
-        dags.add(bn2);
-        ensureVariables(dags);
-        PairWiseConsensusBES kl = new PairWiseConsensusBES(dags.get(0), dags.get(1));
-        kl.getFusion();
-        int hmd =  kl.getHammingDistance();
-        return hmd;
-    }
 
     public static int SHD (Dag_n bn1, Dag_n bn2) {
 
@@ -446,7 +412,7 @@ public class Utils {
         return new Dag_n(g);
 
     }
-
+/*
     public static double LL(BayesIm bn, DataSet data) {
 
         BayesIm bayesIm;
@@ -581,7 +547,7 @@ public class Utils {
         MlBayesIm bnOut = new MlBayesIm(bnaux, MlBayesIm.MANUAL);
         return LL(bnOut, data);
     }
-
+*/
     /**
      * Transforms a BayesNet read from a xbif file into a BayesPm object for tetrad
      *

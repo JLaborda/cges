@@ -21,8 +21,8 @@ public class LocalScoreCacheConcurrent {
     public double get(int variable, Set<Node> parents) {
         DualKey<Integer, Set<Node>> key = new DualKey<>(variable, parents);
 
-        Double _score = this.map.get(key);
-        return _score == null ? Double.NaN : _score;
+        Double score = this.map.get(key);
+        return score == null ? Double.NaN : score;
     }
 
     public void clear() {
