@@ -1,3 +1,6 @@
+![Coninuous Integration](https://github.com/JLaborda/cges/actions/workflows/CI-maven.yml/badge.svg)
+[![codecov](https://codecov.io/gh/JLaborda/cges/branch/main/graph/badge.svg?token=C9GeO49RsE)](https://codecov.io/gh/JLaborda/cges)
+
 # CGES
 Circular Greedy Equivalence Search (CGES) is a distributed structural learning algorithm for Bayesian Networks developed by Jorge Daniel Laborda, Pablo Torrijos, José M. Puerta and José A. Gámez.
 This repository contains the code implementation of the algorithm described in the research article titled [A Ring-Based Distributed Algorithm for
