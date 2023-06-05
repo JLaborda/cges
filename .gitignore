@@ -24,4 +24,6 @@ hs_err_pid*
 replay_pid*
 
 # unnecesary networks and datasets
-others/
+res/datasets/others/*
+res/networks/others/*
+scripts/*
