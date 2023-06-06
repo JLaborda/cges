@@ -41,7 +41,7 @@ public class ExperimentBNBuilder {
     protected String netName;
     protected String databaseName;
 
-    protected int numberOfThreads;
+
     protected int numberOfRealThreads;
     protected int interleaving;
     protected int maxIterations;
@@ -68,9 +68,8 @@ public class ExperimentBNBuilder {
     public Dag_n resultingBayesianNetwork;
 
 
-    public ExperimentBNBuilder(String[] parameters, int threads) throws Exception {
+    public ExperimentBNBuilder(String[] parameters) throws Exception {
         extractParametersForClusterExperiment(parameters);
-        this.numberOfThreads = threads;
         createBNBuilder();
     }
 
@@ -86,7 +85,6 @@ public class ExperimentBNBuilder {
         if (matcher.find()) {
             databaseName = matcher.group(1);
         }
-        this.numberOfThreads = Runtime.getRuntime().availableProcessors();
         this.numberOfRealThreads = algorithm.getnThreads();
         this.maxIterations = algorithm.getMaxIterations();
         this.interleaving = algorithm.getItInterleaving();
@@ -113,9 +111,9 @@ public class ExperimentBNBuilder {
         databasePath = parameters[3];
         databaseName = getDatabaseNameFromPattern();
 
-        numberOfRealThreads = Integer.parseInt(parameters[5]);
-        interleaving = Integer.parseInt(parameters[6]);
-        seed = Integer.parseInt(parameters[7]);
+        numberOfRealThreads = Integer.parseInt(parameters[4]);
+        interleaving = Integer.parseInt(parameters[5]);
+        seed = Integer.parseInt(parameters[6]);
     }
     
     public boolean checkExistentFile(String savePath) throws IOException{
@@ -205,7 +203,6 @@ public class ExperimentBNBuilder {
         System.out.println("\tNet Name: " + netName);
         System.out.println("\tBBDD Name: " + databaseName);
         //System.out.println("\tFusion Consensus: " + fusion_consensus);
-        System.out.println("\tnThreads: " + numberOfThreads);
         System.out.println("\tnPGESThreads: " + numberOfRealThreads);
         System.out.println("\tnItInterleaving: " + interleaving);
         System.out.println("-----------------------------------------");
@@ -267,7 +264,7 @@ public class ExperimentBNBuilder {
         BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
         //FileWriter csvWriter = new FileWriter(savePath, true);
         if(file.length() == 0) {
-            String header = "algorithm,network,bbdd,threads,pges_threads,interleaving,seed,SHD,loglike,bdeu,deltaMB,deltaMB+,deltaMB-,iterations,time(s)\n";
+            String header = "algorithm,network,bbdd,threads,cges_threads,interleaving,seed,SHD,loglike,bdeu,deltaMB,deltaMB+,deltaMB-,iterations,time(s)\n";
             csvWriter.append(header);
         }
         csvWriter.append(this.getResults());
@@ -309,7 +306,6 @@ public class ExperimentBNBuilder {
         return  this.algName + ","
                 + this.netName + ","
                 + this.databaseName + ","
-                + this.numberOfThreads + ","
                 + this.numberOfRealThreads + ","
                 + this.interleaving + ","
                 + this.seed + ","
@@ -344,7 +340,7 @@ public class ExperimentBNBuilder {
 
     @Override
     public String toString() {
-        return "-----------------------\nExperiment " + algName + "\n-----------------------\nNet Name: " + netName + "\tDatabase: " + databaseName + "\tThreads: " + numberOfThreads + "\tInterleaving: " + interleaving + "\tMax. Iterations: " + maxIterations;
+        return "-----------------------\nExperiment " + algName + "\n-----------------------\nNet Name: " + netName + "\tDatabase: " + databaseName  + "\tInterleaving: " + interleaving + "\tMax. Iterations: " + maxIterations;
     }
 }
 

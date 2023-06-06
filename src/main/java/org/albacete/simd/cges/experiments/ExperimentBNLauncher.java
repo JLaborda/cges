@@ -15,13 +15,11 @@ public class ExperimentBNLauncher {
     private final String EXPERIMENTS_FOLDER;
     private final int index;
     private final String paramsFileName;
-    private final int threads;
     private ExperimentBNBuilder experiment;
 
-    public ExperimentBNLauncher(int index, String paramsFileName, int threads, String saveFolder){
+    public ExperimentBNLauncher(int index, String paramsFileName, String saveFolder){
         this.index = index;
         this.paramsFileName = paramsFileName;
-        this.threads = threads;
         this.EXPERIMENTS_FOLDER = saveFolder;
     }
 
@@ -51,12 +49,11 @@ public class ExperimentBNLauncher {
             System.out.println("Args " + i + ": " + string);
             i++;
         }
-        int index = Integer.parseInt(args[0]);
-        String paramsFileName = args[1];
-        int threads = Integer.parseInt(args[2]);
-        String saveFolder = args.length == 4 ? args[3] : "results/";
+        String paramsFileName = args[0];
+        int index = Integer.parseInt(args[1]);
+        String saveFolder = args.length == 3 ? args[2] : "results/";
         
-        return new ExperimentBNLauncher(index, paramsFileName, threads, saveFolder);
+        return new ExperimentBNLauncher(index, paramsFileName, saveFolder);
     }
 
     public String[] readParameters() throws Exception {
@@ -78,7 +75,7 @@ public class ExperimentBNLauncher {
 
     private void createExperiment(String[] parameters){
         try {
-            experiment = new ExperimentBNBuilder(parameters, threads);
+            experiment = new ExperimentBNBuilder(parameters);
         } catch (Exception e) {
             System.out.println("Exception when creating the experiment");
             int i=0;
@@ -96,7 +93,7 @@ public class ExperimentBNLauncher {
 
     private boolean checkExistentFile() throws IOException{
         String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + experiment.netName + "_" + experiment.algName + "_" + 
-                experiment.databaseName + "_t" + experiment.numberOfThreads + "_PGESt" + experiment.numberOfRealThreads +
+                experiment.databaseName + "_t" + experiment.numberOfRealThreads + "_PGESt" + experiment.numberOfRealThreads +
                 "_i" + experiment.interleaving + "_s" + experiment.seed + ".csv";
         
         return experiment.checkExistentFile(savePath);
@@ -106,7 +103,7 @@ public class ExperimentBNLauncher {
         String results = experiment.getResults();
 
         String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + experiment.netName + "_" + experiment.algName + "_" + 
-                experiment.databaseName + "_t" + experiment.numberOfThreads + "_PGESt" + experiment.numberOfRealThreads +
+                experiment.databaseName + "_t" + experiment.numberOfRealThreads + "_PGESt" + experiment.numberOfRealThreads +
                 "_i" + experiment.interleaving + "_s" + experiment.seed + ".csv";
         try {
             saveExperiment(savePath, results);
