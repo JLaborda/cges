@@ -6,7 +6,7 @@
 
   <groupId>org.albacete.simd</groupId>
   <artifactId>CGES</artifactId>
-  <version>1.0-EXPERIMENTS-SNAPSHOT</version>
+  <version>1.0</version>
   <packaging>jar</packaging>
   <name>CGES</name>
   <url>http://simd.albacete.org/</url>
@@ -140,9 +140,10 @@
           <version>0.8.6</version>
           <configuration>
             <excludes>
-              <exclude>src/main/java/org/albacete/simd/simulacionRedes/**</exclude>
-              <exclude>src/main/java/org/albacete/simd/experiments/**</exclude>
-              <exclude>src/main/java/consensusBN/**</exclude>
+              <exclude>**/simulacionRedes/**</exclude>
+              <exclude>**/experiments/**</exclude>
+              <exclude>**/consensusBN/**</exclude>
+              <exclude>**/tetrad/**</exclude>
             </excludes>
           </configuration>
           <executions>
