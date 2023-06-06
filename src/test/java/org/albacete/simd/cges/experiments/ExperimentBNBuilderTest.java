@@ -22,21 +22,20 @@ public class ExperimentBNBuilderTest {
 
         Clustering clustering = new RandomClustering();
         BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2");
-        ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH, 42);
+        ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH);
 
         assertNotNull(exp);
         assertEquals(algorithm, exp.getAlgorithm());
         assertEquals("alarm", exp.getNetName());
         assertEquals(Resources.ALARM_NET_PATH, exp.getNetPath());
         assertEquals(Resources.ALARM_BBDD_PATH, exp.getDatabasePath());
-        assertEquals(42, exp.getSeed());
     }
 
     @Test
     public void runExperimentTest() {
         Clustering clustering = new RandomClustering();
         BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2");
-        ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH, 42);
+        ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH);
 
         exp.runExperiment();
 
@@ -53,7 +52,7 @@ public class ExperimentBNBuilderTest {
     public void saveExperimentTest() {
         Clustering clustering = new RandomClustering();
         BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2");
-        ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH, 42);
+        ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH);
 
 
         String savePath = "./src/test/res/testBN.txt";

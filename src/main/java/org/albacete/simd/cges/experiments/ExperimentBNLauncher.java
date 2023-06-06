@@ -94,7 +94,7 @@ public class ExperimentBNLauncher {
     private boolean checkExistentFile() throws IOException{
         String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + experiment.netName + "_" + experiment.algName + "_" + 
                 experiment.databaseName + "_t" + experiment.numberOfRealThreads + "_PGESt" + experiment.numberOfRealThreads +
-                "_i" + experiment.interleaving + "_s" + experiment.seed + ".csv";
+                "_i" + experiment.edgeLimitation + ".csv";
         
         return experiment.checkExistentFile(savePath);
     }
@@ -104,7 +104,7 @@ public class ExperimentBNLauncher {
 
         String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + experiment.netName + "_" + experiment.algName + "_" + 
                 experiment.databaseName + "_t" + experiment.numberOfRealThreads + "_PGESt" + experiment.numberOfRealThreads +
-                "_i" + experiment.interleaving + "_s" + experiment.seed + ".csv";
+                "_i" + experiment.edgeLimitation + ".csv";
         try {
             saveExperiment(savePath, results);
         } catch (IOException e) {

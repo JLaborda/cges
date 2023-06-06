@@ -43,7 +43,7 @@ public class ExperimentBNBuilder {
 
 
     protected int numberOfRealThreads;
-    protected int interleaving;
+    protected int edgeLimitation;
     protected int maxIterations;
     //protected static HashMap<String, HashMap<String,String>> map;
 
@@ -63,7 +63,6 @@ public class ExperimentBNBuilder {
 
     protected String log = "";
     protected String algName;
-    protected long seed = -1;
     private MlBayesIm controlBayesianNetwork;
     public Dag_n resultingBayesianNetwork;
 
@@ -87,14 +86,9 @@ public class ExperimentBNBuilder {
         }
         this.numberOfRealThreads = algorithm.getnThreads();
         this.maxIterations = algorithm.getMaxIterations();
-        this.interleaving = algorithm.getItInterleaving();
+        this.edgeLimitation = algorithm.getItInterleaving();
     }
 
-    public ExperimentBNBuilder(BNBuilder algorithm, String netName, String netPath, String bbddPath, long partition_seed) {
-        this(algorithm, netName, netPath, bbddPath);
-        this.seed = partition_seed;
-        Utils.setSeed(partition_seed);
-    }
 
 
     private void extractParametersForClusterExperiment(String[] parameters){
@@ -112,8 +106,7 @@ public class ExperimentBNBuilder {
         databaseName = getDatabaseNameFromPattern();
 
         numberOfRealThreads = Integer.parseInt(parameters[4]);
-        interleaving = Integer.parseInt(parameters[5]);
-        seed = Integer.parseInt(parameters[6]);
+        edgeLimitation = Integer.parseInt(parameters[5]);
     }
     
     public boolean checkExistentFile(String savePath) throws IOException{
@@ -145,19 +138,20 @@ public class ExperimentBNBuilder {
                 break;
             case "circular_ges_c1":
                 clustering = new HierarchicalClustering();
-                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, interleaving, "c1");
+                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, edgeLimitation, "c1");
                 break;
+            case "cges":
             case "circular_ges_c2":
                 clustering = new HierarchicalClustering();
-                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, interleaving, "c2");
+                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, edgeLimitation, "c2");
                 break;
             case "circular_ges_c3":
                 clustering = new HierarchicalClustering();
-                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, interleaving, "c3");
+                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, edgeLimitation, "c3");
                 break;
             case "circular_ges_c4":
                 clustering = new HierarchicalClustering();
-                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, interleaving, "c4");
+                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, edgeLimitation, "c4");
                 break;
             case "fges":
                 algorithm = new FGES(databasePath, true, false);
@@ -204,7 +198,7 @@ public class ExperimentBNBuilder {
         System.out.println("\tBBDD Name: " + databaseName);
         //System.out.println("\tFusion Consensus: " + fusion_consensus);
         System.out.println("\tnPGESThreads: " + numberOfRealThreads);
-        System.out.println("\tnItInterleaving: " + interleaving);
+        System.out.println("\tnItInterleaving: " + edgeLimitation);
         System.out.println("-----------------------------------------");
 
         System.out.println("Net_path: " + netPath);
@@ -264,7 +258,7 @@ public class ExperimentBNBuilder {
         BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
         //FileWriter csvWriter = new FileWriter(savePath, true);
         if(file.length() == 0) {
-            String header = "algorithm,network,bbdd,threads,cges_threads,interleaving,seed,SHD,loglike,bdeu,deltaMB,deltaMB+,deltaMB-,iterations,time(s)\n";
+            String header = "algorithm,network,dataset,cges_threads,edge_limitation,SHD,bdeu,deltaMB,deltaMB+,deltaMB-,iterations,time(s)\n";
             csvWriter.append(header);
         }
         csvWriter.append(this.getResults());
@@ -294,8 +288,8 @@ public class ExperimentBNBuilder {
         return numberOfIterations;
     }
 
-    public int getInterleaving() {
-        return interleaving;
+    public int getEdgeLimitation() {
+        return edgeLimitation;
     }
 
     public String getAlgName() {
@@ -307,8 +301,7 @@ public class ExperimentBNBuilder {
                 + this.netName + ","
                 + this.databaseName + ","
                 + this.numberOfRealThreads + ","
-                + this.interleaving + ","
-                + this.seed + ","
+                + this.edgeLimitation + ","
                 + this.structuralHamiltonDistanceValue + ","
                 + this.bdeuScore + ","
                 + this.differencesOfMalkovsBlanket[0] + ","
@@ -334,13 +327,10 @@ public class ExperimentBNBuilder {
         return netName;
     }
 
-    public long getSeed() {
-        return seed;
-    }
 
     @Override
     public String toString() {
-        return "-----------------------\nExperiment " + algName + "\n-----------------------\nNet Name: " + netName + "\tDatabase: " + databaseName  + "\tInterleaving: " + interleaving + "\tMax. Iterations: " + maxIterations;
+        return "-----------------------\nExperiment " + algName + "\n-----------------------\nNet Name: " + netName + "\tDatabase: " + databaseName  + "\tInterleaving: " + edgeLimitation + "\tMax. Iterations: " + maxIterations;
     }
 }
 
