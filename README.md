@@ -1,4 +1,4 @@
-![Coninuous Integration](https://github.com/JLaborda/cges/actions/workflows/CI-maven.yml/badge.svg)
+![Coninuous Integration and Deployment](https://github.com/JLaborda/cges/actions/workflows/CI-CD-pipeline.yml/badge.svg)
 [![codecov](https://codecov.io/gh/JLaborda/cges/branch/main/graph/badge.svg?token=C9GeO49RsE)](https://codecov.io/gh/JLaborda/cges)
 
 # CGES
