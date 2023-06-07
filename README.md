@@ -17,6 +17,7 @@ Learning High-Dimensional Bayesian Networks]. The algorithm focuses on structura
 
 ## Introduction
 In this research project, we propose an algorithm, named cGES, for learning Bayesian Networks in high-dimensional domains. The algorithm utilizes a divide-and-conquer approach, parallelism, and fusion techniques to address the challenges associated with structural learning in high-dimensional datasets. The code in this repository implements the cGES algorithm and provides a practical tool for researchers and practitioners interested in Bayesian Network learning.
+![Figura-cges-mejorado](https://github.com/JLaborda/cges/assets/15078416/5c16635d-3ef2-4f46-bb87-4c6863f24cc6)
 
 ## Requirements
 - [Java 8](https://www.oracle.com/java/technologies/java8.html)
