@@ -1,6 +1,7 @@
 package org.albacete.simd.cges.experiments;
 
 import edu.cmu.tetrad.data.DataSet;
+import org.albacete.simd.cges.bnbuilders.CircularDag;
 import org.albacete.simd.cges.clustering.Clustering;
 import org.albacete.simd.cges.clustering.HierarchicalClustering;
 import org.albacete.simd.cges.framework.BNBuilder;
@@ -18,34 +19,27 @@ public class SimpleBNExperiment {
         String networkFolder = "./res/networks/" + net_name + "/";
         String datasetFolder = "./res/datasets/" + net_name + "/";
         String net_path = networkFolder + net_name + ".xbif";
-        String bbdd_path = datasetFolder  + net_name + ".xbif50003_.csv";
+        String bbdd_path = datasetFolder  + net_name + "00.csv";
         DataSet ds = Utils.readData(bbdd_path);
-        //String test_path = networkFolder + "BBDD/tests/" + net_name + "_test.csv";
 
-        // 2. Algorithm
-        //BNBuilder algorithm = new GES_BNBuilder(bbdd_path);
+        // 2. Setting Algorithm
         Clustering clustering = new HierarchicalClustering();
-        //Clustering clustering = new RandomClustering();
+        CGES algorithm = new CGES(ds, clustering, 4, 100000, "c2");
+        algorithm.setBroadcasting(false);
 
-        //BNBuilder algorithm = new PGESwithStages(ds, clustering, 4, 30, 10000, false, true, true);
-        //BNBuilder algorithm = new GES_BNBuilder(ds, true);
-        BNBuilder algorithm = new CGES(ds, clustering, 4, 100000, "c2");
-        //BNBuilder algorithm = new Fges_BNBuilder(ds);
-        //BNBuilder algorithm = new Empty(ds);
-        
-        // Experiment
-        ExperimentBNBuilder experiment = new ExperimentBNBuilder(algorithm, net_name, net_path, bbdd_path);//new ExperimentBNBuilder(algorithm, net_path, bbdd_path, test_path, 42);
-        
+        //3. Create experiment environment
+        ExperimentBNBuilder experiment = new ExperimentBNBuilder(algorithm, net_name, net_path, bbdd_path);
+
+        // 4. Launch Experiment
         System.out.println("Alg Name: " + experiment.getAlgName());
         experiment.runExperiment();
         experiment.printResults();
         String savePath = "results/prueba.txt";
-        
-        /*BDeuScore bdeu = new BDeuScore(ds);
-        Fges fges = new Fges(bdeu);
-        System.out.println("Score FGES: " + fges.scoreDag(experiment.resultingBayesianNetwork));*/
-        
+
+        // 5. Save Experiment
         try {
+            experiment.printResults();
+            System.out.println("Number of times broadcasting fusion is used: " + CircularDag.fusionWinCounter);
             experiment.saveExperiment(savePath);
         } catch (IOException e) {
             e.printStackTrace();

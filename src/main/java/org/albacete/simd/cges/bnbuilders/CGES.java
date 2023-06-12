@@ -1,6 +1,8 @@
 package org.albacete.simd.cges.bnbuilders;
 
+import consensusBN.ConsensusUnion;
 import edu.cmu.tetrad.data.DataSet;
+import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.cges.clustering.Clustering;
@@ -9,11 +11,7 @@ import org.albacete.simd.cges.framework.BNBuilder;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 import org.albacete.simd.cges.threads.BESThread;
 import org.albacete.simd.cges.threads.FESThread;
@@ -25,12 +23,19 @@ public class CGES extends BNBuilder {
     public static final String EXPERIMENTS_FOLDER = "./experiments/";
     private final String typeConvergence;
     
-    private HashMap<Integer, Set<Edge>> subsetEdges;
+    private List<Set<Edge>> subsetEdges;
     private final Clustering clustering;
     private final HashMap<Integer, CircularDag> circularFusionThreadsResults;
     private CircularDag bestDag;
     private double lastBestBDeu = Double.NEGATIVE_INFINITY;
     private boolean convergence;
+
+    private boolean broadcasting = true;
+
+    /**
+     * Resulting fusion from all the graphs of the processes for the current iteration
+     */
+    private Dag_n fusionDag;
 
     
     public CGES(DataSet data, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence) {
@@ -51,10 +56,13 @@ public class CGES extends BNBuilder {
     public Graph search(){
         //1. Setup
         initialConfig();
+
         //2. Do circular fusion while convergence is false
-        do {
-            iteration();
-        } while (!convergence());
+        if (broadcasting) {
+            broadcastingLoop();
+        } else {
+            noBroadcastingLoop();
+        }
 
         //3. Print and return last graph
         printResults();
@@ -74,15 +82,13 @@ public class CGES extends BNBuilder {
         initializeValuesInResultsMap();
     }
 
+    /**
+     * Splits the edges of the problem into the same amount of partitions as threads used for the algorithm.
+     */
     protected void repartition() {
-        // Splitting edges with the clustering algorithm and then adding them to its corresponding index
+        // Splitting edges with the clustering algorithm and assigning them to the subsetEdges attribute.
         clustering.setProblem(this.problem);
-        List<Set<Edge>> subsetEdgesList = clustering.generateEdgeDistribution(nThreads);
-
-        subsetEdges = new HashMap<>(nThreads);
-        for (int i = 0; i < subsetEdgesList.size(); i++) {
-            subsetEdges.put(i, subsetEdgesList.get(i));
-        }
+        subsetEdges = clustering.generateEdgeDistribution(nThreads);
     }
 
     private void initializeValuesInResultsMap(){
@@ -90,27 +96,59 @@ public class CGES extends BNBuilder {
             circularFusionThreadsResults.put(i, new CircularDag(problem,subsetEdges.get(i),nItInterleaving,i));
         }
     }
-    
-    private void iteration() {
-        it++;
-        putInputDags();
-        circularFusionThreadsResults.values().parallelStream().forEach((dag) -> {
-            try {
-                dag.fusionGES();
-            } catch (InterruptedException ex) {
-                System.out.println("Error with InterruptedException: " +
-                        "\n Dag_n Id: " + dag.id +
-                        "\n Dag_n graph: " + dag.dag);
-            }
-        });
+
+    private void noBroadcastingLoop(){
+        do{
+            it++;
+            putInputGraphs();
+            circularFusionThreadsResults.values().parallelStream().forEach((dag) -> {
+                try {
+                    // Applying cges process
+                    dag.fusionGES();
+                } catch (InterruptedException ex) {
+                    System.out.println("Error with InterruptedException: " +
+                            "\n Dag_n Id: " + dag.id +
+                            "\n Dag_n graph: " + dag.dag);
+                }
+            });
+        } while (!convergence());
+    }
+
+    private void broadcastingLoop() {
+        do{
+            it++;
+            putInputGraphs();
+            fuseAllInputDags();
+            circularFusionThreadsResults.values().parallelStream().forEach((dag) -> {
+                try {
+                    //Broadcasting
+                    dag.setAllFusedDag(this.fusionDag);
+                    // Applying cges process
+                    dag.fusionGES();
+                } catch (InterruptedException ex) {
+                    System.out.println("Error with InterruptedException: " +
+                            "\n Dag_n Id: " + dag.id +
+                            "\n Dag_n graph: " + dag.dag);
+                }
+            });
+        } while (!convergence());
     }
     
-    private void putInputDags() {
-        circularFusionThreadsResults.values().stream().forEach((dag) -> {
+    private void putInputGraphs() {
+        circularFusionThreadsResults.values().forEach((dag) -> {
             CircularDag cd = getInputDag(dag.id);
             dag.setInputDag(cd.dag);
         });
-        
+    }
+
+    private void fuseAllInputDags(){
+        ArrayList<Dag_n> graphs = new ArrayList<>();
+        for (CircularDag cdag: circularFusionThreadsResults.values()) {
+            graphs.add(cdag.dag);
+        }
+
+        ConsensusUnion fusion = new ConsensusUnion(graphs);
+        this.fusionDag = fusion.union();
     }
 
     private CircularDag getInputDag(int i) {
@@ -122,9 +160,7 @@ public class CGES extends BNBuilder {
     }
 
     public void calculateBestGraph(){
-        circularFusionThreadsResults.values().forEach((dag) -> {
-            calculateBestGraph(dag);
-        });
+        circularFusionThreadsResults.values().forEach(this::calculateBestGraph);
     }
     
     public void calculateBestGraph(CircularDag dag){
@@ -138,7 +174,7 @@ public class CGES extends BNBuilder {
 
     private boolean convergence() {
         switch (typeConvergence) {
-            // When any DAG changues in the iteration
+            // When any DAG changes in the iteration, there is no convergence
             case "c1":
             default:
                 convergence = true;
@@ -149,7 +185,7 @@ public class CGES extends BNBuilder {
                 
                 return convergence;
                 
-            // When any DAG improves the previous best DAG
+            // When any DAG improves the previous best DAG, there is no convergence
             case "c2":
                 calculateBestGraph();
 
@@ -196,4 +232,11 @@ public class CGES extends BNBuilder {
         } catch (IOException ex) {}
     }
 
+    public boolean isBroadcasting() {
+        return broadcasting;
+    }
+
+    public void setBroadcasting(boolean broadcasting) {
+        this.broadcasting = broadcasting;
+    }
 }

@@ -28,6 +28,11 @@ public class CircularDag {
     private final int nItInterleaving;
     
     private Dag_n inputDag;
+
+    private Dag_n allFusedDag = null;
+
+    public static int fusionWinCounter = 0;
+
     
     public static final String EXPERIMENTS_FOLDER = "./experiments/";
 
@@ -56,6 +61,9 @@ public class CircularDag {
         
         // 5. GES Stage
         applyGES();
+
+        // 6. Checking if there is broadcasting
+        checkBroadcasting();
 
         // 6. Update bdeu value
         updateResults();
@@ -119,6 +127,29 @@ public class CircularDag {
         pdagToDag(besGraph);
         return new Dag_n(besGraph);
     }
+
+    /**
+     * Checking which graph is better. The one from the cges or the one from the allFused graph.
+     */
+    private void checkBroadcasting(){
+        //Checking if there is broadcasting
+        if(allFusedDag == null)
+            return;
+        // Calculating scores
+        double bdeuCDAG = GESThread.scoreGraph(dag, problem);
+        double bdeuAllFusedDag = GESThread.scoreGraph(allFusedDag, problem);
+
+        // Changing dag to the best dag
+        if(bdeuAllFusedDag > bdeuCDAG){
+            this.dag = new Dag_n(allFusedDag);
+            incrementFusionWinCounter();
+        }
+
+    }
+
+    public synchronized void incrementFusionWinCounter(){
+        fusionWinCounter++;
+    }
     
     private void updateResults() {
         bdeu = GESThread.scoreGraph(dag, problem);
@@ -135,5 +166,9 @@ public class CircularDag {
 
     public void setInputDag(Dag_n inputDag) {
         this.inputDag = inputDag;
+    }
+
+    public void setAllFusedDag(Dag_n allFusedDag) {
+        this.allFusedDag = allFusedDag;
     }
 }

@@ -40,15 +40,15 @@ docker build -t cges .
 1. [Instructions for how to use the code]
 2. [Description of input/output formats]
 The parameters you need to provide to either the jar file, or to the docker container are: 
-   1. The path to the file with the parameters you want your experiments to execute. This file needs to have the following information in each line:
-   2. The number of line or index of the experiment you want to run.
-   3. The index (number of line - 1) of the file for which the experiment will be executed.
+   1. The path to the file with the parameters you want your experiments to execute.
+   2. The index (number of line - 1) of the file for which the experiment will be executed.
+   3. (Optional) 
    The parameter file needs to have the following information separated by a blank space in each line:
 
    ```
    algorithm_name net_name net_path dataset_path number_cges_threads edge_limitation random_seed 
    ```
-   You have at your disposal a file of parameters for the networks andes, link and munin in the './res/parameters/' folder. Feel free to modify use it as you wish to run any experiment you wish.
+   You have at your disposal a file of parameters for the networks andes, link and munin in the './res/parameters/' folder. Feel free to modify it as you wish to run any experiment you want.
 
    You can run any experiment by using these sentences and
    ```
@@ -68,7 +68,7 @@ The parameters you need to provide to either the jar file, or to the docker cont
 **Docker Container**
    ```
    docker build -t cges .
-   docker run cges ./res/parameters/andes_parameters.txt 2 ./MyResults.txt
+   docker run -v $(pwd)/res:/res -v $(pwd)/results:/results --rm cges /res/parameters/andes_parameters.txt 2 results/myResults.csv
    ```
 
 ## Contributing
