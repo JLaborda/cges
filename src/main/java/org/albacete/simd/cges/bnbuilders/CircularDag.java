@@ -176,7 +176,7 @@ public class CircularDag {
         dag = transformPDAGtoDAG(bes.getCurrentGraph());
     }
 
-    private Dag_n transformPDAGtoDAG(Graph besGraph) {
+    public static Dag_n transformPDAGtoDAG(Graph besGraph) {
         pdagToDag(besGraph);
         return new Dag_n(besGraph);
     }

@@ -3,6 +3,8 @@ package org.albacete.simd.cges.framework;
 import consensusBN.ConsensusUnion;
 import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Graph;
+import org.albacete.simd.cges.bnbuilders.CircularDag;
+import org.albacete.simd.cges.threads.BESThread;
 import org.albacete.simd.cges.threads.GESThread;
 import org.albacete.simd.cges.utils.Problem;
 
@@ -20,7 +22,7 @@ public class PairCombinedFusion extends FusionStage{
     @Override
     public Dag_n fusion() throws InterruptedException {
 
-        return graphs.parallelStream()
+        Dag_n result = graphs.parallelStream()
                 // Apply a fusion to each pair of dags.
                 .map(dag -> {
                     ArrayList<Dag_n> pairDags = new ArrayList<>();
@@ -37,6 +39,15 @@ public class PairCombinedFusion extends FusionStage{
                     else
                         return dag2;
                 })).orElse(null);
+
+        if(result == null)
+            return null;
+        // Do the BESThread to complete the GES of the fusion
+        BESThread bes = new BESThread(problem, result, result.getEdges());
+        bes.run();
+
+        return CircularDag.transformPDAGtoDAG(bes.getCurrentGraph());
+
     }
 
 }
