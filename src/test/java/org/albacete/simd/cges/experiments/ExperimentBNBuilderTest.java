@@ -5,7 +5,6 @@ import org.albacete.simd.cges.bnbuilders.CGES;
 import org.albacete.simd.cges.clustering.Clustering;
 import org.albacete.simd.cges.clustering.RandomClustering;
 import org.albacete.simd.cges.framework.BNBuilder;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -21,7 +20,7 @@ public class ExperimentBNBuilderTest {
     public void experimentsConstructorTest() {
 
         Clustering clustering = new RandomClustering();
-        BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2");
+        BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2", CGES.Broadcasting.NO_BROADCASTING);
         ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH);
 
         assertNotNull(exp);
@@ -34,7 +33,7 @@ public class ExperimentBNBuilderTest {
     @Test
     public void runExperimentTest() {
         Clustering clustering = new RandomClustering();
-        BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2");
+        BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2", CGES.Broadcasting.NO_BROADCASTING);
         ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH);
 
         exp.runExperiment();
@@ -51,7 +50,7 @@ public class ExperimentBNBuilderTest {
     @Test
     public void saveExperimentTest() {
         Clustering clustering = new RandomClustering();
-        BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2");
+        BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2", CGES.Broadcasting.NO_BROADCASTING);
         ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH);
 
 

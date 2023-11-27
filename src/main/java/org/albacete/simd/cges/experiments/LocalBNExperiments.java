@@ -83,19 +83,19 @@ public class LocalBNExperiments {
 
                 case "circular_ges_c1":
                     clustering = new HierarchicalClustering();
-                    algorithm = new CGES(bbdd_path, clustering, numberOfPGESThreads, interleaving, "c1");
+                    algorithm = new CGES(bbdd_path, clustering, numberOfPGESThreads, interleaving, "c1", CGES.Broadcasting.NO_BROADCASTING);
                     break;
                 case "circular_ges_c2":
                     clustering = new HierarchicalClustering();
-                    algorithm = new CGES(bbdd_path, clustering, numberOfPGESThreads, interleaving, "c2");
+                    algorithm = new CGES(bbdd_path, clustering, numberOfPGESThreads, interleaving, "c2", CGES.Broadcasting.NO_BROADCASTING);
                     break;
                 case "circular_ges_c3":
                     clustering = new HierarchicalClustering();
-                    algorithm = new CGES(bbdd_path, clustering, numberOfPGESThreads, interleaving, "c3");
+                    algorithm = new CGES(bbdd_path, clustering, numberOfPGESThreads, interleaving, "c3", CGES.Broadcasting.NO_BROADCASTING);
                     break;
                 case "circular_ges_c4":
                     clustering = new HierarchicalClustering();
-                    algorithm = new CGES(bbdd_path, clustering, numberOfPGESThreads, interleaving, "c4");
+                    algorithm = new CGES(bbdd_path, clustering, numberOfPGESThreads, interleaving, "c4", CGES.Broadcasting.NO_BROADCASTING);
                     break;
 
 

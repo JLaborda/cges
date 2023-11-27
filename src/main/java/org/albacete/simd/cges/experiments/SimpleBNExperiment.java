@@ -24,8 +24,7 @@ public class SimpleBNExperiment {
 
         // 2. Setting Algorithm
         Clustering clustering = new HierarchicalClustering();
-        CGES algorithm = new CGES(ds, clustering, 4, 100000, "c2");
-        algorithm.setBroadcasting(false);
+        CGES algorithm = new CGES(ds, clustering, 4, 100000, "c2", CGES.Broadcasting.PAIR_BROADCASTING);
 
         //3. Create experiment environment
         ExperimentBNBuilder experiment = new ExperimentBNBuilder(algorithm, net_name, net_path, bbdd_path);

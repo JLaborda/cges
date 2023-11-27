@@ -4,6 +4,7 @@ import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.cges.framework.FESFusion;
+import org.albacete.simd.cges.framework.PairCombinedFusion;
 import org.albacete.simd.cges.threads.BESThread;
 import org.albacete.simd.cges.threads.FESThread;
 import org.albacete.simd.cges.threads.GESThread;
@@ -13,6 +14,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import static org.albacete.simd.cges.utils.Utils.pdagToDag;
 
@@ -26,8 +28,13 @@ public class CircularDag {
     private final Problem problem;
     private final Set<Edge> subsetEdges;
     private final int nItInterleaving;
-    
+
+    /**
+     * Input Dag used in the original implementation of CGES. This is the graph that comes from the previous process.
+     */
     private Dag_n inputDag;
+
+    private ArrayList<Dag_n> inputDags;
 
     private Dag_n allFusedDag = null;
 
@@ -44,8 +51,7 @@ public class CircularDag {
         this.dag = new Dag_n(problem.getVariables());
     }
 
-    public void fusionGES() throws InterruptedException {
-
+    public void noBroadcastingSearch() throws InterruptedException {
         // Setup
         // 1. Update bdeu and convergence variables
         setup();
@@ -62,15 +68,62 @@ public class CircularDag {
         // 5. GES Stage
         applyGES();
 
-        // 6. Checking if there is broadcasting
-        checkBroadcasting();
-
         // 6. Update bdeu value
         updateResults();
 
         // 7. Convergence
         checkConvergence();
     }
+
+    public void allFusedBroadcastingSearch() throws InterruptedException{
+        // Setup
+        // 1. Update bdeu and convergence variables
+        setup();
+
+        // 2. Check if the input dag is empty
+        if (!inputDag.getEdges().isEmpty()) {
+            // 3. Merge dags into an arraylist
+            ArrayList<Dag_n> dags = mergeBothDags(inputDag);
+
+            // 4. FES Fusion (Consensus Fusion + FES)
+            applyFESFusion(dags);
+        }
+
+        // 5. GES Stage
+        applyGES();
+
+        // 6. Checking if there is broadcasting
+        checkBroadcasting();
+
+        // 7. Update bdeu value
+        updateResults();
+
+        // 8. Convergence
+        checkConvergence();
+    }
+
+    public void pairBroadcastSearch() throws InterruptedException {
+        // 1. Update bdeu and restart convergence flag.
+        setup();
+
+        // 2. Check if there are input dags
+        if(!this.inputDags.isEmpty()){
+            //3. Apply pairCombinedFusion
+            PairCombinedFusion pairCombinedFusion = new PairCombinedFusion(problem, this.dag, inputDags);
+            dag = pairCombinedFusion.fusion();
+
+        }
+        //4. Apply GES Stage
+        applyGES();
+
+        // 6. Update bdeu value
+        updateResults();
+
+        // 7. Convergence
+        checkConvergence();
+
+    }
+
     
     private void setup() {
         lastBdeu = bdeu;
@@ -170,5 +223,9 @@ public class CircularDag {
 
     public void setAllFusedDag(Dag_n allFusedDag) {
         this.allFusedDag = allFusedDag;
+    }
+
+    public void setInputDags(ArrayList<Dag_n> inputDags) {
+        this.inputDags = inputDags;
     }
 }

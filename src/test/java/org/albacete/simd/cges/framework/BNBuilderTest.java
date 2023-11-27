@@ -7,7 +7,6 @@ import org.albacete.simd.cges.clustering.Clustering;
 import org.albacete.simd.cges.clustering.RandomClustering;
 import org.albacete.simd.cges.utils.Problem;
 import org.albacete.simd.cges.utils.Utils;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Set;
@@ -21,7 +20,7 @@ public class BNBuilderTest {
     public void settersAndGettersTest(){
         String path = Resources.CANCER_BBDD_PATH;
         Clustering clustering = new RandomClustering();
-        BNBuilder algorithm = new CGES(path, clustering, 4, 100000, "c2");
+        BNBuilder algorithm = new CGES(path, clustering, 4, 100000, "c2", CGES.Broadcasting.NO_BROADCASTING);
         Problem problem = algorithm.getProblem();
         Set<Edge> arcs = Utils.calculateArcs(problem.getData());
 

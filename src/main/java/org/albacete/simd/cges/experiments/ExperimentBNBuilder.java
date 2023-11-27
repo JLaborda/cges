@@ -138,20 +138,20 @@ public class ExperimentBNBuilder {
                 break;
             case "circular_ges_c1":
                 clustering = new HierarchicalClustering();
-                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, edgeLimitation, "c1");
+                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, edgeLimitation, "c1", CGES.Broadcasting.NO_BROADCASTING);
                 break;
             case "cges":
             case "circular_ges_c2":
                 clustering = new HierarchicalClustering();
-                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, edgeLimitation, "c2");
+                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, edgeLimitation, "c2", CGES.Broadcasting.NO_BROADCASTING);
                 break;
             case "circular_ges_c3":
                 clustering = new HierarchicalClustering();
-                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, edgeLimitation, "c3");
+                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, edgeLimitation, "c3", CGES.Broadcasting.NO_BROADCASTING);
                 break;
             case "circular_ges_c4":
                 clustering = new HierarchicalClustering();
-                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, edgeLimitation, "c4");
+                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, edgeLimitation, "c4", CGES.Broadcasting.NO_BROADCASTING);
                 break;
             case "fges":
                 algorithm = new FGES(databasePath, true, false);

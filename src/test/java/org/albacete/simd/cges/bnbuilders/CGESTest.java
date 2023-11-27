@@ -1,11 +1,9 @@
 package org.albacete.simd.cges.bnbuilders;
 
-import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.cges.Resources;
 import org.albacete.simd.cges.clustering.Clustering;
 import org.albacete.simd.cges.clustering.HierarchicalClustering;
-import org.albacete.simd.cges.utils.Utils;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -17,7 +15,7 @@ public class CGESTest {
         Clustering clustering = new HierarchicalClustering();
         int nThreads = 4;
         int nItInterleaving = 100000;
-        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, nItInterleaving, "c1");
+        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, nItInterleaving, "c1", CGES.Broadcasting.NO_BROADCASTING);
 
         // Execute the search() method
         Graph result = builder.search();
@@ -32,7 +30,7 @@ public class CGESTest {
         Clustering clustering = new HierarchicalClustering();
         int nThreads = 4;
         int nItInterleaving = 100000;
-        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, nItInterleaving, "c2");
+        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, nItInterleaving, "c2", CGES.Broadcasting.NO_BROADCASTING);
 
         // Execute the search() method
         Graph result = builder.search();

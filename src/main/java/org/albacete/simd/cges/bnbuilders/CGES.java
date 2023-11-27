@@ -25,30 +25,27 @@ public class CGES extends BNBuilder {
     
     private List<Set<Edge>> subsetEdges;
     private final Clustering clustering;
-    private final HashMap<Integer, CircularDag> circularFusionThreadsResults;
+    private final List<CircularDag> cgesProcesses;
     private CircularDag bestDag;
     private double lastBestBDeu = Double.NEGATIVE_INFINITY;
     private boolean convergence;
 
-    private boolean broadcasting = true;
+    public enum Broadcasting {NO_BROADCASTING, PAIR_BROADCASTING, ALL_BROADCASTING};
 
-    /**
-     * Resulting fusion from all the graphs of the processes for the current iteration
-     */
-    private Dag_n fusionDag;
-
+    private Broadcasting typeBroadcasting;
     
-    public CGES(DataSet data, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence) {
+    public CGES(DataSet data, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence, Broadcasting typeBroadcasting) {
         super(data, nThreads, -1, nItInterleaving);
 
         this.clustering = clustering;
         clustering.setProblem(problem);
-        this.circularFusionThreadsResults = new HashMap<>(nThreads);
+        this.cgesProcesses = new ArrayList<>(nThreads);
         this.typeConvergence = typeConvergence;
+        this.typeBroadcasting = typeBroadcasting;
     }
 
-    public CGES(String path, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence) {
-        this(Utils.readData(path), clustering, nThreads, nItInterleaving, typeConvergence);
+    public CGES(String path, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence, Broadcasting typeBroadcasting) {
+        this(Utils.readData(path), clustering, nThreads, nItInterleaving, typeConvergence, typeBroadcasting);
     }
     
     
@@ -58,14 +55,23 @@ public class CGES extends BNBuilder {
         initialConfig();
 
         //2. Do circular fusion while convergence is false
-        if (broadcasting) {
-            broadcastingLoop();
-        } else {
-            noBroadcastingLoop();
-        }
+         switch(typeBroadcasting) {
+             case NO_BROADCASTING:
+                 this.noBroadcastingSearch();
+                 break;
+             case PAIR_BROADCASTING:
+                 this.pairBroadcastingSearch();
+                 break;
+             case ALL_BROADCASTING:
+                 this.allBroadcastingSearch();
+                 break;
+             default:
+                 System.out.println("Unknown broadcasting type. Ending program");
+                 return null;
+         }
 
         //3. Print and return last graph
-        printResults();
+        //printResults();
         calculateBestGraph();
         currentGraph = bestDag.dag;
         
@@ -79,7 +85,7 @@ public class CGES extends BNBuilder {
     protected void initialConfig() {
         it = 0;
         repartition();
-        initializeValuesInResultsMap();
+        initializeThreads();
     }
 
     /**
@@ -91,76 +97,126 @@ public class CGES extends BNBuilder {
         subsetEdges = clustering.generateEdgeDistribution(nThreads);
     }
 
-    private void initializeValuesInResultsMap(){
+    /**
+     * Initializes each CGES process with a starting empty graph
+     */
+    private void initializeThreads(){
         for (int i = 0; i < nThreads; i++) {
-            circularFusionThreadsResults.put(i, new CircularDag(problem,subsetEdges.get(i),nItInterleaving,i));
+            cgesProcesses.add(new CircularDag(problem,subsetEdges.get(i),nItInterleaving,i));
         }
     }
 
-    private void noBroadcastingLoop(){
+    /**
+     * This search loop fuses all the results of the CGES processes of the previous iteration, and passes it to processes
+     * to compare the results of the process with the fusion of all the previous graphs. It then takes as result the best
+     * of the two graphs, replacing the result of the CGES process with the fusion graph if it has a better score than the
+     * original result of the process.
+     */
+    private void allBroadcastingSearch() {
         do{
             it++;
             putInputGraphs();
-            circularFusionThreadsResults.values().parallelStream().forEach((dag) -> {
+            Dag_n fusionDag = fuseAllInputDags();
+            cgesProcesses.parallelStream().forEach((cdag) -> {
                 try {
+                    //Broadcasting
+                    cdag.setAllFusedDag(fusionDag);
                     // Applying cges process
-                    dag.fusionGES();
+                    cdag.allFusedBroadcastingSearch();
                 } catch (InterruptedException ex) {
                     System.out.println("Error with InterruptedException: " +
-                            "\n Dag_n Id: " + dag.id +
-                            "\n Dag_n graph: " + dag.dag);
+                            "\n Dag_n Id: " + cdag.id +
+                            "\n Dag_n graph: " + cdag.dag);
                 }
             });
         } while (!convergence());
     }
 
-    private void broadcastingLoop() {
-        do{
-            it++;
-            putInputGraphs();
-            fuseAllInputDags();
-            circularFusionThreadsResults.values().parallelStream().forEach((dag) -> {
-                try {
-                    //Broadcasting
-                    dag.setAllFusedDag(this.fusionDag);
-                    // Applying cges process
-                    dag.fusionGES();
-                } catch (InterruptedException ex) {
-                    System.out.println("Error with InterruptedException: " +
-                            "\n Dag_n Id: " + dag.id +
-                            "\n Dag_n graph: " + dag.dag);
-                }
-            });
-        } while (!convergence());
-    }
-    
     private void putInputGraphs() {
-        circularFusionThreadsResults.values().forEach((dag) -> {
+        cgesProcesses.forEach((dag) -> {
             CircularDag cd = getInputDag(dag.id);
             dag.setInputDag(cd.dag);
         });
     }
 
-    private void fuseAllInputDags(){
+    private Dag_n fuseAllInputDags(){
         ArrayList<Dag_n> graphs = new ArrayList<>();
-        for (CircularDag cdag: circularFusionThreadsResults.values()) {
+        for (CircularDag cdag: cgesProcesses) {
             graphs.add(cdag.dag);
         }
 
         ConsensusUnion fusion = new ConsensusUnion(graphs);
-        this.fusionDag = fusion.union();
+        return fusion.union();
     }
+
+    /**
+     * Search loop that executes in parallel k processes of CGES processes. It only takes into account the results
+     * of the CGES processes to pass to the posterior process, performing a cycle.
+     */
+    private void noBroadcastingSearch(){
+        do{
+            it++;
+            putInputGraphs();
+            cgesProcesses.parallelStream().forEach((cdag) -> {
+                try {
+                    // Applying cges process
+                    cdag.noBroadcastingSearch();
+                } catch (InterruptedException ex) {
+                    System.out.println("Error with InterruptedException: " +
+                            "\n Dag_n Id: " + cdag.id +
+                            "\n Dag_n graph: " + cdag.dag);
+                }
+            });
+        } while (!convergence());
+    }
+
+    private void pairBroadcastingSearch(){
+        do{
+            it++;
+            // Add inputDag List
+            addInputDagList();
+            cgesProcesses.parallelStream().forEach(cdag -> {
+                try {
+                    cdag.pairBroadcastSearch();
+                } catch (InterruptedException e) {
+                    System.out.println("Error with InterruptedException: " +
+                    "\n Dag_n Id: " + cdag.id +
+                    "\n Dag_n graph: " + cdag.dag);
+                    throw new RuntimeException(e);
+                }
+            });
+
+
+
+        }while(!convergence());
+    }
+
+    private void addInputDagList() {
+        ArrayList<Dag_n> inputDags = getInputDags();
+        cgesProcesses.forEach((cges) -> {
+            cges.setInputDags(inputDags);
+        });
+    }
+
+    private ArrayList<Dag_n> getInputDags() {
+        ArrayList<Dag_n> dags = new ArrayList<>(cgesProcesses.size());
+        for (CircularDag cges: cgesProcesses) {
+            dags.add(new Dag_n(cges.dag));
+        }
+        return dags;
+    }
+
 
     private CircularDag getInputDag(int i) {
         if(i == 0) {
-            return circularFusionThreadsResults.get(nThreads - 1);
+            return cgesProcesses.get(nThreads - 1);
         } else {
-            return circularFusionThreadsResults.get(i - 1);
+            return cgesProcesses.get(i - 1);
         }
     }
 
     public void calculateBestGraph(){
-        circularFusionThreadsResults.values().forEach(this::calculateBestGraph);
+        cgesProcesses.forEach(this::calculateBestGraph);
     }
     
     public void calculateBestGraph(CircularDag dag){
@@ -179,7 +235,7 @@ public class CGES extends BNBuilder {
             default:
                 convergence = true;
                 
-                circularFusionThreadsResults.values().forEach((dag) -> {
+                cgesProcesses.forEach((dag) -> {
                     convergence = convergence && dag.convergence;
                 });
                 
@@ -232,11 +288,11 @@ public class CGES extends BNBuilder {
         } catch (IOException ex) {}
     }
 
-    public boolean isBroadcasting() {
-        return broadcasting;
+    public Broadcasting getTypeBroadcasting() {
+        return typeBroadcasting;
     }
 
-    public void setBroadcasting(boolean broadcasting) {
-        this.broadcasting = broadcasting;
+    public void setTypeBroadcasting(Broadcasting typeBroadcasting) {
+        this.typeBroadcasting = typeBroadcasting;
     }
 }
