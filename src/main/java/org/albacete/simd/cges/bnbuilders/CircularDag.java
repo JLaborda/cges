@@ -40,8 +40,9 @@ public class CircularDag {
 
     public static int fusionWinCounter = 0;
 
-    
     public static final String EXPERIMENTS_FOLDER = "./experiments/";
+
+    public static boolean saveStages = false;
 
     public CircularDag(Problem problem, Set<Edge> subsetEdges, int nItInterleaving, int id) {
         this.id = id;
@@ -55,7 +56,7 @@ public class CircularDag {
         // Setup
         // 1. Update bdeu and convergence variables
         setup();
-        
+
         // 2. Check if the input dag is empty
         if (!inputDag.getEdges().isEmpty()) {
             // 3. Merge dags into an arraylist
@@ -106,22 +107,18 @@ public class CircularDag {
         // 1. Update bdeu and restart convergence flag.
         setup();
 
-        // 2. Check if there are input dags
-        if(!this.inputDags.isEmpty()){
-            //3. Apply pairCombinedFusion
-            PairCombinedFusion pairCombinedFusion = new PairCombinedFusion(problem, this.dag, inputDags);
-            dag = pairCombinedFusion.fusion();
+        //2. Apply pairCombinedFusion
+        PairCombinedFusion pairCombinedFusion = new PairCombinedFusion(problem, this.dag, inputDags);
+        dag = pairCombinedFusion.fusion();
 
-        }
-        //4. Apply GES Stage
+        //3. Apply GES Stage
         applyGES();
 
-        // 6. Update bdeu value
+        // 4. Update bdeu value
         updateResults();
 
-        // 7. Convergence
+        // 5. Convergence
         checkConvergence();
-
     }
 
     
@@ -150,6 +147,8 @@ public class CircularDag {
     }
 
     private void printResults(int id, String stage, double BDeu) {
+        if(!saveStages)
+            return;
         String savePath = EXPERIMENTS_FOLDER + "temp_" + id + ".csv";
         File file = new File(savePath);
         FileWriter csvWriter = null;
@@ -158,6 +157,7 @@ public class CircularDag {
             csvWriter.append(id + "," + stage + "," + BDeu + "\n");
             csvWriter.flush();
         } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -185,9 +185,6 @@ public class CircularDag {
      * Checking which graph is better. The one from the cges or the one from the allFused graph.
      */
     private void checkBroadcasting(){
-        //Checking if there is broadcasting
-        if(allFusedDag == null)
-            return;
         // Calculating scores
         double bdeuCDAG = GESThread.scoreGraph(dag, problem);
         double bdeuAllFusedDag = GESThread.scoreGraph(allFusedDag, problem);
