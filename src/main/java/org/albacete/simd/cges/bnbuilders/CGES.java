@@ -8,9 +8,6 @@ import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.cges.clustering.Clustering;
 import org.albacete.simd.cges.framework.BNBuilder;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 
 import org.albacete.simd.cges.threads.BESThread;
@@ -20,7 +17,6 @@ import org.albacete.simd.cges.utils.Utils;
 
 public class CGES extends BNBuilder {
     
-    public static final String EXPERIMENTS_FOLDER = "./experiments/";
     private final String typeConvergence;
     
     private List<Set<Edge>> subsetEdges;
@@ -30,9 +26,9 @@ public class CGES extends BNBuilder {
     private double lastBestBDeu = Double.NEGATIVE_INFINITY;
     private boolean convergence;
 
-    public enum Broadcasting {NO_BROADCASTING, PAIR_BROADCASTING, ALL_BROADCASTING};
+    public enum Broadcasting {NO_BROADCASTING, PAIR_BROADCASTING, ALL_BROADCASTING}
 
-    private Broadcasting typeBroadcasting;
+    private final Broadcasting typeBroadcasting;
     
     public CGES(DataSet data, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence, Broadcasting typeBroadcasting) {
         super(data, nThreads, -1, nItInterleaving);
@@ -42,6 +38,8 @@ public class CGES extends BNBuilder {
         this.cgesProcesses = new ArrayList<>(nThreads);
         this.typeConvergence = typeConvergence;
         this.typeBroadcasting = typeBroadcasting;
+        setHyperparamsHeader("clustering,nThreads,interleaving,typeConvergence,typeBroadcasting");
+        setHyperparamsBody(clustering.getClass().getSimpleName() + "," + nThreads + "," + nItInterleaving + "," + typeConvergence + "," + typeBroadcasting);
     }
 
     public CGES(String path, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence, Broadcasting typeBroadcasting) {
@@ -65,9 +63,6 @@ public class CGES extends BNBuilder {
              case ALL_BROADCASTING:
                  this.allBroadcastingSearch();
                  break;
-             default:
-                 System.out.println("Unknown broadcasting type. Ending program");
-                 return null;
          }
 
         //3. Print and return last graph
@@ -129,7 +124,7 @@ public class CGES extends BNBuilder {
                             "\n Dag_n graph: " + cdag.dag);
                 }
             });
-        } while (!convergence());
+        } while (notConverged());
     }
 
     private void putInputGraphs() {
@@ -167,7 +162,7 @@ public class CGES extends BNBuilder {
                             "\n Dag_n graph: " + cdag.dag);
                 }
             });
-        } while (!convergence());
+        } while (notConverged());
     }
 
     private void pairBroadcastingSearch(){
@@ -188,14 +183,12 @@ public class CGES extends BNBuilder {
 
 
 
-        }while(!convergence());
+        }while(notConverged());
     }
 
     private void addInputDagList() {
         ArrayList<Dag_n> inputDags = getInputDags();
-        cgesProcesses.forEach((cges) -> {
-            cges.setInputDags(inputDags);
-        });
+        cgesProcesses.forEach(cges -> cges.setInputDags(inputDags));
     }
 
     private ArrayList<Dag_n> getInputDags() {
@@ -228,18 +221,20 @@ public class CGES extends BNBuilder {
         }
     }
 
-    private boolean convergence() {
+    /**
+     * Returns true when the search loop can continue (not converged), false otherwise.
+     * @return boolean value stating if the search loop can continue (true) or not (false).
+     */
+    private boolean notConverged() {
         switch (typeConvergence) {
             // When any DAG changes in the iteration, there is no convergence
             case "c1":
             default:
                 convergence = true;
                 
-                cgesProcesses.forEach((dag) -> {
-                    convergence = convergence && dag.convergence;
-                });
+                cgesProcesses.forEach(dag -> convergence = convergence && dag.convergence);
                 
-                return convergence;
+                return !convergence;
                 
             // When any DAG improves the previous best DAG, there is no convergence
             case "c2":
@@ -249,7 +244,7 @@ public class CGES extends BNBuilder {
                 
                 lastBestBDeu = bestDag.getBDeu();
                         
-                return max;
+                return !max;
         }
     }
     
@@ -264,35 +259,10 @@ public class CGES extends BNBuilder {
             currentGraph = bes.getCurrentGraph();
             score = bes.getScoreBDeu();
             currentGraph = Utils.removeInconsistencies(currentGraph);
-        } catch (InterruptedException ex) {}
-    }
-    
-    public void printResults() {
-        String savePath = EXPERIMENTS_FOLDER + "results.csv";
-        File file = new File(savePath);
-        FileWriter csvWriter = null;
-        try {
-            csvWriter = new FileWriter(file,true);
-            csvWriter.append("id,stage,BDeu\n");
-            
-            for (int i = 0; i < nThreads; i++) {
-                File doc = new File(EXPERIMENTS_FOLDER + "temp_" + i + ".csv");
-                Scanner obj = new Scanner(doc);
-
-                while (obj.hasNextLine()) {
-                    csvWriter.append(obj.nextLine() + "\n");
-                }
-            }
-
-            csvWriter.flush();
-        } catch (IOException ex) {}
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+            System.out.println("Error in FinalGES step");
+        }
     }
 
-    public Broadcasting getTypeBroadcasting() {
-        return typeBroadcasting;
-    }
-
-    public void setTypeBroadcasting(Broadcasting typeBroadcasting) {
-        this.typeBroadcasting = typeBroadcasting;
-    }
 }

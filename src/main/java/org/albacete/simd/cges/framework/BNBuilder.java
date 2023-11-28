@@ -96,6 +96,9 @@ public abstract class BNBuilder {
      */
     protected Set<Edge> setOfArcs;
 
+    private String hyperparamsBody;
+
+    private String hyperparamsHeader;
 
 
     public BNBuilder(DataSet data, int nThreads, int maxIterations, int nItInterleaving){
@@ -271,6 +274,22 @@ public abstract class BNBuilder {
         return nItInterleaving;
     }
 
+
+    public String getHyperparamsBody() {
+        return hyperparamsBody;
+    }
+
+    public void setHyperparamsBody(String hyperparamsBody) {
+        this.hyperparamsBody = hyperparamsBody;
+    }
+
+    public String getHyperparamsHeader() {
+        return hyperparamsHeader;
+    }
+
+    public void setHyperparamsHeader(String hyperparamsHeader) {
+        this.hyperparamsHeader = hyperparamsHeader;
+    }
 
 
 }

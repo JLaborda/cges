@@ -140,10 +140,10 @@
           <version>0.8.6</version>
           <configuration>
             <excludes>
-              <exclude>**/simulacionRedes/**</exclude>
               <exclude>**/experiments/**</exclude>
               <exclude>**/consensusBN/**</exclude>
               <exclude>**/tetrad/**</exclude>
+              <exclude>**/sampling/**</exclude>
             </excludes>
           </configuration>
           <executions>

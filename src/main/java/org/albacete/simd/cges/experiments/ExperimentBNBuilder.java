@@ -61,9 +61,7 @@ public class ExperimentBNBuilder {
     protected int numberOfIterations;
 
 
-    protected String log = "";
     protected String algName;
-    private MlBayesIm controlBayesianNetwork;
     public Dag_n resultingBayesianNetwork;
 
 
@@ -109,7 +107,7 @@ public class ExperimentBNBuilder {
         edgeLimitation = Integer.parseInt(parameters[5]);
     }
     
-    public boolean checkExistentFile(String savePath) throws IOException{
+    public boolean checkExistentFile(String savePath){
         File file = new File(savePath);
 
         return file.length() != 0;
@@ -174,7 +172,7 @@ public class ExperimentBNBuilder {
         try {
             printExperimentInformation();
 
-            controlBayesianNetwork = readOriginalBayesianNetwork();
+            MlBayesIm controlBayesianNetwork = readOriginalBayesianNetwork();
 
             // Search is executed
             // Starting startWatch
@@ -258,7 +256,7 @@ public class ExperimentBNBuilder {
         BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
         //FileWriter csvWriter = new FileWriter(savePath, true);
         if(file.length() == 0) {
-            String header = "algorithm,network,dataset,cges_threads,edge_limitation,SHD,bdeu,deltaMB,deltaMB+,deltaMB-,iterations,time(s)\n";
+            String header = "algorithm," + this.algorithm.getHyperparamsHeader() + ",network,dataset,cges_threads,edge_limitation,SHD,bdeu,deltaMB,deltaMB+,deltaMB-,iterations,time(s)\n";
             csvWriter.append(header);
         }
         csvWriter.append(this.getResults());
@@ -298,6 +296,7 @@ public class ExperimentBNBuilder {
 
     public String getResults(){
         return  this.algName + ","
+                + this.algorithm.getHyperparamsBody() + ","
                 + this.netName + ","
                 + this.databaseName + ","
                 + this.numberOfRealThreads + ","

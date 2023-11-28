@@ -23,6 +23,9 @@ public class EdgeSearch implements Comparable<EdgeSearch> {
 
     @Override
     public boolean equals(Object other) {
+        if(this == other)
+            return true;
+
         if (other instanceof EdgeSearch) {
             EdgeSearch obj = (EdgeSearch) other;
             return obj.edge.equals(this.edge);
@@ -35,15 +38,4 @@ public class EdgeSearch implements Comparable<EdgeSearch> {
         return Objects.hashCode(this.edge);
     }
 
-    public double getScore() {
-        return this.score;
-    }
-
-    public SubSet gethSubset() {
-        return this.hSubset;
-    }
-
-    public Edge getEdge() {
-        return this.edge;
-    }
 }

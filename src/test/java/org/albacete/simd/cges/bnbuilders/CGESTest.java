@@ -39,7 +39,37 @@ public class CGESTest {
         assertNotNull(result);
     }
 
+    @Test
+    public void pairBroadcastingTest(){
+        // Create an instance of the CGES class
+        Clustering clustering = new HierarchicalClustering();
+        int nThreads = 4;
+        int nItInterleaving = 100000;
+        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, nItInterleaving, "c2", CGES.Broadcasting.PAIR_BROADCASTING);
+
+        // Execute the search() method
+        Graph result = builder.search();
+
+        // Verify if a valid graph has been returned
+        assertNotNull(result);
+    }
+
+    @Test
+    public void allBroadcastingTest(){
+        // Create an instance of the CGES class
+        Clustering clustering = new HierarchicalClustering();
+        int nThreads = 4;
+        int nItInterleaving = 100000;
+        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, nItInterleaving, "c2", CGES.Broadcasting.ALL_BROADCASTING);
+
+        // Execute the search() method
+        Graph result = builder.search();
+
+        // Verify if a valid graph has been returned
+        assertNotNull(result);
+    }
 
 
-    // Add more test cases for the other methods in the CGES class
+
+
 }
