@@ -1,6 +1,5 @@
 package org.albacete.simd.cges.threads;
 
-import consensusBN.PowerSet;
 import consensusBN.PowerSetFabric;
 import consensusBN.SubSet;
 import edu.cmu.tetrad.graph.*;
@@ -13,7 +12,6 @@ import java.util.*;
 
 import java.util.stream.Collectors;
 
-@SuppressWarnings("DuplicatedCode")
 public class FESThread extends GESThread {
 
     private static int threadCounter = 1;
@@ -31,7 +29,7 @@ public class FESThread extends GESThread {
      * @param subset subset of edges the fes stage will try to add to the
      * resulting graph
      * @param maxIt maximum number of iterations allowed in the fes stage
-     * @param speedUp
+     * @param speedUp reduces the number of edges to check in the stages if true.
      */
     public FESThread(Problem problem, Graph initialDag, Set<Edge> subset, int maxIt, boolean speedUp, boolean update, boolean parallel) {
         this(problem, subset, maxIt, speedUp, update, parallel);
@@ -46,7 +44,7 @@ public class FESThread extends GESThread {
      * @param subset subset of edges the fes stage will try to add to the
      * resulting graph
      * @param maxIt maximum number of iterations allowed in the fes stage
-     * @param speedUp
+     * @param speedUp reduces the number of edges to check in the stages if true.
      */
     public FESThread(Problem problem, Set<Edge> subset, int maxIt, boolean speedUp, boolean update, boolean parallel) {
         this.problem = problem;
@@ -64,7 +62,7 @@ public class FESThread extends GESThread {
     //==========================PUBLIC METHODS==========================//
     @Override
     /*
-      Run method from {@link Thread Thread} interface. The method executes the {@link #search()} search} method to add
+      Run method from {@link Thread} interface. The method executes the {@link #search()} search} method to add
       edges to the initial graph.
      */
     public void run() {
@@ -124,17 +122,15 @@ public class FESThread extends GESThread {
      * @param score The score in the state prior to the forward equivalence
      * search
      * @return the score in the state after the FES method. Note that the graph
-     * is changed as a side-effect to its state after the forward equivalence
+     * is changed as a side effect to its state after the forward equivalence
      * search.
      */
+    @SuppressWarnings("UnusedReturnValue")
     private double fes(Graph graph, double score) {
         //System.out.println("** FORWARD EQUIVALENCE SEARCH");
         double bestScore = score;
         double bestInsert;
 
-        //x_i = null;
-        //y_i = null;
-        //t_0 = null;
         iterations = 0;
         
         //System.out.println("Initial Score = " + nf.format(bestScore));
@@ -159,11 +155,6 @@ public class FESThread extends GESThread {
                 rebuildPattern(graph);
             
             // Printing score
-            /*if (!t_0.isEmpty()) {
-                System.out.println("[" + getId() + "] Score: " + nf.format(bestScore) + " (+" + nf.format(bestInsert - score) + ")\tOperator: " + graph.getEdge(x_i, y_i) + " " + t_0);
-            } else {
-                System.out.println("[" + getId() + "] Score: " + nf.format(bestScore) + " (+" + nf.format(bestInsert - score) + ")\tOperator: " + graph.getEdge(x_i, y_i));
-            }*/
             bestScore = bestInsert;
 
             // Checking that the maximum number of edges has not been reached
@@ -190,34 +181,16 @@ public class FESThread extends GESThread {
      * @param graph The graph in the state prior to the forward equivalence
      * search.
      * @return the score in the state after the forward equivalence search. Note
-     * that the graph is changed as a side-effect to its state after the forward
+     * that the graph is changed as a side effect to its state after the forward
      * equivalence search.
      */
     private double fs(Graph graph) {
-        //       System.out.println("** FORWARD EQUIVALENCE SEARCH");
-        //       System.out.println("Initial Score = " + nf.format(bestScore));
 
         PowerSetFabric.setMode(PowerSetFabric.MODE_FES);
 
         x_i = y_i = null;
         t_0 = null;
 
-        /*EdgeSearch[] scores = new EdgeSearch[S.size()];
-        List<Edge> edges = new ArrayList<>(S);
-
-        Arrays.parallelSetAll(scores, e -> {
-            return scoreEdge(graph, edges.get(e), initialScore);
-        });
-
-        EdgeSearch max = Collections.max(Arrays.asList(scores));
-
-        if (max.score > initialScore) {
-            x_i = max.edge.getNode1();
-            y_i = max.edge.getNode2();
-            t_0 = max.hSubset;
-        }
-        */
-        
         Set<EdgeSearch> newScores;
         if (parallel)
             newScores = enlaces.parallelStream()
@@ -265,8 +238,6 @@ public class FESThread extends GESThread {
     }
 
     private void removeEdgesNotNeighbors(Graph graph, Set<Node> process) {
-        int tam;
-        tam = process.size();
         process.add(x_i);
         process.add(y_i);
 

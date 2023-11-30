@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-@SuppressWarnings("DuplicatedCode")
+
 public class BESThread extends GESThread {
 
 
@@ -41,7 +41,7 @@ public class BESThread extends GESThread {
     }
 
     /**
-    Run method from {@link Runnable Runnable} interface. The method executes the {@link #search()} search} method to remove
+    Run method from {@link Runnable Runnable} interface. The method executes the {@link #search()} search method to remove
     edges from the initial graph.
      */
     @Override
@@ -100,6 +100,7 @@ public class BESThread extends GESThread {
      *         Note that the graph is changed as a side-effect to its state after
      *         the backward equivalence search.
      */
+    @SuppressWarnings("UnusedReturnValue")
     private double bes(Graph graph, double score) {
         //System.out.println("** BACKWARD EQUIVALENCE SEARCH");
         double bestScore = score;
@@ -122,18 +123,13 @@ public class BESThread extends GESThread {
             delete(x_d,y_d,h_0, graph);
             
             // Checking cycles?
-            //System.out.println("  Ciclos: " + graph.existsDirectedCycle());
+            //System.out.println("  Cycles: " + graph.existsDirectedCycle());
 
             //PDAGtoCPDAG
             rebuildPattern(graph);
             
             // Printing score
-            /*if (!h_0.isEmpty())
-                System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestDelete-score) +")\tOperator: " + graph.getEdge(x_d, y_d) + " " + h_0);
-            else
-                System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestDelete-score) +")\tOperator: " + graph.getEdge(x_d, y_d));
-            */
-            bestScore = bestDelete;
+            //bestScore = bestDelete;
             //System.out.println("    Real Score" + scoreGraph(graph, problem));
 
             // Checking that the maximum number of edges has not been reached
@@ -161,8 +157,6 @@ public class BESThread extends GESThread {
      * @return score of the best possible deletion found.
      */
     private double bs(Graph graph, double initialScore){
-        //   	System.out.println("\n** BACKWARD ELIMINATION SEARCH");
-        //   	System.out.println("Initial Score = " + nf.format(initialScore));
 
         PowerSetFabric.setMode(PowerSetFabric.MODE_BES);
 
@@ -175,9 +169,7 @@ public class BESThread extends GESThread {
             EdgeSearch[] arrScores = new EdgeSearch[edgesInGraph.size()];
             List<Edge> edges = new ArrayList<>(edgesInGraph);
 
-            Arrays.parallelSetAll(arrScores, e->{
-                return scoreEdge(graph, edges.get(e), initialScore);
-            });
+            Arrays.parallelSetAll(arrScores, e-> scoreEdge(graph, edges.get(e), initialScore));
 
             List<EdgeSearch> list = Arrays.asList(arrScores);
             EdgeSearch max = Collections.max(list);
@@ -203,16 +195,16 @@ public class BESThread extends GESThread {
             List<Node> hNeighbors = getSubsetOfNeighbors(_x, _y, graph);
             PowerSet hSubsets = PowerSetFabric.getPowerSet(_x, _y, hNeighbors);
             
-            double changueEval;
+            double changeEval;
             double evalScore;
             double bestScore = initialScore; 
             SubSet bestSubSet = new SubSet();
             
             while(hSubsets.hasMoreElements()) {
                 SubSet hSubset = hSubsets.nextElement();
-                changueEval = deleteEval(_x, _y, hSubset, graph);
+                changeEval = deleteEval(_x, _y, hSubset, graph);
                 
-                evalScore = initialScore + changueEval;
+                evalScore = initialScore + changeEval;
 
                 if (evalScore > bestScore) {
                     // START TEST 1

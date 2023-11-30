@@ -609,9 +609,6 @@ public final class Fges2 implements GraphSearch, GraphScorer {
 
         int chunkSize = getChunkSize(nodes.size());
 
-//        AdjTask task = new AdjTask(new ArrayList<>(nodes), 0, nodes.size());
-//        task.call();
-
 
         for (int i = 0; i < nodes.size() && !Thread.currentThread().isInterrupted(); i += chunkSize) {
             AdjTask task = new AdjTask(new ArrayList<>(nodes), i, min(nodes.size(), i + chunkSize));

@@ -47,7 +47,7 @@ public class SamplingBNGenerator {
 
   /**
    * Constructor for BayesNetGenerator.
- * @throws Exception
+ * @throws Exception from reading wrong file.
    */
   public SamplingBNGenerator(String fileName, int nSamples, int seed) throws Exception {
 
@@ -158,8 +158,8 @@ public class SamplingBNGenerator {
    * Main method
    *
    * @param args the commandline parameters
- * @throws Exception
- * @throws NumberFormatException
+ * @throws Exception from Sampling
+ * @throws NumberFormatException from reading data
    */
   static public void main(String[] args) throws NumberFormatException, Exception {
       System.out.println("Length of args: " + args.length);

@@ -14,17 +14,16 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import static org.albacete.simd.cges.utils.Utils.pdagToDag;
 
-public class CircularDag {
+public class CircularProcess {
     public Dag_n dag;
     public final int id;
     public boolean convergence = false;
     
-    private double bdeu = Double.NEGATIVE_INFINITY;
-    private double lastBdeu;
+    private double score = Double.NEGATIVE_INFINITY;
+    private double lastScore;
     private final Problem problem;
     private final Set<Edge> subsetEdges;
     private final int nItInterleaving;
@@ -44,7 +43,7 @@ public class CircularDag {
 
     public static boolean saveStages = false;
 
-    public CircularDag(Problem problem, Set<Edge> subsetEdges, int nItInterleaving, int id) {
+    public CircularProcess(Problem problem, Set<Edge> subsetEdges, int nItInterleaving, int id) {
         this.id = id;
         this.problem = problem;
         this.subsetEdges = subsetEdges;
@@ -123,7 +122,7 @@ public class CircularDag {
 
     
     private void setup() {
-        lastBdeu = bdeu;
+        lastScore = score;
         convergence = false;
     }
     
@@ -151,10 +150,8 @@ public class CircularDag {
             return;
         String savePath = EXPERIMENTS_FOLDER + "temp_" + id + ".csv";
         File file = new File(savePath);
-        FileWriter csvWriter = null;
-        try {
-            csvWriter = new FileWriter(file, true);
-            csvWriter.append(id + "," + stage + "," + BDeu + "\n");
+        try (FileWriter csvWriter = new FileWriter(file, true)){
+            csvWriter.append(String.valueOf(id)).append(",").append(stage).append(",").append(String.valueOf(BDeu)).append("\n");
             csvWriter.flush();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -202,16 +199,16 @@ public class CircularDag {
     }
     
     private void updateResults() {
-        bdeu = GESThread.scoreGraph(dag, problem);
-        printResults(id, "BES", bdeu);
+        score = GESThread.scoreGraph(dag, problem);
+        printResults(id, "BES", score);
     }
 
     private void checkConvergence() {
-        if (bdeu <= lastBdeu) convergence = true;
+        if (score <= lastScore) convergence = true;
     }
     
     public double getBDeu() {
-        return bdeu;
+        return score;
     }
 
     public void setInputDag(Dag_n inputDag) {

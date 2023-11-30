@@ -22,15 +22,15 @@ public abstract class ThreadStage extends Stage{
     /**
      * The {@link Thread Thread} array that encapsulate the {@link GESThread GESThread} for each stage.
      */
-    protected Thread[] threads;
+    protected final Thread[] threads;
 
     protected boolean flag = false;
 
-    protected int itInterleaving;
+    protected final int itInterleaving;
 
-    protected int nThreads;
+    protected final int nThreads;
 
-    protected List<Set<Edge>> subsets;
+    protected final List<Set<Edge>> subsets;
 
     public ThreadStage(Problem problem, int nThreads, int itInterleaving, List<Set<Edge>> subsets) {
         super(problem);

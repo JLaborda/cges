@@ -3,15 +3,12 @@ package org.albacete.simd.cges.framework;
 import consensusBN.ConsensusUnion;
 import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Graph;
-import org.albacete.simd.cges.bnbuilders.CircularDag;
+import org.albacete.simd.cges.bnbuilders.CircularProcess;
 import org.albacete.simd.cges.threads.BESThread;
 import org.albacete.simd.cges.threads.GESThread;
 import org.albacete.simd.cges.utils.Problem;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class PairCombinedFusion extends FusionStage{
 
@@ -46,7 +43,7 @@ public class PairCombinedFusion extends FusionStage{
         BESThread bes = new BESThread(problem, result, result.getEdges());
         bes.run();
 
-        return CircularDag.transformPDAGtoDAG(bes.getCurrentGraph());
+        return CircularProcess.transformPDAGtoDAG(bes.getCurrentGraph());
 
     }
 

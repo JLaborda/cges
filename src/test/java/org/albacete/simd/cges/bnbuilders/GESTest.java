@@ -4,13 +4,8 @@ import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Node;
 import org.albacete.simd.cges.Resources;
-import org.albacete.simd.cges.clustering.Clustering;
-import org.albacete.simd.cges.clustering.RandomClustering;
 import org.albacete.simd.cges.framework.BNBuilder;
-import org.albacete.simd.cges.framework.BackwardStage;
-import org.albacete.simd.cges.framework.ForwardStage;
 import org.albacete.simd.cges.utils.Utils;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -20,8 +15,8 @@ import static org.junit.Assert.*;
 
 public class GESTest {
 
-    String path = Resources.CANCER_BBDD_PATH;
-    DataSet dataSet = Utils.readData(path);
+    final String path = Resources.CANCER_BBDD_PATH;
+    final DataSet dataSet = Utils.readData(path);
 
 
     @Test
@@ -43,10 +38,10 @@ public class GESTest {
         assertNotNull(alg3);
         assertNotNull(alg4);
 
-        assertEquals(1, alg1.getnThreads());
-        assertEquals(1, alg2.getnThreads());
-        assertEquals(1, alg3.getnThreads());
-        assertEquals(1, alg4.getnThreads());
+        assertEquals(1, alg1.getNumberOfThreads());
+        assertEquals(1, alg2.getNumberOfThreads());
+        assertEquals(1, alg3.getNumberOfThreads());
+        assertEquals(1, alg4.getNumberOfThreads());
         assertEquals(-1, alg1.getMaxIterations());
         assertEquals(-1, alg2.getMaxIterations());
         assertEquals(-1, alg3.getMaxIterations());

@@ -41,12 +41,12 @@ public class Problem {
     /**
      * Cases for each variable of the problem.
      */
-    protected int[][] cases;
+    protected final int[][] cases;
 
     /**
      * Number of values a variable can take.
      */
-    protected int[] nValues;
+    protected final int[] nValues;
 
     /**
      * Map from variables to their column indices in the data set.
@@ -56,12 +56,12 @@ public class Problem {
     /**
      * Caches scores for discrete search.
      */
-    protected LocalScoreCacheConcurrent localScoreCache = new LocalScoreCacheConcurrent();
+    protected final LocalScoreCacheConcurrent localScoreCache = new LocalScoreCacheConcurrent();
 
     /**
      * BDeu Score.
      */
-    protected BDeuScore bdeu;
+    protected final BDeuScore bdeu;
 
 
     public Problem(DataSet dataSet){
@@ -89,7 +89,7 @@ public class Problem {
         samplePrior = 10.0;
 
         //building index
-        Graph graph = new EdgeListGraph_n(new LinkedList<Node>(this.variables));
+        Graph graph = new EdgeListGraph_n(new LinkedList<>(this.variables));
         buildIndexing(graph);
         
         bdeu = new BDeuScore(data);

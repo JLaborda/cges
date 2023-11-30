@@ -19,14 +19,13 @@ import java.util.Set;
 
 public abstract class BNBuilder {
     /**
-     * {@link DataSet DataSet}DataSet containing the values of the variables of the problem in hand.
+     * {@link Problem Problem} that contains all the information of the data.
      */
-    //private final DataSet data;
-    protected Problem problem;
+    protected final Problem problem;
     /**
      * The number of threads the algorithm is going to use.
      */
-    protected int nThreads = 1;
+    protected int numberOfThreads = 1;
 
     /**
      * Seed for the random number generator.
@@ -34,9 +33,9 @@ public abstract class BNBuilder {
     private long seed = 42;
 
     /**
-     * Number of iterations allowed inside the FES stage. This is a hyperparameter used in experimentation.
+     * Number of iterations allowed inside the FES stage. This is a hyper parameter used in experimentation.
      */
-    protected int nItInterleaving;
+    protected int interleaving;
 
 
     /**
@@ -60,11 +59,6 @@ public abstract class BNBuilder {
      */
     protected List<Set<Edge>> subSets = null;
 
-    /**
-     * {@link ArrayList ArrayList} of graphs. This contains the list of {@link Graph graphs} created for each stage,
-     * just before the fusion is done.
-     */
-    protected ArrayList<Dag_n> graphs = null;
 
     /**
      * {@link Graph Graph} containing the current bayesian network that has been constructed so far.
@@ -79,7 +73,7 @@ public abstract class BNBuilder {
     /**
      * An initial graph to start from.
      */
-    private Graph initialGraph;
+    protected Graph initialGraph;
 
     /**
      * Score of the currentGraph
@@ -96,49 +90,49 @@ public abstract class BNBuilder {
      */
     protected Set<Edge> setOfArcs;
 
-    private String hyperparamsBody;
+    private String hyperParamsBody;
 
-    private String hyperparamsHeader;
+    private String hyperParamsHeader;
 
 
-    public BNBuilder(DataSet data, int nThreads, int maxIterations, int nItInterleaving){
+    public BNBuilder(DataSet data, int numberOfThreads, int maxIterations, int interleaving){
         this.problem = new Problem(data);
         this.maxIterations = maxIterations;
-        this.nItInterleaving = nItInterleaving;
-        initialize(nThreads);
+        this.interleaving = interleaving;
+        initialize(numberOfThreads);
     }
 
-    public BNBuilder(String path, int nThreads, int maxIterations, int nItInterleaving) {
-        this(Utils.readData(path), nThreads, maxIterations, nItInterleaving);
+    public BNBuilder(String path, int numberOfThreads, int maxIterations, int interleaving) {
+        this(Utils.readData(path), numberOfThreads, maxIterations, interleaving);
     }
 
-    public BNBuilder(Graph initialGraph, DataSet data, int nThreads, int maxIterations, int nItInterleaving) {
-        this(data, nThreads, maxIterations, nItInterleaving);
+    public BNBuilder(Graph initialGraph, DataSet data, int numberOfThreads, int maxIterations, int interleaving) {
+        this(data, numberOfThreads, maxIterations, interleaving);
         this.initialGraph = new EdgeListGraph_n(initialGraph);
         checkForConsistenciesInInitialGraphWithProblem(initialGraph);
     }
 
 
-    public BNBuilder(Graph initialGraph, String path, int nThreads, int maxIterations, int nItInterleaving) {
-        this(initialGraph, Utils.readData(path), nThreads, maxIterations, nItInterleaving);
+    public BNBuilder(Graph initialGraph, String path, int numberOfThreads, int maxIterations, int interleaving) {
+        this(initialGraph, Utils.readData(path), numberOfThreads, maxIterations, interleaving);
     }
 
-    public BNBuilder(Graph initialGraph, Problem problem, int nThreads, int maxIterations, int nItInterleaving) {
+    public BNBuilder(Graph initialGraph, Problem problem, int numberOfThreads, int maxIterations, int interleaving) {
         this.problem = problem;
         this.maxIterations = maxIterations;
-        this.nItInterleaving = nItInterleaving;
+        this.interleaving = interleaving;
         this.initialGraph = initialGraph;
-        initialize(nThreads);
+        initialize(numberOfThreads);
 
         checkForConsistenciesInInitialGraphWithProblem(initialGraph);
 
     }
 
     private void initialize(int nThreads) {
-        this.nThreads = nThreads;
-        this.gesThreads = new FESThread[this.nThreads];
-        this.threads = new Thread[this.nThreads];
-        this.subSets = new ArrayList<>(this.nThreads);
+        this.numberOfThreads = nThreads;
+        this.gesThreads = new FESThread[this.numberOfThreads];
+        this.threads = new Thread[this.numberOfThreads];
+        this.subSets = new ArrayList<>(this.numberOfThreads);
 
         //The total number of arcs of a graph is n*(n-1)/2, where n is the number of nodes in the graph.
         this.setOfArcs = new HashSet<>(this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() - 1));
@@ -147,13 +141,12 @@ public abstract class BNBuilder {
 
     private void checkForConsistenciesInInitialGraphWithProblem(Graph initialGraph) {
         initialGraph = GraphUtils.replaceNodes(initialGraph, problem.getVariables());
-        if (initialGraph != null) {
-            if (!new HashSet<>(initialGraph.getNodes()).equals(new HashSet<>(problem.getVariables()))) {
-                throw new IllegalArgumentException("Variables aren't the same.");
-            }
-            this.initialGraph = initialGraph;
-            this.currentGraph = GraphUtils.replaceNodes(initialGraph, problem.getVariables());
+        if (!new HashSet<>(initialGraph.getNodes()).equals(new HashSet<>(problem.getVariables()))) {
+            throw new IllegalArgumentException("Variables aren't the same.");
         }
+        this.initialGraph = initialGraph;
+        this.currentGraph = GraphUtils.replaceNodes(initialGraph, problem.getVariables());
+
     }
 
 
@@ -224,19 +217,12 @@ public abstract class BNBuilder {
 
     /**
      * Sets the maximum number of iterations for each {@link FESThread ThFES}.
-     * @param nItInterleaving maximum number of iterations used in each {@link FESThread ThFES}.
+     * @param interleaving maximum number of iterations used in each {@link FESThread ThFES}.
      */
-    public void setnItInterleaving(int nItInterleaving) {
-        this.nItInterleaving = nItInterleaving;
+    public void setInterleaving(int interleaving) {
+        this.interleaving = interleaving;
     }
 
-    /**
-     * Gets the current list of graphs.
-     * @return ArrayList of the current Dags created in a previous stage.
-     */
-    public ArrayList<Dag_n> getGraphs() {
-        return this.graphs;
-    }
 
     /**
      * Gets the {@link #currentGraph currentGraph} constructed so far.
@@ -266,29 +252,29 @@ public abstract class BNBuilder {
     }
 
 
-    public int getnThreads() {
-        return nThreads;
+    public int getNumberOfThreads() {
+        return numberOfThreads;
     }
 
     public int getItInterleaving() {
-        return nItInterleaving;
+        return interleaving;
     }
 
 
-    public String getHyperparamsBody() {
-        return hyperparamsBody;
+    public String getHyperParamsBody() {
+        return hyperParamsBody;
     }
 
-    public void setHyperparamsBody(String hyperparamsBody) {
-        this.hyperparamsBody = hyperparamsBody;
+    public void setHyperParamsBody(String hyperParamsBody) {
+        this.hyperParamsBody = hyperParamsBody;
     }
 
-    public String getHyperparamsHeader() {
-        return hyperparamsHeader;
+    public String getHyperParamsHeader() {
+        return hyperParamsHeader;
     }
 
-    public void setHyperparamsHeader(String hyperparamsHeader) {
-        this.hyperparamsHeader = hyperparamsHeader;
+    public void setHyperParamsHeader(String hyperParamsHeader) {
+        this.hyperParamsHeader = hyperParamsHeader;
     }
 
 

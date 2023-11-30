@@ -24,20 +24,20 @@ public abstract class FusionStage extends Stage {
 
     protected Dag_n fusionIntersection(){
         ArrayList<Node> order = new ArrayList<>(this.currentGraph.getCausalOrdering()); // currentGraph.getCausalOrdering
-        for(int i = 0; i < this.graphs.size(); i++) {
-            for(Edge e:this.graphs.get(i).getEdges()) {
-                if((order.indexOf(e.getNode1()) < order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.TAIL && e.getEndpoint2()==Endpoint.ARROW))
+        for (Dag_n dag_n : this.graphs) {
+            for (Edge e : dag_n.getEdges()) {
+                if ((order.indexOf(e.getNode1()) < order.indexOf(e.getNode2())) && (e.getEndpoint1() == Endpoint.TAIL && e.getEndpoint2() == Endpoint.ARROW))
                     continue;
 
-                if((order.indexOf(e.getNode1()) > order.indexOf(e.getNode2())) && (e.getEndpoint1()== Endpoint.ARROW && e.getEndpoint2()==Endpoint.TAIL))
+                if ((order.indexOf(e.getNode1()) > order.indexOf(e.getNode2())) && (e.getEndpoint1() == Endpoint.ARROW && e.getEndpoint2() == Endpoint.TAIL))
                     continue;
 
-                if(e.getEndpoint1()==Endpoint.TAIL)
+                if (e.getEndpoint1() == Endpoint.TAIL)
                     e.setEndpoint1(Endpoint.ARROW);
                 else
                     e.setEndpoint1(Endpoint.TAIL);
 
-                if(e.getEndpoint2()==Endpoint.TAIL)
+                if (e.getEndpoint2() == Endpoint.TAIL)
                     e.setEndpoint2(Endpoint.ARROW);
                 else
                     e.setEndpoint2(Endpoint.TAIL);

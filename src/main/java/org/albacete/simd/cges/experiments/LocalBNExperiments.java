@@ -16,9 +16,9 @@ import org.albacete.simd.cges.bnbuilders.GES;
 public class LocalBNExperiments {
     
     protected static BNBuilder algorithm;
-    protected static String EXPERIMENTS_FOLDER = "resultados/";
+    protected static final String EXPERIMENTS_FOLDER = "resultados/";
     
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         // 1. Configuration
         String networkFolder = "./res/networks/";
 
@@ -31,35 +31,25 @@ public class LocalBNExperiments {
         String[] bbdd_patchs = new String[]{"50003_", "50002_", "50001_", "50004_","50005_", "50006_", "50007_",
                                             "50008_", "50009_", "50001246_", "_"};
 
+        // 3. Launch all the experiments
         for (int threads : nThreads) {
             for (String net_name : bbdds) {
                 for (String bb : bbdd_patchs) {
                     String net_path = networkFolder + net_name + ".xbif";
                     String bbdd_path = networkFolder + "BBDD/" + net_name + ".xbif" + bb + ".csv";
-                    String test_path = networkFolder + "BBDD/tests/" + net_name + "_test.csv";
-
-                    //launchExperiment("empty", net_name, net_path, bbdd_path, test_path, 1, -1, bb);
-
-                    /*launchExperiment("ges", net_name, net_path, bbdd_path, test_path, 1, -1, bb);
-                    System.gc();
-                    launchExperiment("ges parallel", net_name, net_path, bbdd_path, test_path, 1, -1, bb);
-                    System.gc();*/
                     for (String alg : algorithmsPGES) {
                         try {
-                            launchExperiment(alg, net_name, net_path, bbdd_path, test_path, threads, Integer.MAX_VALUE, bb);
-                        } catch(Exception ex) {System.out.println(ex);}
+                            launchExperiment(alg, net_name, net_path, bbdd_path, threads, Integer.MAX_VALUE, bb);
+                        } catch(Exception ex) {ex.printStackTrace();}
                         System.gc();
                     }
-                    /*launchExperiment("fges", net_name, net_path, bbdd_path, test_path, 1, -1, bb);
-                    System.gc();
-                    launchExperiment("fges-faithfulness", net_name, net_path, bbdd_path, test_path, 1, -1, bb);
-                    System.gc();*/
                 }
             }
         }
     }
     
-    private static void launchExperiment(String algName, String net_name, String net_path, String bbdd_path, String test_path, int numberOfPGESThreads, int interleaving, String database) throws Exception {
+    @SuppressWarnings("SameParameterValue")
+    private static void launchExperiment(String algName, String net_name, String net_path, String bbdd_path, int numberOfPGESThreads, int interleaving, String database) throws Exception {
         Clustering clustering;
         
         System.out.println("\n\n\n----------------------------------------------------------------------------- \n"

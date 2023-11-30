@@ -26,20 +26,18 @@ public class BNBuilderTest {
 
         algorithm.setSeed(30);
         algorithm.setMaxIterations(30);
-        algorithm.setnItInterleaving(20);
-
+        algorithm.setInterleaving(20);
 
         assertEquals(30, algorithm.getSeed());
         assertEquals(arcs, algorithm.getSetOfArcs());
         assertTrue(algorithm.getSubSets().isEmpty());
         assertEquals(problem.getData(), algorithm.getData());
         assertEquals(30, algorithm.getMaxIterations());
-        assertNull(algorithm.getGraphs());
         assertEquals(20,algorithm.getItInterleaving());
         assertNull(algorithm.getCurrentGraph());
         assertEquals(1, algorithm.getIterations());
         assertEquals(problem, algorithm.getProblem());
-        assertEquals(4, algorithm.getnThreads());
+        assertEquals(4, algorithm.getNumberOfThreads());
 
 
     }

@@ -21,8 +21,8 @@ public class CGES extends BNBuilder {
     
     private List<Set<Edge>> subsetEdges;
     private final Clustering clustering;
-    private final List<CircularDag> cgesProcesses;
-    private CircularDag bestDag;
+    private final List<CircularProcess> cgesProcesses;
+    private CircularProcess bestCircularProcess;
     private double lastBestBDeu = Double.NEGATIVE_INFINITY;
     private boolean convergence;
 
@@ -38,8 +38,8 @@ public class CGES extends BNBuilder {
         this.cgesProcesses = new ArrayList<>(nThreads);
         this.typeConvergence = typeConvergence;
         this.typeBroadcasting = typeBroadcasting;
-        setHyperparamsHeader("clustering,nThreads,interleaving,typeConvergence,typeBroadcasting");
-        setHyperparamsBody(clustering.getClass().getSimpleName() + "," + nThreads + "," + nItInterleaving + "," + typeConvergence + "," + typeBroadcasting);
+        setHyperParamsHeader("clustering,nThreads,interleaving,typeConvergence,typeBroadcasting");
+        setHyperParamsBody(clustering.getClass().getSimpleName() + "," + nThreads + "," + nItInterleaving + "," + typeConvergence + "," + typeBroadcasting);
     }
 
     public CGES(String path, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence, Broadcasting typeBroadcasting) {
@@ -68,7 +68,7 @@ public class CGES extends BNBuilder {
         //3. Print and return last graph
         //printResults();
         calculateBestGraph();
-        currentGraph = bestDag.dag;
+        currentGraph = bestCircularProcess.dag;
         
         //4. Do a final GES with all the data
         System.out.println("\n\n\n FINAL GES");
@@ -89,15 +89,15 @@ public class CGES extends BNBuilder {
     protected void repartition() {
         // Splitting edges with the clustering algorithm and assigning them to the subsetEdges attribute.
         clustering.setProblem(this.problem);
-        subsetEdges = clustering.generateEdgeDistribution(nThreads);
+        subsetEdges = clustering.generateEdgeDistribution(numberOfThreads);
     }
 
     /**
      * Initializes each CGES process with a starting empty graph
      */
     private void initializeThreads(){
-        for (int i = 0; i < nThreads; i++) {
-            cgesProcesses.add(new CircularDag(problem,subsetEdges.get(i),nItInterleaving,i));
+        for (int i = 0; i < numberOfThreads; i++) {
+            cgesProcesses.add(new CircularProcess(problem,subsetEdges.get(i), interleaving,i));
         }
     }
 
@@ -129,14 +129,14 @@ public class CGES extends BNBuilder {
 
     private void putInputGraphs() {
         cgesProcesses.forEach((dag) -> {
-            CircularDag cd = getInputDag(dag.id);
+            CircularProcess cd = getInputDag(dag.id);
             dag.setInputDag(cd.dag);
         });
     }
 
     private Dag_n fuseAllInputDags(){
         ArrayList<Dag_n> graphs = new ArrayList<>();
-        for (CircularDag cdag: cgesProcesses) {
+        for (CircularProcess cdag: cgesProcesses) {
             graphs.add(cdag.dag);
         }
 
@@ -193,16 +193,16 @@ public class CGES extends BNBuilder {
 
     private ArrayList<Dag_n> getInputDags() {
         ArrayList<Dag_n> dags = new ArrayList<>(cgesProcesses.size());
-        for (CircularDag cges: cgesProcesses) {
+        for (CircularProcess cges: cgesProcesses) {
             dags.add(new Dag_n(cges.dag));
         }
         return dags;
     }
 
 
-    private CircularDag getInputDag(int i) {
+    private CircularProcess getInputDag(int i) {
         if(i == 0) {
-            return cgesProcesses.get(nThreads - 1);
+            return cgesProcesses.get(numberOfThreads - 1);
         } else {
             return cgesProcesses.get(i - 1);
         }
@@ -212,12 +212,12 @@ public class CGES extends BNBuilder {
         cgesProcesses.forEach(this::calculateBestGraph);
     }
     
-    public void calculateBestGraph(CircularDag dag){
-        if (bestDag == null)
-            bestDag = dag;
+    public void calculateBestGraph(CircularProcess dag){
+        if (bestCircularProcess == null)
+            bestCircularProcess = dag;
         else{
-            if (dag.getBDeu() > bestDag.getBDeu())
-                bestDag = dag;
+            if (dag.getBDeu() > bestCircularProcess.getBDeu())
+                bestCircularProcess = dag;
         }
     }
 
@@ -240,9 +240,9 @@ public class CGES extends BNBuilder {
             case "c2":
                 calculateBestGraph();
 
-                boolean max = lastBestBDeu >= bestDag.getBDeu();
+                boolean max = lastBestBDeu >= bestCircularProcess.getBDeu();
                 
-                lastBestBDeu = bestDag.getBDeu();
+                lastBestBDeu = bestCircularProcess.getBDeu();
                         
                 return !max;
         }

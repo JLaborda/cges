@@ -3,14 +3,11 @@ package org.albacete.simd.cges.experiments;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
 public class ExperimentBNLauncher {
-
-    public static final int MAXITERATIONS = 100;
 
     private final String EXPERIMENTS_FOLDER;
     private final int index;
@@ -56,7 +53,7 @@ public class ExperimentBNLauncher {
         return new ExperimentBNLauncher(index, paramsFileName, saveFolder);
     }
 
-    public String[] readParameters() throws Exception {
+    public String[] readParameters(){
         String[] parameterStrings = null;
         try (BufferedReader br = new BufferedReader(new FileReader(paramsFileName))) {
             String line;
@@ -64,10 +61,7 @@ public class ExperimentBNLauncher {
                 br.readLine();
             line = br.readLine();
             parameterStrings = line.split(" ");
-        }
-        catch(FileNotFoundException e){
-            System.out.println(e);
-        } catch (IOException e) {
+        } catch(IOException e){
             e.printStackTrace();
         }
         return parameterStrings;
@@ -91,7 +85,7 @@ public class ExperimentBNLauncher {
         experiment.runExperiment();
     }
 
-    private boolean checkExistentFile() throws IOException{
+    private boolean checkExistentFile() {
         String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + experiment.netName + "_" + experiment.algName + "_" + 
                 experiment.databaseName + "_t" + experiment.numberOfRealThreads + "_PGESt" + experiment.numberOfRealThreads +
                 "_i" + experiment.edgeLimitation + ".csv";

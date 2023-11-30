@@ -6,9 +6,9 @@ import java.util.Objects;
 
 public class EdgeSearch implements Comparable<EdgeSearch> {
 
-    public double score;
-    public SubSet hSubset;
-    public Edge edge;
+    public final double score;
+    public final SubSet hSubset;
+    public final Edge edge;
 
     public EdgeSearch(double score, SubSet hSubSet, Edge edge) {
         this.score = score;

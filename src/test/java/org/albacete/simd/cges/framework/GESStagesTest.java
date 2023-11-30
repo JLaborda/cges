@@ -7,7 +7,6 @@ import org.albacete.simd.cges.Resources;
 import org.albacete.simd.cges.threads.GESThread;
 import org.albacete.simd.cges.utils.Problem;
 import org.albacete.simd.cges.utils.Utils;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;

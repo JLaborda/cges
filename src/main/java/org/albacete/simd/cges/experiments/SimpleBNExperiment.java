@@ -1,10 +1,9 @@
 package org.albacete.simd.cges.experiments;
 
 import edu.cmu.tetrad.data.DataSet;
-import org.albacete.simd.cges.bnbuilders.CircularDag;
+import org.albacete.simd.cges.bnbuilders.CircularProcess;
 import org.albacete.simd.cges.clustering.Clustering;
 import org.albacete.simd.cges.clustering.HierarchicalClustering;
-import org.albacete.simd.cges.framework.BNBuilder;
 import org.albacete.simd.cges.utils.Utils;
 
 import java.io.IOException;
@@ -38,7 +37,7 @@ public class SimpleBNExperiment {
         // 5. Save Experiment
         try {
             experiment.printResults();
-            System.out.println("Number of times broadcasting fusion is used: " + CircularDag.fusionWinCounter);
+            System.out.println("Number of times broadcasting fusion is used: " + CircularProcess.fusionWinCounter);
             experiment.saveExperiment(savePath);
         } catch (IOException e) {
             e.printStackTrace();

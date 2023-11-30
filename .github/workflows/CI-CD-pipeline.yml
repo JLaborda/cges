@@ -46,7 +46,7 @@ jobs:
          cache: maven
       - name: Build with Maven
         run: mvn clean verify --batch-mode
-        # Codecoverage
+        # Code-coverage
       - name: Install dependencies
         run: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
       - name: Run tests and collect coverage

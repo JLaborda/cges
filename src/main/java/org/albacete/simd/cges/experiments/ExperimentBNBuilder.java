@@ -2,8 +2,6 @@ package org.albacete.simd.cges.experiments;
 
 import edu.cmu.tetrad.bayes.BayesPm;
 import edu.cmu.tetrad.bayes.MlBayesIm;
-import edu.cmu.tetrad.data.DataReader;
-import edu.cmu.tetrad.data.DelimiterType;
 import edu.cmu.tetrad.graph.Dag_n;
 import org.albacete.simd.cges.bnbuilders.GES;
 import org.albacete.simd.cges.bnbuilders.CGES;
@@ -13,7 +11,6 @@ import org.albacete.simd.cges.framework.BNBuilder;
 import org.albacete.simd.cges.threads.GESThread;
 import org.albacete.simd.cges.utils.Utils;
 import org.apache.commons.lang3.time.StopWatch;
-import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.BIFReader;
 
 import java.io.BufferedWriter;
@@ -82,7 +79,7 @@ public class ExperimentBNBuilder {
         if (matcher.find()) {
             databaseName = matcher.group(1);
         }
-        this.numberOfRealThreads = algorithm.getnThreads();
+        this.numberOfRealThreads = algorithm.getNumberOfThreads();
         this.maxIterations = algorithm.getMaxIterations();
         this.edgeLimitation = algorithm.getItInterleaving();
     }
@@ -206,17 +203,11 @@ public class ExperimentBNBuilder {
     private MlBayesIm readOriginalBayesianNetwork() throws Exception {
         BIFReader bayesianReader = new BIFReader();
         bayesianReader.processFile(this.netPath);
-        BayesNet bayesianNet = bayesianReader;
-        System.out.println("Numero de variables: " + bayesianNet.getNrOfNodes());
+        System.out.println("Numero de variables: " + bayesianReader.getNrOfNodes());
 
         //Transforming the BayesNet into a BayesPm
-        BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bayesianNet);
-        MlBayesIm bn2 = new MlBayesIm(bayesPm);
-
-        DataReader reader = new DataReader();
-        reader.setDelimiter(DelimiterType.COMMA);
-        reader.setMaxIntegralDiscrete(100);
-        return bn2;
+        BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bayesianReader);
+        return new MlBayesIm(bayesPm);
     }
 
     private void calcuateMeasurements(MlBayesIm controlBayesianNetwork) {
@@ -230,7 +221,7 @@ public class ExperimentBNBuilder {
         // "SDM": 
         this.structuralHamiltonDistanceValue = Utils.SHD(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag());
         
-        this.differencesOfMalkovsBlanket = Utils.avgMarkovBlanquetdif(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag());
+        this.differencesOfMalkovsBlanket = Utils.avgMarkovBlanketDelta(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag());
         this.numberOfIterations = algorithm.getIterations();
         this.bdeuScore = GESThread.scoreGraph(algorithm.getCurrentDag(), algorithm.getProblem());
     }
@@ -249,6 +240,9 @@ public class ExperimentBNBuilder {
         System.out.println("differencesOfMalkovsBlanket avg: "+ differencesOfMalkovsBlanket[0]);
         System.out.println("differencesOfMalkovsBlanket plus: "+ differencesOfMalkovsBlanket[1]);
         System.out.println("differencesOfMalkovsBlanket minus: "+ differencesOfMalkovsBlanket[2]);
+        System.out.println("-----------------------------------------------------------------------");
+        System.out.println("Final BN Result:");
+        System.out.println(this.resultingBayesianNetwork);
     }
 
     public void saveExperiment(String savePath) throws IOException{
@@ -256,7 +250,7 @@ public class ExperimentBNBuilder {
         BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
         //FileWriter csvWriter = new FileWriter(savePath, true);
         if(file.length() == 0) {
-            String header = "algorithm," + this.algorithm.getHyperparamsHeader() + ",network,dataset,cges_threads,edge_limitation,SHD,bdeu,deltaMB,deltaMB+,deltaMB-,iterations,time(s)\n";
+            String header = "algorithm," + this.algorithm.getHyperParamsHeader() + ",network,dataset,cges_threads,edge_limitation,SHD,bdeu,deltaMB,deltaMB+,deltaMB-,iterations,time(s)\n";
             csvWriter.append(header);
         }
         csvWriter.append(this.getResults());
@@ -286,17 +280,13 @@ public class ExperimentBNBuilder {
         return numberOfIterations;
     }
 
-    public int getEdgeLimitation() {
-        return edgeLimitation;
-    }
-
     public String getAlgName() {
         return algName;
     }
 
     public String getResults(){
         return  this.algName + ","
-                + this.algorithm.getHyperparamsBody() + ","
+                + this.algorithm.getHyperParamsBody() + ","
                 + this.netName + ","
                 + this.databaseName + ","
                 + this.numberOfRealThreads + ","

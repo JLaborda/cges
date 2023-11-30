@@ -4,7 +4,7 @@ import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.cges.Resources;
-import org.albacete.simd.cges.bnbuilders.CircularDag;
+import org.albacete.simd.cges.bnbuilders.CircularProcess;
 import org.albacete.simd.cges.threads.BESThread;
 import org.albacete.simd.cges.threads.GESThread;
 import org.albacete.simd.cges.utils.Problem;
@@ -80,7 +80,7 @@ public class PairCombinedFusionTest {
         // Do the BESThread to complete the GES of the fusion
         BESThread bes = new BESThread(problem, expectedFusion, expectedFusion.getEdges());
         bes.run();
-        expectedFusion = CircularDag.transformPDAGtoDAG(bes.getCurrentGraph());
+        expectedFusion = CircularProcess.transformPDAGtoDAG(bes.getCurrentGraph());
 
         // Act
         PairCombinedFusion fusion = new PairCombinedFusion(problem, currentGraph, graphs);

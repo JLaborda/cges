@@ -1,15 +1,10 @@
 package org.albacete.simd.cges.utils;
 
-import consensusBN.PairWiseConsensusBES;
-import edu.cmu.tetrad.bayes.BayesIm;
 import edu.cmu.tetrad.bayes.BayesPm;
-import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.data.DataReader;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.data.DelimiterType;
-import edu.cmu.tetrad.data.DiscreteVariable;
 import edu.cmu.tetrad.graph.*;
-import edu.cmu.tetrad.search.SearchGraphUtils;
 import weka.classifiers.bayes.BayesNet;
 
 import java.io.File;
@@ -144,16 +139,13 @@ public class Utils {
         //2. Iterate over variables and save pairs
         for (int i = 0; i < data.getNumColumns() - 1; i++) {
             for (int j = i + 1; j < data.getNumColumns(); j++) {
-                // Getting pair of variables (Each variable is different)
+                // Getting a pair of variables (Each variable is different)
                 Node var_A = variables.get(i);
                 Node var_B = variables.get(j);
 
                 //3. Storing both pairs
                 setOfArcs.add(Edges.directedEdge(var_A, var_B));
                 setOfArcs.add(Edges.directedEdge(var_B, var_A));
-                //index++;
-                //this.setOfArcs[index] = new TupleNode(var_B,var_A);
-                //index++;
             }
         }
         return setOfArcs;
@@ -178,7 +170,6 @@ public class Utils {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return dataSet;
     }
 
@@ -202,73 +193,42 @@ public class Utils {
         return -1;
     }
 
-    private static void ensureVariables(ArrayList<Dag_n> setofbns){
-
+    private static List<Dag_n> ensureVariables(List<Dag_n> setofbns){
+        List<Dag_n> ensuredDags = new ArrayList<>();
         List<Node> nodes = setofbns.get(0).getNodes();
+        ensuredDags.add(new Dag_n(setofbns.get(0)));
         //System.out.println("Nodes: " + nodes);
         for(int i = 1 ; i< setofbns.size(); i++) {
             Dag_n oldDag = setofbns.get(i);
             Set<Edge> oldEdges = oldDag.getEdges();
-            Dag_n newdag = new Dag_n(nodes);
+            Dag_n newDag = new Dag_n(nodes);
             for(Edge e: oldEdges){
-                /*
-                System.out.println("Node1");
-                System.out.println(e.getNode1());
-                System.out.println("Node2");
-                System.out.println(e.getNode2());
-                */
-                //int tailIndex = nodes.indexOf(e.getNode1());
-                //int headIndex = nodes.indexOf(e.getNode2());
 
                 int tailIndex = getIndexOfNodeByName(nodes, e.getNode1().getName());
                 int headIndex = getIndexOfNodeByName(nodes, e.getNode2().getName());
 
-                //System.out.println("tail: " + tailIndex);
-                //System.out.println("head: "  + headIndex);
                 Edge newEdge = new Edge(nodes.get(tailIndex),nodes.get(headIndex), Endpoint.TAIL, Endpoint.ARROW);
-                newdag.addEdge(newEdge);
+                newDag.addEdge(newEdge);
             }
-            setofbns.remove(i);
-            setofbns.add(i, newdag);
+            ensuredDags.add(newDag);
         }
+        return ensuredDags;
     }
 
 
     public static int SHD (Dag_n bn1, Dag_n bn2) {
-
-        ArrayList<Dag_n> dags = new ArrayList<>();
+        if(bn1 == null || bn2 == null)
+            return -1;
+        List<Dag_n> dags = new ArrayList<>();
         dags.add(bn1);
         dags.add(bn2);
-        ensureVariables(dags);
+        dags = ensureVariables(dags);
 
         Graph g1 = new EdgeListGraph_n(dags.get(0));
         Graph g2 = new EdgeListGraph_n(dags.get(1));
 
-        for(Node n: dags.get(0).getNodes()) {
-            List<Node> p = dags.get(0).getParents(n);
-            for (int i=0; i<p.size()-1;i++)
-                for(int j=i+1; j<p.size();j++) {
-                    Edge e1 = g1.getEdge(p.get(i), p.get(j));
-                    Edge e2 = g1.getEdge(p.get(j), p.get(i));
-                    if(e1==null && e2 == null) {
-                        Edge e = new Edge(p.get(i),p.get(j),Endpoint.TAIL,Endpoint.TAIL);
-                        g1.addEdge(e);
-                    }
-                }
-        }
-
-        for(Node n: dags.get(1).getNodes()) {
-            List<Node> p = dags.get(1).getParents(n);
-            for (int i=0; i<p.size()-1;i++)
-                for(int j=i+1; j<p.size();j++) {
-                    Edge e1 = g2.getEdge(p.get(i), p.get(j));
-                    Edge e2 = g2.getEdge(p.get(j), p.get(i));
-                    if(e1==null && e2 == null) {
-                        Edge e = new Edge(p.get(i),p.get(j),Endpoint.TAIL,Endpoint.TAIL);
-                        g2.addEdge(e);
-                    }
-                }
-        }
+        moralizeGraph(g1);
+        moralizeGraph(g2);
 
         int sum = 0;
         for(Edge e: g1.getEdges()) {
@@ -285,6 +245,20 @@ public class Utils {
         return sum;
     }
 
+    public static void moralizeGraph(Graph graph) {
+        for(Node n: graph.getNodes()) {
+            List<Node> p = graph.getParents(n);
+            for (int i=0; i<p.size()-1;i++)
+                for(int j=i+1; j<p.size();j++) {
+                    Edge e1 = graph.getEdge(p.get(i), p.get(j));
+                    Edge e2 = graph.getEdge(p.get(j), p.get(i));
+                    if(e1==null && e2 == null) {
+                        Edge e = new Edge(p.get(i),p.get(j),Endpoint.TAIL,Endpoint.TAIL);
+                        graph.addEdge(e);
+                    }
+                }
+        }
+    }
 
 
     public static List<Node> getMarkovBlanket(Dag_n bn, Node n){
@@ -309,14 +283,14 @@ public class Utils {
     }
 
     /**
-     * Gives back the percentages of markov's blanquet difference with the original bayesian network. It gives back the
-     * percentage of difference with the blanquet of the original bayesian network, the percentage of extra nodes added
-     * to the blanquet and the percentage of missing nodes in the blanquet compared with the original.
-     * @param original
-     * @param created
-     * @return
+     * Gives back the percentages of markov's blanket difference with the original bayesian network. It gives back the
+     * percentage of difference with the blanket of the original bayesian network, the percentage of extra nodes added
+     * to the blanket and the percentage of missing nodes in the blanket compared with the original.
+     * @param original Original graph
+     * @param created Resulting graph of the structural learning algorithm
+     * @return scores of the average markov blanket
      */
-    public static double [] avgMarkovBlanquetdif(Dag_n original, Dag_n created) {
+    public static double [] avgMarkovBlanketDelta(Dag_n original, Dag_n created) {
 
         if (original.getNodes().size() != created.getNodes().size())
             return null;
@@ -326,7 +300,7 @@ public class Utils {
                 return null;
         }
 
-        // First number is the average dfMB, the second one is the amount of more variables in each MB, the last number is the the amount of missing variables in each MB
+        // First number is the average dfMB, the second one is the amount of more variables in each MB, the last number is the amount of missing variables in each MB
         double[] result = new double[3];
         double differenceNodes = 0;
         double plusNodes = 0;
@@ -341,8 +315,8 @@ public class Utils {
             List<Node> mb2 = getMarkovBlanket(created, e2);
 
 
-            ArrayList<String> names1 = new ArrayList<String>();
-            ArrayList<String> names2 = new ArrayList<String>();
+            ArrayList<String> names1 = new ArrayList<>();
+            ArrayList<String> names2 = new ArrayList<>();
             // Nodos de más en el manto creado
             for (Node n1 : mb1) {
                 String name1 = n1.getName();
@@ -412,146 +386,11 @@ public class Utils {
         return new Dag_n(g);
 
     }
-/*
-    public static double LL(BayesIm bn, DataSet data) {
 
-        BayesIm bayesIm;
-
-        int[][][] observedCounts;
-
-        Graph graph = bn.getDag();
-        Node[] nodes = new Node[graph.getNumNodes()];
-
-        observedCounts = new int[nodes.length][][];
-
-        int[][] observedCountsRowSum = new int[nodes.length][];
-
-        bayesIm = new MlBayesIm(bn);
-
-        for (int i = 0; i < nodes.length; i++) {
-
-            int numRows = bayesIm.getNumRows(i);
-            observedCounts[i] = new int[numRows][];
-
-            observedCountsRowSum[i] = new int[numRows];
-
-            for (int j = 0; j < numRows; j++) {
-
-                observedCountsRowSum[i][j] = 0;
-
-                int numCols = bayesIm.getNumColumns(i);
-                observedCounts[i][j] = new int[numCols];
-            }
-        }
-
-        //At this point set values in observedCounts
-
-        for (int j = 0; j < data.getNumColumns(); j++) {
-            DiscreteVariable var = (DiscreteVariable) data.getVariables().get(j);
-            String varName = var.getName();
-            Node varNode = bn.getDag().getNode(varName);
-            int varIndex = bayesIm.getNodeIndex(varNode);
-
-            int[] parentVarIndices = bayesIm.getParents(varIndex);
-
-            if (parentVarIndices.length == 0) {
-                //System.out.println("No parents");
-                for (int col = 0; col < var.getNumCategories(); col++) {
-                    observedCounts[varIndex][0][col] = 0;
-                }
-
-                for (int i = 0; i < data.getNumRows(); i++) {
-
-                    observedCounts[varIndex][0][data.getInt(i, j)] += 1.0;
-
-
-                }
-
-            }
-            else {    //For variables with parents:
-                int numRows = bayesIm.getNumRows(varIndex);
-
-                for (int row = 0; row < numRows; row++) {
-                    int[] parValues = bayesIm.getParentValues(varIndex, row);
-
-                    for (int col = 0; col < var.getNumCategories(); col++) {
-                        try{
-                            observedCounts[varIndex][row][col] = 0;
-                        }catch(Exception ex) {}
-                    }
-
-                    for (int i = 0; i < data.getNumRows(); i++) {
-                        //for a case where the parent values = parValues increment the estCount
-
-                        boolean parentMatch = true;
-
-                        for (int p = 0; p < parentVarIndices.length; p++) {
-                            if (parValues[p] != data.getInt(i, parentVarIndices[p])) {
-                                parentMatch = false;
-                                break;
-                            }
-                        }
-
-                        if (!parentMatch) {
-                            continue;  //Not a matching case; go to next.
-                        }
-
-                        observedCounts[varIndex][row][data.getInt(i, j)] += 1;
-                    }
-
-                }
-
-            }
-
-
-        }
-
-
-        for (int i = 0; i < nodes.length; i++) {
-            for (int j = 0; j < bayesIm.getNumRows(i); j++) {
-                for (int k = 0; k < bayesIm.getNumColumns(i); k++) {
-                    observedCountsRowSum[i][j] += observedCounts[i][j][k];
-                }
-            }
-        }
-
-        double sum = 0.0;
-
-        int n = nodes.length;
-
-        for (int i = 0; i < n; i++) {
-            int qi = bayesIm.getNumRows(i);
-            for (int j = 0; j < qi; j++) {
-                int ri = bayesIm.getNumColumns(i);
-                for (int k = 0; k < ri; k++) {
-                    try {
-                        double p1 = observedCounts[i][j][k];
-                        double p2 = observedCountsRowSum[i][j];
-                        double p3 = Math.log(p1/p2);
-                        if(p1 != 0.0) sum += p1 * p3;
-                    }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-            }
-
-        }
-
-        return sum / data.getNumRows() / data.getNumColumns();
-    }
-
-    public static double LL(Dag_n g, DataSet data) {
-        BayesPm bnaux = new BayesPm(g);
-        MlBayesIm bnOut = new MlBayesIm(bnaux, MlBayesIm.MANUAL);
-        return LL(bnOut, data);
-    }
-*/
     /**
      * Transforms a BayesNet read from a xbif file into a BayesPm object for tetrad
      *
-     * @param wekabn BayesNet read from an xbif file
+     * @param wekabn BayesNet read from a xbif file
      * @return The BayesPm of the BayesNet
      */
     public static BayesPm transformBayesNetToBayesPm(BayesNet wekabn) {
@@ -562,7 +401,7 @@ public class Utils {
             GraphNode node = new GraphNode(wekabn.getNodeName(indexNode));
             graph.addNode(node);
         }
-        // Adding all of the edges from the wekabn into the new Graph
+        // Adding all the edges from the wekabn into the new Graph
         for (int indexNode = 0; indexNode < wekabn.getNrOfNodes(); indexNode++) {
             int nParent = wekabn.getNrOfParents(indexNode);
             for (int np = 0; np < nParent; np++) {
