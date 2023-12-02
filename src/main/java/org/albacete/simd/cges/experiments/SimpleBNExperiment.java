@@ -7,6 +7,9 @@ import org.albacete.simd.cges.clustering.HierarchicalClustering;
 import org.albacete.simd.cges.utils.Utils;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.albacete.simd.cges.bnbuilders.CGES;
 
 public class SimpleBNExperiment {
@@ -20,13 +23,23 @@ public class SimpleBNExperiment {
         String net_path = networkFolder + net_name + ".xbif";
         String bbdd_path = datasetFolder  + net_name + "00.csv";
         DataSet ds = Utils.readData(bbdd_path);
+        Map<String,String> paramsMap = new HashMap<>();
+        paramsMap.put(ExperimentBNBuilder.KEYS[0], "cges");
+        paramsMap.put(ExperimentBNBuilder.KEYS[1], net_name);
+        paramsMap.put(ExperimentBNBuilder.KEYS[2], net_path);
+        paramsMap.put(ExperimentBNBuilder.KEYS[3], bbdd_path);
+        paramsMap.put(ExperimentBNBuilder.KEYS[4], "HierarchicalClustering");
+        paramsMap.put(ExperimentBNBuilder.KEYS[5], "4");
+        paramsMap.put(ExperimentBNBuilder.KEYS[6], "c2");
+        paramsMap.put(ExperimentBNBuilder.KEYS[7], "PAIR_BROADCASTING");
+        
 
         // 2. Setting Algorithm
         Clustering clustering = new HierarchicalClustering();
         CGES algorithm = new CGES(ds, clustering, 4, 100000, "c2", CGES.Broadcasting.PAIR_BROADCASTING);
 
-        //3. Create experiment environment
-        ExperimentBNBuilder experiment = new ExperimentBNBuilder(algorithm, net_name, net_path, bbdd_path);
+        //2. Create experiment environment
+        ExperimentBNBuilder experiment = new ExperimentBNBuilder(algorithm, paramsMap);
 
         // 4. Launch Experiment
         System.out.println("Alg Name: " + experiment.getAlgName());

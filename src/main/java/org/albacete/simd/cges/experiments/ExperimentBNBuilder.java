@@ -4,9 +4,11 @@ import edu.cmu.tetrad.bayes.BayesPm;
 import edu.cmu.tetrad.bayes.MlBayesIm;
 import edu.cmu.tetrad.graph.Dag_n;
 import org.albacete.simd.cges.bnbuilders.GES;
+import org.albacete.simd.cges.bnbuilders.CGES.Broadcasting;
 import org.albacete.simd.cges.bnbuilders.CGES;
 import org.albacete.simd.cges.clustering.Clustering;
 import org.albacete.simd.cges.clustering.HierarchicalClustering;
+import org.albacete.simd.cges.clustering.RandomClustering;
 import org.albacete.simd.cges.framework.BNBuilder;
 import org.albacete.simd.cges.threads.GESThread;
 import org.albacete.simd.cges.utils.Utils;
@@ -17,6 +19,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,16 +40,13 @@ import org.albacete.simd.cges.bnbuilders.FGES;
 public class ExperimentBNBuilder {
 
     protected BNBuilder algorithm;
-    protected String netPath;
-    protected String databasePath;
-    protected String netName;
-    protected String databaseName;
 
-
-    protected int numberOfRealThreads;
-    protected int edgeLimitation;
-    protected int maxIterations;
-    //protected static HashMap<String, HashMap<String,String>> map;
+    protected Map<String,String> paramsMap = new HashMap<>();
+    // Definir las claves como constantes de la clase
+    public static final String[] KEYS = {
+            "algName", "netName", "netPath", "databasePath",
+            "clusteringName", "numberOfRealThreads", "convergence", "broadcasting"
+    };
 
     protected int structuralHamiltonDistanceValue = Integer.MAX_VALUE;
     protected double bdeuScore;
@@ -63,67 +67,74 @@ public class ExperimentBNBuilder {
 
 
     public ExperimentBNBuilder(String[] parameters) throws Exception {
-        extractParametersForClusterExperiment(parameters);
+        //extractParametersForClusterExperiment(parameters);
+        extractParameters(parameters);
         createBNBuilder();
     }
-
-    public ExperimentBNBuilder(BNBuilder algorithm, String netName, String netPath, String bbddPath) {
+    public ExperimentBNBuilder(Map<String,String> paramsMap) throws Exception{
+        if(!checkKeys(paramsMap)){
+            System.out.println("Keys and paramsMap do not share the same keys or has a different lenght");
+            System.exit(1);
+        }
+        this.paramsMap = paramsMap;
+        createBNBuilder();
+    }
+    public ExperimentBNBuilder(BNBuilder algorithm, String[] parameters){
+        extractParameters(parameters);
+    }
+    public ExperimentBNBuilder(BNBuilder algorithm, Map<String,String> paramsMap){
+        if(!checkKeys(paramsMap)){
+            System.out.println("Keys and paramsMap do not share the same keys or has a different lenght");
+            System.exit(1);
+        }
+        this.paramsMap = paramsMap;
         this.algorithm = algorithm;
-        this.netName = netName;
-        this.netPath = netPath;
-        this.databasePath = bbddPath;
-        this.algName = algorithm.getClass().getSimpleName();
-
-        Pattern pattern = Pattern.compile(".*/(.*).csv");
-        Matcher matcher = pattern.matcher(this.databasePath);
-        if (matcher.find()) {
-            databaseName = matcher.group(1);
-        }
-        this.numberOfRealThreads = algorithm.getNumberOfThreads();
-        this.maxIterations = algorithm.getMaxIterations();
-        this.edgeLimitation = algorithm.getItInterleaving();
     }
 
-
-
-    private void extractParametersForClusterExperiment(String[] parameters){
-        System.out.println("Extracting parameters...");
-        System.out.println("Number of hyperparams: " + parameters.length);
-        int i=0;
-        for (String string : parameters) {
-            System.out.println("Param[" + i + "]: " + string);
-            i++;
+    private boolean checkKeys(Map<String,String> paramsMap){
+        if(paramsMap.keySet().size()!= KEYS.length){
+            System.out.println("Map and keys don't kave the same size");
+            return false;
         }
-        algName = parameters[0];
-        netName = parameters[1];
-        netPath = parameters[2];
-        databasePath = parameters[3];
-        databaseName = getDatabaseNameFromPattern();
 
-        numberOfRealThreads = Integer.parseInt(parameters[4]);
-        edgeLimitation = Integer.parseInt(parameters[5]);
-    }
-    
-    public boolean checkExistentFile(String savePath){
-        File file = new File(savePath);
-
-        return file.length() != 0;
-    }
-    
-
-    private String getDatabaseNameFromPattern(){
-        // Matching the end of the csv file to get the name of the database
-        Pattern pattern = Pattern.compile(".*/(.*).csv");
-        Matcher matcher = pattern.matcher(this.databasePath);
-        if (matcher.find()) {
-            return matcher.group(1);
+        for(String key : KEYS){
+            if(!paramsMap.keySet().contains(key))
+                return false;
         }
-        return null;
+        return true;
+    }
+
+    private void extractParameters(String[] parameters) {
+        // Comprobar el tamaño de los parámetros
+        if(parameters.length != KEYS.length){
+            System.out.println("The amount of parameters must be: " + KEYS.length);
+            System.exit(1);
+        }
+
+        // Asignar los valores a variables específicas
+        for(int i = 0; i < parameters.length; i++){
+            String key = KEYS[i];
+            String value = parameters[i];
+            this.paramsMap.put(key,value);
+        }
     }
 
     private void createBNBuilder() throws Exception {
+        String clusteringName = paramsMap.get("clusteringName");        
         Clustering clustering;
-
+        if(clusteringName.equals("HierarchicalClustering"))
+            clustering = new HierarchicalClustering();
+        else
+            clustering = new RandomClustering();
+        
+        algorithm = new CGES(paramsMap.get("databasePath"),
+                        clustering,
+                        Integer.parseInt(paramsMap.get("numberOfRealThreads")),
+                        paramsMap.get("convergence"),
+                        Broadcasting.valueOf(paramsMap.get("broadcasting"))
+                        );
+        
+        /*
         switch(algName) {
             case "ges":
                 algorithm = new GES(databasePath, true);
@@ -160,6 +171,24 @@ public class ExperimentBNBuilder {
             default:
                 throw new Exception("Error... Algoritmo incorrecto: " + algName);
         }
+        */
+    }
+
+    
+    public boolean checkExistentFile(String savePath){
+        File file = new File(savePath);
+        return file.length() != 0;
+    }
+    
+
+    public static String getDatabaseNameFromPattern(String databasePath){
+        // Matching the end of the csv file to get the name of the database
+        Pattern pattern = Pattern.compile(".*/(.*).csv");
+        Matcher matcher = pattern.matcher(databasePath);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 
 
@@ -189,20 +218,15 @@ public class ExperimentBNBuilder {
     private void printExperimentInformation() {
         System.out.println("Starting Experiment:");
         System.out.println("-----------------------------------------");
-        System.out.println("\tNet Name: " + netName);
-        System.out.println("\tBBDD Name: " + databaseName);
-        //System.out.println("\tFusion Consensus: " + fusion_consensus);
-        System.out.println("\tnPGESThreads: " + numberOfRealThreads);
-        System.out.println("\tnItInterleaving: " + edgeLimitation);
-        System.out.println("-----------------------------------------");
-
-        System.out.println("Net_path: " + netPath);
-        System.out.println("BBDD_path: " + databasePath);
+        for (String key : paramsMap.keySet()) {
+            String parameter = paramsMap.get(key);
+            System.out.println(key + ": " + parameter);
+        }
     }
 
     private MlBayesIm readOriginalBayesianNetwork() throws Exception {
         BIFReader bayesianReader = new BIFReader();
-        bayesianReader.processFile(this.netPath);
+        bayesianReader.processFile(this.paramsMap.get("netPath"));
         System.out.println("Numero de variables: " + bayesianReader.getNrOfNodes());
 
         //Transforming the BayesNet into a BayesPm
@@ -287,10 +311,10 @@ public class ExperimentBNBuilder {
     public String getResults(){
         return  this.algName + ","
                 + this.algorithm.getHyperParamsBody() + ","
-                + this.netName + ","
-                + this.databaseName + ","
-                + this.numberOfRealThreads + ","
-                + this.edgeLimitation + ","
+                + this.paramsMap.get("netName") + ","
+                + getDatabaseNameFromPattern(paramsMap.get("databasePath")) + ","
+                + paramsMap.get("numberOfRealThreads") + ","
+                + this.algorithm.getItInterleaving() + ","
                 + this.structuralHamiltonDistanceValue + ","
                 + this.bdeuScore + ","
                 + this.differencesOfMalkovsBlanket[0] + ","
@@ -305,21 +329,40 @@ public class ExperimentBNBuilder {
     }
 
     public String getNetPath() {
-        return netPath;
+        return paramsMap.get("netPath");
     }
 
     public String getDatabasePath() {
-        return databasePath;
+        return paramsMap.get("databasePath");
     }
 
     public String getNetName() {
-        return netName;
+        return paramsMap.get("netName");
+    }
+
+    public String getSaveFileName(){
+        int i=0;
+        StringBuilder fileNameBuilder = new StringBuilder();
+        for (String value : paramsMap.values()) {
+            fileNameBuilder.append(value);
+            if (++i < paramsMap.size()) {
+                fileNameBuilder.append("_");
+            }
+        }
+        fileNameBuilder.append("csv");
+        return fileNameBuilder.toString();
     }
 
 
     @Override
     public String toString() {
-        return "-----------------------\nExperiment " + algName + "\n-----------------------\nNet Name: " + netName + "\tDatabase: " + databaseName  + "\tInterleaving: " + edgeLimitation + "\tMax. Iterations: " + maxIterations;
+        StringBuilder result = new StringBuilder();
+        result.append("-----------------------\nExperiment " + algName);
+        for (String key : paramsMap.keySet()) {
+            String parameter = paramsMap.get(key);
+            result.append(key + ": " + parameter);
+        }
+        return  result.toString();
     }
 }
 

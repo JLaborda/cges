@@ -25,22 +25,18 @@ public class ExperimentBNLauncher {
         ExperimentBNLauncher experimentBNLauncher = getExperimentBNLauncherFromCommandLineArguments(args);
         String[] parameters = experimentBNLauncher.readParameters();
 
-        System.out.println("Launching experiment");
+        System.out.println("Creating experiment object...");
         experimentBNLauncher.createExperiment(parameters);
         
-        if (!experimentBNLauncher.checkExistentFile()){
-            System.out.println("Starting experiment");
-            experimentBNLauncher.runExperiment();
-            experimentBNLauncher.saveExperiment();
-            System.out.println("Experiment finished");
-        }
-        else{
-            System.out.println("Experiment has already been done. Therefore, it has not been run again.");
-        }
+        System.out.println("Starting experiment...");
+        experimentBNLauncher.runExperiment();
+        experimentBNLauncher.saveExperiment();
+        System.out.println("Experiment finished!");
+        
     }
 
     private static ExperimentBNLauncher getExperimentBNLauncherFromCommandLineArguments(String[] args) {
-        int i = 1;
+        int i = 0;
         System.out.println("Number of args: "  + args.length);
         for (String string : args) {
             System.out.println("Args " + i + ": " + string);
@@ -86,9 +82,7 @@ public class ExperimentBNLauncher {
     }
 
     private boolean checkExistentFile() {
-        String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + experiment.netName + "_" + experiment.algName + "_" + 
-                experiment.databaseName + "_t" + experiment.numberOfRealThreads + "_PGESt" + experiment.numberOfRealThreads +
-                "_i" + experiment.edgeLimitation + ".csv";
+        String savePath = EXPERIMENTS_FOLDER  + experiment.getSaveFileName();
         
         return experiment.checkExistentFile(savePath);
     }
@@ -96,9 +90,7 @@ public class ExperimentBNLauncher {
     private void saveExperiment() {
         String results = experiment.getResults();
 
-        String savePath = EXPERIMENTS_FOLDER  + "experiment_results_" + experiment.netName + "_" + experiment.algName + "_" + 
-                experiment.databaseName + "_t" + experiment.numberOfRealThreads + "_PGESt" + experiment.numberOfRealThreads +
-                "_i" + experiment.edgeLimitation + ".csv";
+        String savePath = EXPERIMENTS_FOLDER  + experiment.getSaveFileName();
         try {
             saveExperiment(savePath, results);
         } catch (IOException e) {

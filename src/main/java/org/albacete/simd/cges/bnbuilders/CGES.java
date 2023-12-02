@@ -45,6 +45,23 @@ public class CGES extends BNBuilder {
     public CGES(String path, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence, Broadcasting typeBroadcasting) {
         this(Utils.readData(path), clustering, nThreads, nItInterleaving, typeConvergence, typeBroadcasting);
     }
+
+    public CGES(String path, Clustering clustering, int nThreads, String typeConvergence, Broadcasting typeBroadcasting) {
+        super(path, nThreads, -1, -1);
+        this.clustering = clustering;
+        clustering.setProblem(problem);
+        this.cgesProcesses = new ArrayList<>(nThreads);
+        this.typeConvergence = typeConvergence;
+        this.typeBroadcasting = typeBroadcasting;
+        this.interleaving = (int) (10 / nThreads * Math.sqrt(problem.getVariables().size()));
+        setHyperParamsHeader("clustering,nThreads,interleaving,typeConvergence,typeBroadcasting");
+        setHyperParamsBody(clustering.getClass().getSimpleName() + "," + nThreads + "," + this.interleaving + "," + typeConvergence + "," + typeBroadcasting);
+        
+        this.interleaving = (int) (10 / nThreads * Math.sqrt(problem.getVariables().size()));
+
+    }
+
+
     
     
     @Override
