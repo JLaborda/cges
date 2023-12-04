@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Nombre del trabajo en PBS
-JOB_NAME="cges-jlaborda"
+JOB_NAME="cges-B"
 
 # Parameters path
-PARAMS="/home/jorlabs/projects/cges/res/parameters/prueba.txt" # Esta puesta la de prueba
+PARAMS="/home/jorlabs/projects/cges/res/parameters/params.txt"
 
 # Script paths
 SCRIPT="/home/jorlabs/projects/cges/res/scripts/run_experiment.bash"

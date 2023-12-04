@@ -117,6 +117,12 @@ public class ExperimentBNBuilder {
             String value = parameters[i];
             this.paramsMap.put(key,value);
         }
+
+        System.out.println("Extracted Parameters:");
+        for(String key : paramsMap.keySet()){
+            String value = paramsMap.get(key);
+            System.out.println(key + ": " + value);
+        }
     }
 
     private void createBNBuilder() throws Exception {
@@ -341,15 +347,25 @@ public class ExperimentBNBuilder {
     }
 
     public String getSaveFileName(){
+        /*    public static final String[] KEYS = {
+            "algName", "netName", "netPath", "databasePath",
+            "clusteringName", "numberOfRealThreads", "convergence", "broadcasting"
+    }; */
         int i=0;
         StringBuilder fileNameBuilder = new StringBuilder();
-        for (String value : paramsMap.values()) {
-            fileNameBuilder.append(value);
-            if (++i < paramsMap.size()) {
-                fileNameBuilder.append("_");
-            }
-        }
-        fileNameBuilder.append("csv");
+        fileNameBuilder.append("exp_");
+        fileNameBuilder.append(paramsMap.get("algName"));
+        fileNameBuilder.append("_");
+        fileNameBuilder.append(paramsMap.get("netName"));
+        fileNameBuilder.append("_");
+        fileNameBuilder.append("T");
+        fileNameBuilder.append(paramsMap.get("numberOfRealThreads"));
+        fileNameBuilder.append("_");
+        fileNameBuilder.append(paramsMap.get("convergence"));
+        fileNameBuilder.append("_");
+        fileNameBuilder.append(paramsMap.get("broadcasting"));
+        
+        fileNameBuilder.append(".csv");
         return fileNameBuilder.toString();
     }
 

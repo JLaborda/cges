@@ -12,16 +12,6 @@ PARAMS_OUTPUT="/home/jorlabs/projects/cges/res/parameters/params.txt"
 # Redes disponibles
 NETWORKS=("pigs" "andes" "link" "munin")
 
-# Conjunto de datasets para cada red
-DATASETS=()
-for network in "${NETWORKS[@]}"; do
-  for i in {00..10}; do
-    DATASETS+=("${PROJECT_DIR}${DATASETS_DIR}${network}/${network}${i}.csv")
-  done
-  DATASETS+=("${PROJECT_DIR}${DATASETS_DIR}${network}/${network}_ALL.csv")
-done
-
-
 # Otros parámetros fijos
 CLUSTERING="HierarchicalClustering"
 NTHREADS=("1" "2" "4" "8")
@@ -30,10 +20,17 @@ BROADCASTING=("NO_BROADCASTING" "PAIR_BROADCASTING" "ALL_BROADCASTING")
 
 # Genera todas las combinaciones de parámetros
 for network in "${NETWORKS[@]}"; do
+  # Conjunto de datasets para la red actual
+  DATASETS=()
+  for i in {00..10}; do
+    DATASETS+=("${PROJECT_DIR}${DATASETS_DIR}${network}/${network}${i}.csv")
+  done
+  DATASETS+=("${PROJECT_DIR}${DATASETS_DIR}${network}/${network}_ALL.csv")
+
   for dataset in "${DATASETS[@]}"; do
     for nthreads in "${NTHREADS[@]}"; do
       for broadcasting in "${BROADCASTING[@]}"; do
-        netpath=${PROJECT_DIR}${NETWORKS_DIR}${network}/${network}.xbif"
+        netpath="${PROJECT_DIR}${NETWORKS_DIR}${network}/${network}.xbif"
         echo "cges ${network} ${netpath} ${dataset} ${CLUSTERING} ${nthreads} ${CONVERGENCE} ${broadcasting}"
       done
     done

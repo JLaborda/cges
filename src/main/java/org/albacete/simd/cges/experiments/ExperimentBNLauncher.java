@@ -60,6 +60,12 @@ public class ExperimentBNLauncher {
         } catch(IOException e){
             e.printStackTrace();
         }
+        
+        System.out.println("Parameters read:");
+        for (int i = 0; i < parameterStrings.length; i++) {
+            System.out.println("Index: " + i + "\t" + parameterStrings[i]);
+        }
+
         return parameterStrings;
     }
 

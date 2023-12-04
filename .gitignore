@@ -29,4 +29,9 @@ replay_pid*
 /scripts/
 /results/
 
+# Experiment outputs and errors
+*.e*
+*.o*
+
+# target folder
 /target/*
