@@ -94,6 +94,12 @@ public abstract class BNBuilder {
 
     private String hyperParamsHeader;
 
+    protected String algorithmName = this.getClass().getSimpleName();
+
+    protected String networkName;
+
+    protected String databaseName;
+
 
     public BNBuilder(DataSet data, int numberOfThreads, int maxIterations, int interleaving){
         this.problem = new Problem(data);
@@ -234,7 +240,6 @@ public abstract class BNBuilder {
     }
 
     public Dag_n getCurrentDag() {
-        //TODO: Transform the graph (EdgeListGraph) into a Dag_n
         return Utils.removeInconsistencies(this.currentGraph);
     }
 

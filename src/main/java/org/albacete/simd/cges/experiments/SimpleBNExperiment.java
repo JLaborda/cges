@@ -45,15 +45,14 @@ public class SimpleBNExperiment {
         System.out.println("Alg Name: " + experiment.getAlgName());
         experiment.runExperiment();
         experiment.printResults();
-        String savePath = "results/prueba.txt";
+        String savePath = "results/pruebas/" + experiment.getSaveFileName();//String savePath = "results/prueba.txt";
 
         // 5. Save Experiment
-        try {
-            experiment.printResults();
-            System.out.println("Number of times broadcasting fusion is used: " + CircularProcess.fusionWinCounter);
-            experiment.saveExperiment(savePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        experiment.printResults();
+        System.out.println("Number of times broadcasting fusion is used: " + CircularProcess.fusionWinCounter);
+        
+        System.out.println("Saving at: " + savePath);
+        experiment.saveExperiment(savePath);
+
     }
 }

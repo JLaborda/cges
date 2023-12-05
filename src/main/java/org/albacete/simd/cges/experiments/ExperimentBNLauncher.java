@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.albacete.simd.cges.framework.BNBuilder;
+
 public class ExperimentBNLauncher {
 
     private final String EXPERIMENTS_FOLDER;
@@ -94,29 +96,8 @@ public class ExperimentBNLauncher {
     }
 
     private void saveExperiment() {
-        String results = experiment.getResults();
-
         String savePath = EXPERIMENTS_FOLDER  + experiment.getSaveFileName();
-        try {
-            saveExperiment(savePath, results);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Error saving results at: " + savePath);
-        }
+        experiment.saveExperiment(savePath);
     }
     
-    public static void saveExperiment(String savePath, String results) throws IOException{
-        File file = new File(savePath);
-            BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
-            //FileWriter csvWriter = new FileWriter(savePath, true);
-            if(file.length() == 0) {
-                String header = "algorithm,network,bbdd,threads,pges_threads,interleaving,seed,SHD,loglike,bdeu,deltaMM,deltaMM+,deltaMM-,iterations,time(s)\n";
-                csvWriter.append(header);
-            }
-            csvWriter.append(results);
-
-            csvWriter.flush();
-            csvWriter.close();
-            System.out.println("Results saved at: " + savePath);
-    }
 }

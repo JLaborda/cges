@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +42,9 @@ public class ExperimentBNBuilder {
 
     protected BNBuilder algorithm;
 
-    protected Map<String,String> paramsMap = new HashMap<>();
+    protected Map<String,String> paramsMap = new LinkedHashMap<>();
+    protected Map<String,Double> measurementsMap = new LinkedHashMap<>();
+
     // Definir las claves como constantes de la clase
     public static final String[] KEYS = {
             "algName", "netName", "netPath", "databasePath",
@@ -254,6 +257,15 @@ public class ExperimentBNBuilder {
         this.differencesOfMalkovsBlanket = Utils.avgMarkovBlanketDelta(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag());
         this.numberOfIterations = algorithm.getIterations();
         this.bdeuScore = GESThread.scoreGraph(algorithm.getCurrentDag(), algorithm.getProblem());
+
+        measurementsMap.put("elapsedTime", (double) stopWatch.getTime(TimeUnit.MILLISECONDS));
+        measurementsMap.put("shd", (double)Utils.SHD(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag()));
+        measurementsMap.put("dfMM_avg", differencesOfMalkovsBlanket[0]);
+        measurementsMap.put("dfMM_plus", differencesOfMalkovsBlanket[1]);
+        measurementsMap.put("dfMM_minus", differencesOfMalkovsBlanket[1]);
+        measurementsMap.put("iterations", (double) algorithm.getIterations());
+        measurementsMap.put("bdeu", GESThread.scoreGraph(algorithm.getCurrentDag(), algorithm.getProblem()));
+
     }
 
     public void printResults() {
@@ -275,20 +287,98 @@ public class ExperimentBNBuilder {
         System.out.println(this.resultingBayesianNetwork);
     }
 
-    public void saveExperiment(String savePath) throws IOException{
-        File file = new File(savePath);
-        BufferedWriter csvWriter = new BufferedWriter(new FileWriter(savePath, true));
-        //FileWriter csvWriter = new FileWriter(savePath, true);
-        if(file.length() == 0) {
-            String header = "algorithm," + this.algorithm.getHyperParamsHeader() + ",network,dataset,cges_threads,edge_limitation,SHD,bdeu,deltaMB,deltaMB+,deltaMB-,iterations,time(s)\n";
-            csvWriter.append(header);
-        }
-        csvWriter.append(this.getResults());
+    public void saveExperiment(String savePath) {
+        // Verificar si el archivo ya existe
+        boolean fileExists = new File(savePath).exists();
 
-        csvWriter.flush();
-        csvWriter.close();
-        System.out.println("Results saved at: " + savePath);
+        try (FileWriter csvWriter = new FileWriter(savePath, true)) {
+            // Si el archivo no existe, escribir el encabezado
+            if (!fileExists) {
+                // Obtener las claves del mapa (parámetros) y agregar las medidas
+                String header = getHeaderForParameters() + "," + getHeaderForMeasurements() + "\n" ;
+                csvWriter.append(header);
+            }
+
+            // Obtener los valores del mapa y agregar las medidas
+            String bodyLine = getBodyParams() + "," + getBodyMeasurements();
+
+            csvWriter.append(bodyLine);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Manejar la excepción según tus necesidades
+        }
     }
+
+    private String getHeaderForParameters(){
+        StringBuilder headerBuilder = new StringBuilder();
+
+        for (String key : paramsMap.keySet()) {
+        
+            // Verificar si el valor contiene el substring "path"
+            if (!key.contains("Path")) {
+                headerBuilder.append(key).append(",");
+            }
+        }
+
+        // Eliminar la coma final si hay al menos un parámetro en el encabezado
+        if (headerBuilder.length() > 0) {
+            headerBuilder.deleteCharAt(headerBuilder.length() - 1);
+        }
+
+        return headerBuilder.toString();
+
+    }
+
+    private String getHeaderForMeasurements(){
+        StringBuilder headerBuilder = new StringBuilder();
+
+        // Añadiendo las claves al header
+        for (String key : measurementsMap.keySet()) {
+            headerBuilder.append(key).append(",");
+        }
+
+        // Eliminar la coma final si hay al menos un parámetro en el encabezado
+        if (headerBuilder.length() > 0) {
+            headerBuilder.deleteCharAt(headerBuilder.length() - 1);
+        }
+
+        return headerBuilder.toString();
+    }
+
+    private String getBodyParams(){
+        StringBuilder builder = new StringBuilder();
+
+        for (Map.Entry<String,String> entry : paramsMap.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            // Verificar si el valor contiene el substring "path"
+            if (!key.contains("Path")) {
+                builder.append(value).append(",");
+            }
+        }
+
+        // Eliminar la coma final si hay al menos un parámetro en el encabezado
+        if (builder.length() > 0) {
+            builder.deleteCharAt(builder.length() - 1);
+        }
+
+        return builder.toString();
+    }
+
+        private String getBodyMeasurements(){
+            StringBuilder builder = new StringBuilder();
+
+            for (Double value : measurementsMap.values()) {
+                builder.append(value).append(",");
+            }
+
+            // Eliminar la coma final si hay al menos un parámetro en el encabezado
+            if (builder.length() > 0) {
+                builder.deleteCharAt(builder.length() - 1);
+            }
+
+            return builder.toString();
+        }
 
     public double[] getDifferencesOfMalkovsBlanket() {
         return differencesOfMalkovsBlanket;
@@ -315,8 +405,7 @@ public class ExperimentBNBuilder {
     }
 
     public String getResults(){
-        return  this.algName + ","
-                + this.algorithm.getHyperParamsBody() + ","
+        return  this.paramsMap.get("algName") + ","
                 + this.paramsMap.get("netName") + ","
                 + getDatabaseNameFromPattern(paramsMap.get("databasePath")) + ","
                 + paramsMap.get("numberOfRealThreads") + ","
@@ -347,11 +436,6 @@ public class ExperimentBNBuilder {
     }
 
     public String getSaveFileName(){
-        /*    public static final String[] KEYS = {
-            "algName", "netName", "netPath", "databasePath",
-            "clusteringName", "numberOfRealThreads", "convergence", "broadcasting"
-    }; */
-        int i=0;
         StringBuilder fileNameBuilder = new StringBuilder();
         fileNameBuilder.append("exp_");
         fileNameBuilder.append(paramsMap.get("algName"));
@@ -364,6 +448,14 @@ public class ExperimentBNBuilder {
         fileNameBuilder.append(paramsMap.get("convergence"));
         fileNameBuilder.append("_");
         fileNameBuilder.append(paramsMap.get("broadcasting"));
+
+        String datasetPath = paramsMap.get("databasePath");
+        String[] pathComponents = datasetPath.split("/");
+        String datasetIdentifier = pathComponents[pathComponents.length - 1].replace(".csv", "");
+    
+        fileNameBuilder.append("_");
+        fileNameBuilder.append(datasetIdentifier);
+    
         
         fileNameBuilder.append(".csv");
         return fileNameBuilder.toString();
