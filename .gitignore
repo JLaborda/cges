@@ -35,3 +35,9 @@ replay_pid*
 
 # target folder
 /target/*
+
+# Code coverage
+cov.xml
+
+# .idea folder
+.idea/
