@@ -7,8 +7,8 @@ JOB_NAME="cges-B"
 PARAMS="/home/jorlabs/projects/cges/res/parameters/params.txt"
 
 # Script paths
-SCRIPT="/home/jorlabs/projects/cges/res/scripts/run_experiment.bash"
-BUILD_SCRIPT="/home/jorlabs/projects/cges/res/scripts/build.bash"
+SCRIPT="/home/jorlabs/projects/cges/res/scripts/experiments/run_experiment.bash"
+BUILD_SCRIPT="/home/jorlabs/projects/cges/res/scripts/experiments/build.bash"
 
 # Número total de experimentos
 TOTAL_EXPERIMENTS=$(wc -l < ${PARAMS})
