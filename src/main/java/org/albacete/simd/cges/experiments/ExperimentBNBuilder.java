@@ -258,7 +258,7 @@ public class ExperimentBNBuilder {
         this.numberOfIterations = algorithm.getIterations();
         this.bdeuScore = GESThread.scoreGraph(algorithm.getCurrentDag(), algorithm.getProblem());
 
-        measurementsMap.put("elapsedTime", (double) stopWatch.getTime(TimeUnit.MILLISECONDS));
+        measurementsMap.put("elapsedTime(s)", (double) stopWatch.getTime(TimeUnit.MILLISECONDS) / 1000);
         measurementsMap.put("shd", (double)Utils.SHD(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag()));
         measurementsMap.put("dfMM_avg", differencesOfMalkovsBlanket[0]);
         measurementsMap.put("dfMM_plus", differencesOfMalkovsBlanket[1]);
@@ -319,6 +319,9 @@ public class ExperimentBNBuilder {
                 headerBuilder.append(key).append(",");
             }
         }
+        //Añadir el nombre de la base de datos
+        headerBuilder.append("database").append(",");
+
 
         // Eliminar la coma final si hay al menos un parámetro en el encabezado
         if (headerBuilder.length() > 0) {
@@ -356,6 +359,8 @@ public class ExperimentBNBuilder {
                 builder.append(value).append(",");
             }
         }
+        // Añadir el nombre de la base de datos
+        builder.append(getDatabaseNameFromPattern(paramsMap.get("databasePath"))).append(",");
 
         // Eliminar la coma final si hay al menos un parámetro en el encabezado
         if (builder.length() > 0) {
