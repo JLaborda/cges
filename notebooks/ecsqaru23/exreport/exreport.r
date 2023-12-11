@@ -1,11 +1,11 @@
 library(exreport)
-setwd("/home/pablo/Documentos/- 6. Doctorado/ParallelBNs/notebooks/exreport/")
+setwd("/Users/jdls/developer/projects/cges/notebooks/broadcasting_experiments/exreport")
 
 # read csv results-pred-acc.csv
 csv <- read.csv("exreport.csv")
 
 # print info of variables
-str(csv) 
+str(csv)
 
 experiment <- expCreate(csv, name="pGES", methods="algorithm", problems="network", parameters=c("pges_threads"))
 summary(experiment)
