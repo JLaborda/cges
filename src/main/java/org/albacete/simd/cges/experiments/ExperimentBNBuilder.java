@@ -84,6 +84,7 @@ public class ExperimentBNBuilder {
     }
     public ExperimentBNBuilder(BNBuilder algorithm, String[] parameters){
         extractParameters(parameters);
+        this.algorithm = algorithm;
     }
     public ExperimentBNBuilder(BNBuilder algorithm, Map<String,String> paramsMap){
         if(!checkKeys(paramsMap)){
@@ -406,7 +407,7 @@ public class ExperimentBNBuilder {
     }
 
     public String getAlgName() {
-        return algName;
+        return paramsMap.get("algName");
     }
 
     public String getResults(){
