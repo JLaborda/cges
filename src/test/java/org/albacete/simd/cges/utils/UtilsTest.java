@@ -385,4 +385,19 @@ public class UtilsTest {
         return graph;
     }
 
+@Test
+public void shuffleCollectionTest() {
+    // Create a collection with some elements
+    List<Integer> collection = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5));
+
+    // Shuffle the collection
+    Utils.shuffleCollection(collection);
+
+    // Verify that the collection has the same elements, but in a different order
+    List<Integer> expected = Arrays.asList(1, 2, 3, 4, 5);
+    assertNotEquals(expected, collection);
+    assertTrue(collection.containsAll(expected));
+    assertTrue(expected.containsAll(collection));
+}
+
 }
