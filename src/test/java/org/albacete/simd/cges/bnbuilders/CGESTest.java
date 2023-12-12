@@ -69,6 +69,35 @@ public class CGESTest {
         assertNotNull(result);
     }
 
+    @Test
+    public void randomBroadcastingTest(){
+        // Create an instance of the CGES class
+        Clustering clustering = new HierarchicalClustering();
+        int nThreads = 4;
+        int nItInterleaving = 100000;
+        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, nItInterleaving, "c2", CGES.Broadcasting.RANDOM_BROADCASTING);
+
+        // Execute the search() method
+        Graph result = builder.search();
+
+        // Verify if a valid graph has been returned
+        assertNotNull(result);
+    }
+
+    @Test
+    public void bestBroadcastingTest(){
+        // Create an instance of the CGES class
+        Clustering clustering = new HierarchicalClustering();
+        int nThreads = 4;
+        int nItInterleaving = 100000;
+        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, nItInterleaving, "c2", CGES.Broadcasting.BEST_BROADCASTING);
+
+        // Execute the search() method
+        Graph result = builder.search();
+
+        // Verify if a valid graph has been returned
+        assertNotNull(result);
+    }
 
 
 
