@@ -415,4 +415,13 @@ public class Utils {
 
     }
 
+    /**
+     * Shuffle collection using the random object of Utils class.
+     */
+    public static <T> void shuffleCollection(Collection<T> collection){
+        List<T> list = new ArrayList<>(collection);
+        Collections.shuffle(list, random);
+        collection.clear();
+        collection.addAll(list);
+    }
 }

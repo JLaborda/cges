@@ -26,9 +26,10 @@ public class CGES extends BNBuilder {
     private double lastBestBDeu = Double.NEGATIVE_INFINITY;
     private boolean convergence;
 
-    public enum Broadcasting {NO_BROADCASTING, PAIR_BROADCASTING, ALL_BROADCASTING}
-
+    public enum Broadcasting {NO_BROADCASTING, PAIR_BROADCASTING, ALL_BROADCASTING, RANDOM_BROADCASTING, BEST_BROADCASTING}
     private final Broadcasting typeBroadcasting;
+
+    private Random random = new Random(getSeed());
     
     public CGES(DataSet data, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence, Broadcasting typeBroadcasting) {
         super(data, nThreads, -1, nItInterleaving);
@@ -61,8 +62,6 @@ public class CGES extends BNBuilder {
 
     }
 
-
-    
     
     @Override
     public Graph search(){
@@ -70,20 +69,9 @@ public class CGES extends BNBuilder {
         initialConfig();
 
         //2. Do circular fusion while convergence is false
-         switch(typeBroadcasting) {
-             case NO_BROADCASTING:
-                 this.noBroadcastingSearch();
-                 break;
-             case PAIR_BROADCASTING:
-                 this.pairBroadcastingSearch();
-                 break;
-             case ALL_BROADCASTING:
-                 this.allBroadcastingSearch();
-                 break;
-         }
+        search(this.typeBroadcasting);
 
-        //3. Print and return last graph
-        //printResults();
+        //3. Generate the best graph from the search
         calculateBestGraph();
         currentGraph = bestCircularProcess.dag;
         
@@ -115,6 +103,30 @@ public class CGES extends BNBuilder {
     private void initializeThreads(){
         for (int i = 0; i < numberOfThreads; i++) {
             cgesProcesses.add(new CircularProcess(problem,subsetEdges.get(i), interleaving,i));
+        }
+    }
+
+    /**
+     * This method selects the type of search to be performed by the CGES processes.
+     * @param typeBroadcasting Type of broadcasting to be used in the search.
+     */
+    private void search(Broadcasting typeBroadcasting) {
+        switch (typeBroadcasting) {
+            case NO_BROADCASTING:
+                noBroadcastingSearch();
+                break;
+            case PAIR_BROADCASTING:
+                pairBroadcastingSearch();
+                break;
+            case ALL_BROADCASTING:
+                allBroadcastingSearch();
+                break;
+            case RANDOM_BROADCASTING:
+                randomBroadcastingSearch();
+                break;
+            case BEST_BROADCASTING:
+                bestBroadcastingSearch();
+                break;
         }
     }
 
@@ -203,6 +215,59 @@ public class CGES extends BNBuilder {
         }while(notConverged());
     }
 
+    private void randomBroadcastingSearch(){
+        do{
+            it++;
+            // Add random input dags
+            addRandomInput();
+            cgesProcesses.parallelStream().forEach(cdag -> {
+                try {
+                    cdag.noBroadcastingSearch();
+                } catch (InterruptedException e) {
+                    System.out.println("Error with InterruptedException: " +
+                            "\n Dag_n Id: " + cdag.id +
+                            "\n Dag_n graph: " + cdag.dag);
+                    throw new RuntimeException(e);
+                }
+            });
+        }while(notConverged());
+    }
+
+    private void addRandomInput(){
+        // Shuffle cgesProcesses
+        Utils.shuffleCollection(cgesProcesses);
+        // Add input as always
+        this.putInputGraphs();
+    }
+
+    private void bestBroadcastingSearch(){
+        do{
+            it++;
+            // Add inputDag List
+            addBestInput();
+            cgesProcesses.parallelStream().forEach(cdag -> {
+                try {
+                    cdag.noBroadcastingSearch();
+                } catch (InterruptedException e) {
+                    System.out.println("Error with InterruptedException: " +
+                            "\n Dag_n Id: " + cdag.id +
+                            "\n Dag_n graph: " + cdag.dag);
+                    throw new RuntimeException(e);
+                }
+            });
+        }while(notConverged());
+    }
+
+    private void addBestInput(){
+        // Calculate best graph
+        calculateBestGraph();
+        // Add best input to all cgesProcesses
+        cgesProcesses.forEach((dag) -> {
+            dag.setInputDag(bestCircularProcess.dag);
+        });
+
+    }
+
     private void addInputDagList() {
         ArrayList<Dag_n> inputDags = getInputDags();
         cgesProcesses.forEach(cges -> cges.setInputDags(inputDags));
@@ -280,6 +345,18 @@ public class CGES extends BNBuilder {
             ex.printStackTrace();
             System.out.println("Error in FinalGES step");
         }
+    }
+
+    @Override
+    public long getSeed() {
+        // TODO Auto-generated method stub
+        return super.getSeed();
+    }
+
+    @Override
+    public void setSeed(long seed) {
+        // TODO Auto-generated method stub
+        super.setSeed(seed);
     }
 
 }

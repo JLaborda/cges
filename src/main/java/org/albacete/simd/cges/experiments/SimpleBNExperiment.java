@@ -31,7 +31,7 @@ public class SimpleBNExperiment {
         paramsMap.put(ExperimentBNBuilder.KEYS[4], "HierarchicalClustering");
         paramsMap.put(ExperimentBNBuilder.KEYS[5], "4");
         paramsMap.put(ExperimentBNBuilder.KEYS[6], "c2");
-        paramsMap.put(ExperimentBNBuilder.KEYS[7], "PAIR_BROADCASTING");
+        paramsMap.put(ExperimentBNBuilder.KEYS[7], "BEST_BROADCASTING");
         
 
         // 2. Setting Algorithm
