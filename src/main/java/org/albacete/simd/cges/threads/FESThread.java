@@ -98,14 +98,14 @@ public class FESThread extends GESThread {
             this.elapsedTime = endTime - startTime;
 
             double newScore = scoreDag(graph);
-            System.out.println(" [" + getId() + "] FES New Score: " + newScore + ", Initial Score: " + scoreInitial);
+            Utils.println(" [" + getId() + "] FES New Score: " + newScore + ", Initial Score: " + scoreInitial);
             // If we improve the score, return the new graph
             if (newScore > scoreInitial) {
                 this.modelBDeu = newScore;
                 this.flag = true;
                 return graph;
             } else {
-                //System.out.println("   [" + getId() + "] ELSE");
+                //Utils.println("   [" + getId() + "] ELSE");
                 this.modelBDeu = scoreInitial;
                 this.flag = false;
                 return this.initialDag;
@@ -127,13 +127,13 @@ public class FESThread extends GESThread {
      */
     @SuppressWarnings("UnusedReturnValue")
     private double fes(Graph graph, double score) {
-        //System.out.println("** FORWARD EQUIVALENCE SEARCH");
+        //Utils.println("** FORWARD EQUIVALENCE SEARCH");
         double bestScore = score;
         double bestInsert;
 
         iterations = 0;
         
-        //System.out.println("Initial Score = " + nf.format(bestScore));
+        //Utils.println("Initial Score = " + nf.format(bestScore));
         // Calling fs to calculate best edge to add.
         enlaces = S;
         bestInsert = fs(graph);
@@ -142,7 +142,7 @@ public class FESThread extends GESThread {
             bestScore = bestInsert;
 
             // Inserting edge
-            System.out.println("Thread " + getId() + " inserting: (" + x_i + ", " + y_i + ", " + t_0 + "), score: " + bestScore);
+            Utils.println("Thread " + getId() + " inserting: (" + x_i + ", " + y_i + ", " + t_0 + "), score: " + bestScore);
             insert(x_i, y_i, t_0, graph);
 
             // Checking cycles?
@@ -159,7 +159,7 @@ public class FESThread extends GESThread {
 
             // Checking that the maximum number of edges has not been reached
             if (getMaxNumEdges() != -1 && graph.getNumEdges() >= getMaxNumEdges()) {
-                //System.out.println("Maximum edges reached");
+                //Utils.println("Maximum edges reached");
                 break;
             }
 
@@ -250,7 +250,7 @@ public class FESThread extends GESThread {
             Node y = edge.getNode2();
             return !process.contains(x) && !process.contains(y);
         });
-        //System.out.println("TAMAÑO DE enlaces: " + enlaces.size() + ", S: " + S.size() + ". \t Process: " + process.size()  + ", revert: " + tam);
+        //Utils.println("TAMAÑO DE enlaces: " + enlaces.size() + ", S: " + S.size() + ". \t Process: " + process.size()  + ", revert: " + tam);
     }
 
     private Set<Node> revertToCPDAG(Graph graph) {
@@ -269,7 +269,7 @@ public class FESThread extends GESThread {
 
             SubSet tSubset = new SubSet();
             double insertEval = insertEval(_x, _y, tSubset, graph, problem);
-            //System.out.println("InsertEval: " + insertEval);
+            //Utils.println("InsertEval: " + insertEval);
             if (insertEval > 0) {
                 List<Node> naYXT = new LinkedList<>(tSubset);
                 List<Node> naYX = findNaYX(_x, _y, graph);
@@ -350,7 +350,7 @@ public class FESThread extends GESThread {
                     if (greedyScore > insertEval) {
                         insertEval = greedyScore;
                     }
-                    //System.out.println("InsertEval: " + insertEval);
+                    //Utils.println("InsertEval: " + insertEval);
                     return new EdgeSearch(insertEval, tSubset, edge);
 
                 }

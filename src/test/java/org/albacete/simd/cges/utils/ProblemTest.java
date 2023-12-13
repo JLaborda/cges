@@ -93,7 +93,7 @@ public class ProblemTest {
 
         //Checking cases
         assertEquals(5000, cases.length);
-        //System.out.println(cases.length);
+        ////System.out.println(cases.length);
         for(int[] caseRow : cases){
             assertEquals(5, caseRow.length);
         }

@@ -176,14 +176,15 @@ public abstract class GESThread implements Runnable{
      * @param graph Current {@link Graph Graph} of the stage where the edge will be inserted into.
      */
     public static void insert(Node x, Node y, Set<Node> subset, Graph graph) {
-        //System.out.println("Insert: " + x + " -> " + y);
+        Utils.println("Insert: " + x + " -> " + y);
         graph.addDirectedEdge(x, y);
 
         for (Node node : subset) {
-            //System.out.println("Delete: " + node + " -- " + y);
             graph.removeEdge(node, y);
-            //System.out.println("Insert: " + node + " -> " + y);
             graph.addDirectedEdge(node, y);
+            Utils.println("Delete: " + node + " -- " + y);
+            Utils.println("Insert: " + node + " -> " + y);
+        
         }
     }
 
@@ -195,20 +196,23 @@ public abstract class GESThread implements Runnable{
      * @param graph Current {@link Graph Graph} of the stage where the edge will be deleted from.
      */
     public static void delete(Node x, Node y, Set<Node> subset, Graph graph) {
-        //System.out.println("Delete: " + x + " -- " + y);
+        Utils.println("Delete: " + x + " -- " + y);
         graph.removeEdges(x, y);
 
         for (Node aSubset : subset) {
-            //System.out.println("Deleting Edges in subset");
+
+            Utils.println("Deleting Edges in subset");
             if (!graph.isParentOf(aSubset, x) && !graph.isParentOf(x, aSubset)) {
-                //System.out.println("Delete: " + x + " -- " + aSubset);
+                Utils.println("Delete: " + x + " -- " + aSubset);
                 graph.removeEdge(x, aSubset);
-                //System.out.println("Insert: " + x + " -> " + aSubset);
+                
+                Utils.println("Insert: " + x + " -> " + aSubset);
                 graph.addDirectedEdge(x, aSubset);
             }
-            //System.out.println("Delete: " + y + " -- " + aSubset);
+            Utils.println("Delete: " + y + " -- " + aSubset);
             graph.removeEdge(y, aSubset);
-            //System.out.println("Insert: " + y + " -> " + aSubset);
+
+            Utils.println("Insert: " + y + " -> " + aSubset);
             graph.addDirectedEdge(y, aSubset);
         }
     }

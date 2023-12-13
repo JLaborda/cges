@@ -48,8 +48,9 @@ public class ExperimentBNBuilder {
     // Definir las claves como constantes de la clase
     public static final String[] KEYS = {
             "algName", "netName", "netPath", "databasePath",
-            "clusteringName", "numberOfRealThreads", "convergence", "broadcasting"
+            "clusteringName", "numberOfRealThreads", "convergence", "broadcasting", "seed"
     };
+    
 
     protected int structuralHamiltonDistanceValue = Integer.MAX_VALUE;
     protected double bdeuScore;
@@ -64,8 +65,6 @@ public class ExperimentBNBuilder {
     protected long elapsedTime;
     protected int numberOfIterations;
 
-
-    protected String algName;
     public Dag_n resultingBayesianNetwork;
 
 
@@ -75,10 +74,6 @@ public class ExperimentBNBuilder {
         createBNBuilder();
     }
     public ExperimentBNBuilder(Map<String,String> paramsMap) throws Exception{
-        if(!checkKeys(paramsMap)){
-            System.out.println("Keys and paramsMap do not share the same keys or has a different lenght");
-            System.exit(1);
-        }
         this.paramsMap = paramsMap;
         createBNBuilder();
     }
@@ -87,46 +82,25 @@ public class ExperimentBNBuilder {
         this.algorithm = algorithm;
     }
     public ExperimentBNBuilder(BNBuilder algorithm, Map<String,String> paramsMap){
-        if(!checkKeys(paramsMap)){
-            System.out.println("Keys and paramsMap do not share the same keys or has a different lenght");
-            System.exit(1);
-        }
-        this.paramsMap = paramsMap;
         this.algorithm = algorithm;
+        this.paramsMap = paramsMap;
     }
 
-    private boolean checkKeys(Map<String,String> paramsMap){
-        if(paramsMap.keySet().size()!= KEYS.length){
-            System.out.println("Map and keys don't kave the same size");
-            return false;
-        }
-
-        for(String key : KEYS){
-            if(!paramsMap.keySet().contains(key))
-                return false;
-        }
-        return true;
-    }
 
     private void extractParameters(String[] parameters) {
-        // Comprobar el tamaño de los parámetros
-        if(parameters.length != KEYS.length){
-            System.out.println("The amount of parameters must be: " + KEYS.length);
+        // Verificar que la cantidad de parámetros sea par
+        if(parameters.length % 2 != 0){
+            Utils.println("The amount of parameters must be even");
             System.exit(1);
         }
 
-        // Asignar los valores a variables específicas
-        for(int i = 0; i < parameters.length; i++){
-            String key = KEYS[i];
-            String value = parameters[i];
-            this.paramsMap.put(key,value);
+        // Asignar a paramsMap clave:valor procedente de parameters
+        for (int i = 0; i < parameters.length; i+=2) {
+            String key = parameters[i];
+            String value = parameters[i+1];
+            this.paramsMap.put(key, value);
         }
 
-        System.out.println("Extracted Parameters:");
-        for(String key : paramsMap.keySet()){
-            String value = paramsMap.get(key);
-            System.out.println(key + ": " + value);
-        }
     }
 
     private void createBNBuilder() throws Exception {
@@ -143,6 +117,10 @@ public class ExperimentBNBuilder {
                         paramsMap.get("convergence"),
                         Broadcasting.valueOf(paramsMap.get("broadcasting"))
                         );
+        //Setting seed
+        if(paramsMap.containsKey("seed")){
+            algorithm.setSeed(Long.parseLong(paramsMap.get("seed")));
+        }
         
         /*
         switch(algName) {
@@ -206,7 +184,8 @@ public class ExperimentBNBuilder {
     public void runExperiment()
     {
         try {
-            printExperimentInformation();
+            // Printing Experiment parameters
+            Utils.println(this.toString());
 
             MlBayesIm controlBayesianNetwork = readOriginalBayesianNetwork();
 
@@ -225,19 +204,11 @@ public class ExperimentBNBuilder {
 
     }
 
-    private void printExperimentInformation() {
-        System.out.println("Starting Experiment:");
-        System.out.println("-----------------------------------------");
-        for (String key : paramsMap.keySet()) {
-            String parameter = paramsMap.get(key);
-            System.out.println(key + ": " + parameter);
-        }
-    }
 
     private MlBayesIm readOriginalBayesianNetwork() throws Exception {
         BIFReader bayesianReader = new BIFReader();
         bayesianReader.processFile(this.paramsMap.get("netPath"));
-        System.out.println("Numero de variables: " + bayesianReader.getNrOfNodes());
+        Utils.println("Numero de variables: " + bayesianReader.getNrOfNodes());
 
         //Transforming the BayesNet into a BayesPm
         BayesPm bayesPm = Utils.transformBayesNetToBayesPm(bayesianReader);
@@ -270,11 +241,9 @@ public class ExperimentBNBuilder {
     }
 
     public void printResults() {
-        System.out.println(this);
-        System.out.println("Resulting DAG:");
-        System.out.println(algorithm.getCurrentGraph());
-        System.out.println("Total Nodes of Resulting DAG");
-        System.out.println(algorithm.getCurrentGraph().getNodes().size());
+        System.out.println("-------------------------\nExperiment " + paramsMap.get("algName"));
+        System.out.println("Parameters: ");
+        System.out.println(this.toString());
         System.out.println("-------------------------\nMetrics: ");
         System.out.println("SHD: "+ structuralHamiltonDistanceValue);
         System.out.println("Final BDeu: " +this.bdeuScore);
@@ -284,8 +253,9 @@ public class ExperimentBNBuilder {
         System.out.println("differencesOfMalkovsBlanket plus: "+ differencesOfMalkovsBlanket[1]);
         System.out.println("differencesOfMalkovsBlanket minus: "+ differencesOfMalkovsBlanket[2]);
         System.out.println("-----------------------------------------------------------------------");
-        System.out.println("Final BN Result:");
-        System.out.println(this.resultingBayesianNetwork);
+        //System.out.println("Final BN Result:");
+        //System.out.println(this.resultingBayesianNetwork.toString());
+
     }
 
     public void saveExperiment(String savePath) {
@@ -346,6 +316,7 @@ public class ExperimentBNBuilder {
             headerBuilder.deleteCharAt(headerBuilder.length() - 1);
         }
 
+        Utils.println("Measurement Header: " + headerBuilder.toString());
         return headerBuilder.toString();
     }
 
@@ -471,10 +442,11 @@ public class ExperimentBNBuilder {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        result.append("-----------------------\nExperiment " + algName);
+        result.append("-----------------------\nExperiment " + paramsMap.get("algName") + "\n");
         for (String key : paramsMap.keySet()) {
             String parameter = paramsMap.get(key);
             result.append(key + ": " + parameter);
+            result.append("\t");
         }
         return  result.toString();
     }

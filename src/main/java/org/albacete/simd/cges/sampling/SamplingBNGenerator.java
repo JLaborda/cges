@@ -10,6 +10,8 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.albacete.simd.cges.utils.Utils;
+
 /*
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -102,11 +104,11 @@ public class SamplingBNGenerator {
     int[] order = new int[nNrOfAtts];
     boolean[] bDone = new boolean[nNrOfAtts];
     for (int iAtt = 0; iAtt < nNrOfAtts; iAtt++) {
-//	      System.out.println("at: "+bf.getNodeName(iAtt));
+//	      Utils.println("at: "+bf.getNodeName(iAtt));
       int iAtt2 = 0;
       boolean allParentsDone = false;
       while (!allParentsDone && iAtt2 < nNrOfAtts) {
-//	   	  System.out.println("con at: "+bf.getNodeName(iAtt2));
+//	   	  Utils.println("con at: "+bf.getNodeName(iAtt2));
         if (!bDone[iAtt2]) {
           allParentsDone = true;
           int iParent = 0;
@@ -162,14 +164,14 @@ public class SamplingBNGenerator {
  * @throws NumberFormatException from reading data
    */
   static public void main(String[] args) throws NumberFormatException, Exception {
-      System.out.println("Length of args: " + args.length);
-      System.out.println(args[0]);
-      System.out.println(args[1]);
-      System.out.println(args[2]);
+      Utils.println("Length of args: " + args.length);
+      Utils.println(args[0]);
+      Utils.println(args[1]);
+      Utils.println(args[2]);
       File carpeta_experimentos = new File(args[0]);
       ArrayList<String> experimentos = listarFicherosdeCarpeta(carpeta_experimentos);
       for(String exp: experimentos){
-          System.out.println(exp);
+          Utils.println(exp);
       }
       for (int red = 0; red<experimentos.size(); red++){
           for(int ndatos = 0; ndatos< 10; ndatos++) {
@@ -181,7 +183,7 @@ public class SamplingBNGenerator {
                   Instances data = b.bf.m_Instances;
                   csv.setInstances(data);
                   String outpath = carpeta_experimentos + "/BBDD/" + experimentos.get(red)+Integer.parseInt(args[1])+ndatos+".csv";
-                  System.out.println("Saving to: " + outpath);
+                  Utils.println("Saving to: " + outpath);
                   File fcsv = new File(outpath);
                   FileOutputStream output = new FileOutputStream(fcsv);
                   csv.setDestination(output);
@@ -201,7 +203,7 @@ public class SamplingBNGenerator {
             if (ficheroEntrada.isDirectory()) {
                 carpetas.add(ficheroEntrada.getName());
             } else {
-                System.out.println("Se espera un subdirectorio");
+                Utils.println("Se espera un subdirectorio");
             }
         }
         return carpetas;
@@ -214,7 +216,7 @@ public class SamplingBNGenerator {
 
         for (final File ficheroEntrada : carpeta.listFiles()) {
             if (ficheroEntrada.isDirectory()) {
-                System.out.println("Se esperan ficheros");
+                Utils.println("Se esperan ficheros");
             } else {
                 ficheros.add(ficheroEntrada.getName());
             }

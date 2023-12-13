@@ -1,13 +1,9 @@
 package org.albacete.simd.cges.experiments;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-
-import org.albacete.simd.cges.framework.BNBuilder;
+import org.albacete.simd.cges.utils.Utils;
 
 public class ExperimentBNLauncher {
 
@@ -27,21 +23,21 @@ public class ExperimentBNLauncher {
         ExperimentBNLauncher experimentBNLauncher = getExperimentBNLauncherFromCommandLineArguments(args);
         String[] parameters = experimentBNLauncher.readParameters();
 
-        System.out.println("Creating experiment object...");
+        Utils.println("Creating experiment object...");
         experimentBNLauncher.createExperiment(parameters);
         
-        System.out.println("Starting experiment...");
+        Utils.println("Starting experiment...");
         experimentBNLauncher.runExperiment();
         experimentBNLauncher.saveExperiment();
-        System.out.println("Experiment finished!");
+        Utils.println("Experiment finished!");
         
     }
 
     private static ExperimentBNLauncher getExperimentBNLauncherFromCommandLineArguments(String[] args) {
         int i = 0;
-        System.out.println("Number of args: "  + args.length);
+        Utils.println("Number of args: "  + args.length);
         for (String string : args) {
-            System.out.println("Args " + i + ": " + string);
+            Utils.println("Args " + i + ": " + string);
             i++;
         }
         String paramsFileName = args[0];
@@ -63,9 +59,9 @@ public class ExperimentBNLauncher {
             e.printStackTrace();
         }
         
-        System.out.println("Parameters read:");
+        Utils.println("Parameters read:");
         for (int i = 0; i < parameterStrings.length; i++) {
-            System.out.println("Index: " + i + "\t" + parameterStrings[i]);
+            Utils.println("Index: " + i + "\t" + parameterStrings[i]);
         }
 
         return parameterStrings;
@@ -75,10 +71,10 @@ public class ExperimentBNLauncher {
         try {
             experiment = new ExperimentBNBuilder(parameters);
         } catch (Exception e) {
-            System.out.println("Exception when creating the experiment");
+            Utils.println("Exception when creating the experiment");
             int i=0;
             for (String string : parameters) {
-                System.out.println("Param[" + i + "]: " + string);
+                Utils.println("Param[" + i + "]: " + string);
                 i++;
             }
             e.printStackTrace();
@@ -87,12 +83,6 @@ public class ExperimentBNLauncher {
     
     private void runExperiment(){
         experiment.runExperiment();
-    }
-
-    private boolean checkExistentFile() {
-        String savePath = EXPERIMENTS_FOLDER  + experiment.getSaveFileName();
-        
-        return experiment.checkExistentFile(savePath);
     }
 
     private void saveExperiment() {

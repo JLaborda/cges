@@ -162,7 +162,7 @@ public class UtilsTest {
         dag2.removeEdge(dag2.getNode("Cancer"), dag2.getNode("Dyspnoea"));
         dag2.addDirectedEdge(dag2.getNode("Xray"), dag2.getNode("Dyspnoea"));
 
-        System.out.println(dag2);
+        //System.out.println(dag2);
 
         // Acting: Calculating average MB
         result = Utils.avgMarkovBlanketDelta(dag1, dag2);
@@ -183,7 +183,7 @@ public class UtilsTest {
         BIFReader bf = new BIFReader();
         bf.processFile(Resources.CANCER_NET_PATH);
 
-        System.out.println("Numero de variables: "+bf.getNrOfNodes());
+        //System.out.println("Numero de variables: "+bf.getNrOfNodes());
         MlBayesIm bn2 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bf));
 
         Dag_n dag = new Dag_n(bn2.getDag());
@@ -200,7 +200,7 @@ public class UtilsTest {
         BIFReader bf = new BIFReader();
         bf.processFile(Resources.CANCER_NET_PATH);
 
-        System.out.println("Numero de variables: "+bf.getNrOfNodes());
+        //System.out.println("Numero de variables: "+bf.getNrOfNodes());
         MlBayesIm bn2 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bf));
 
         Dag_n dag = new Dag_n(bn2.getDag());

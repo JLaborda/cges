@@ -15,6 +15,8 @@ public class Utils {
 
 
     private static Random random = new Random();
+
+    private static boolean verbose = false;
     
     /**
      * Transforms a maximally directed pattern (PDAG) represented in graph
@@ -197,7 +199,6 @@ public class Utils {
         List<Dag_n> ensuredDags = new ArrayList<>();
         List<Node> nodes = setofbns.get(0).getNodes();
         ensuredDags.add(new Dag_n(setofbns.get(0)));
-        //System.out.println("Nodes: " + nodes);
         for(int i = 1 ; i< setofbns.size(); i++) {
             Dag_n oldDag = setofbns.get(i);
             Set<Edge> oldEdges = oldDag.getEdges();
@@ -366,7 +367,6 @@ public class Utils {
         Node nodeT, nodeH;
         for (Edge e : g.getEdges()){
             if(!e.isDirected()) continue;
-            //System.out.println("Undirected Edge: " + e);
             Endpoint endpoint1 = e.getEndpoint1();
             if (endpoint1.equals(Endpoint.ARROW)){
                 nodeT = e.getNode1();
@@ -378,7 +378,8 @@ public class Utils {
 
 
             if(g.existsDirectedPathFromTo(nodeT, nodeH)){
-                System.out.println("Directed path from " + nodeT + " to " + nodeH +"\t Deleting Edge...");
+                if(verbose)
+                    Utils.println("Directed path from " + nodeT + " to " + nodeH +"\t Deleting Edge...");
                 g.removeEdge(e);
             }
         }
@@ -410,7 +411,6 @@ public class Utils {
                 graph.addEdge(ed);
             }
         }
-        //System.out.println(graph);
         return new BayesPm(graph);
 
     }
@@ -424,4 +424,18 @@ public class Utils {
         collection.clear();
         collection.addAll(list);
     }
+
+    public static boolean isVerbose() {
+        return verbose;
+    }
+
+    public static void setVerbose(boolean verbose) {
+        Utils.verbose = verbose;
+    }
+
+    public static void println(String output){
+        if(verbose)
+            Utils.println(output);
+    }
+
 }

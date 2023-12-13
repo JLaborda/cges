@@ -74,14 +74,14 @@ public class BESThread extends GESThread {
             this.elapsedTime = endTime - startTime;
 
             double newScore = scoreDag(graph);
-            System.out.println(" ["+getId()+"] BES New Score: " + newScore + ", Initial Score: " + scoreInitial);
+            Utils.println(" ["+getId()+"] BES New Score: " + newScore + ", Initial Score: " + scoreInitial);
             // If we improve the score, return the new graph
             if (newScore > scoreInitial) {
                 this.modelBDeu = newScore;
                 this.flag = true;
                 return graph;
             } else {
-                //System.out.println("   ["+getId()+"] ELSE");
+                //Utils.println("   ["+getId()+"] ELSE");
                 this.modelBDeu = scoreInitial;
                 this.flag = false;
                 return this.initialDag;
@@ -102,7 +102,7 @@ public class BESThread extends GESThread {
      */
     @SuppressWarnings("UnusedReturnValue")
     private double bes(Graph graph, double score) {
-        //System.out.println("** BACKWARD EQUIVALENCE SEARCH");
+        //Utils.println("** BACKWARD EQUIVALENCE SEARCH");
         double bestScore = score;
         double bestDelete;
 
@@ -110,7 +110,7 @@ public class BESThread extends GESThread {
         y_d = null;
         h_0 = null;
 
-        //System.out.println("Initial Score = " + nf.format(bestScore));
+        //Utils.println("Initial Score = " + nf.format(bestScore));
         // Calling fs to calculate best edge to add.
         bestDelete = bs(graph,bestScore);
 
@@ -119,22 +119,22 @@ public class BESThread extends GESThread {
             bestScore = bestDelete;
 
             // Deleting edge
-            //System.out.println("Thread " + getId() + " deleting: (" + x_d + ", " + y_d + ", " + h_0+ ")");
+            //Utils.println("Thread " + getId() + " deleting: (" + x_d + ", " + y_d + ", " + h_0+ ")");
             delete(x_d,y_d,h_0, graph);
             
             // Checking cycles?
-            //System.out.println("  Cycles: " + graph.existsDirectedCycle());
+            //Utils.println("  Cycles: " + graph.existsDirectedCycle());
 
             //PDAGtoCPDAG
             rebuildPattern(graph);
             
             // Printing score
             //bestScore = bestDelete;
-            //System.out.println("    Real Score" + scoreGraph(graph, problem));
+            //Utils.println("    Real Score" + scoreGraph(graph, problem));
 
             // Checking that the maximum number of edges has not been reached
             if (getMaxNumEdges() != -1 && graph.getNumEdges() > getMaxNumEdges()) {
-                //System.out.println("Maximum edges reached");
+                //Utils.println("Maximum edges reached");
                 break;
             }
 

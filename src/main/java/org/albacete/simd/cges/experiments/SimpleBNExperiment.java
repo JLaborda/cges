@@ -15,9 +15,9 @@ import org.albacete.simd.cges.bnbuilders.CGES;
 public class SimpleBNExperiment {
 
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws Exception{
         // 1. Configuration
-        String net_name = "andes";
+        /*String net_name = "andes";
         String networkFolder = "./res/networks/" + net_name + "/";
         String datasetFolder = "./res/datasets/" + net_name + "/";
         String net_path = networkFolder + net_name + ".xbif";
@@ -32,14 +32,16 @@ public class SimpleBNExperiment {
         paramsMap.put(ExperimentBNBuilder.KEYS[5], "4");
         paramsMap.put(ExperimentBNBuilder.KEYS[6], "c2");
         paramsMap.put(ExperimentBNBuilder.KEYS[7], "BEST_BROADCASTING");
-        
+        */
+        String paramString = "algName cges netName andes clusteringName HierarchicalClustering numberOfRealThreads 8 convergence c2 broadcasting RANDOM_BROADCASTING seed 103 databasePath /home/jorlabs/projects/cges/res/datasets/andes/andes08.csv netPath /home/jorlabs/projects/cges/res/networks/andes/andes.xbif";
+        String[] parameters = paramString.split(" ");
 
         // 2. Setting Algorithm
-        Clustering clustering = new HierarchicalClustering();
-        CGES algorithm = new CGES(ds, clustering, 4, 100000, "c2", CGES.Broadcasting.PAIR_BROADCASTING);
+        //Clustering clustering = new HierarchicalClustering();
+        //CGES algorithm = new CGES(ds, clustering, 4, 100000, "c2", CGES.Broadcasting.PAIR_BROADCASTING);
 
         //2. Create experiment environment
-        ExperimentBNBuilder experiment = new ExperimentBNBuilder(algorithm, paramsMap);
+        ExperimentBNBuilder experiment = new ExperimentBNBuilder(parameters);
 
         // 4. Launch Experiment
         System.out.println("Alg Name: " + experiment.getAlgName());
@@ -48,9 +50,7 @@ public class SimpleBNExperiment {
         String savePath = "results/pruebas/" + experiment.getSaveFileName();//String savePath = "results/prueba.txt";
 
         // 5. Save Experiment
-        experiment.printResults();
-        System.out.println("Number of times broadcasting fusion is used: " + CircularProcess.fusionWinCounter);
-        
+        //System.out.println("Number of times broadcasting fusion is used: " + CircularProcess.fusionWinCounter);
         System.out.println("Saving at: " + savePath);
         experiment.saveExperiment(savePath);
 

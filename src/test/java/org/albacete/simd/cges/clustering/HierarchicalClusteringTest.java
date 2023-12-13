@@ -71,8 +71,8 @@ public class HierarchicalClusteringTest {
         //List<Set<Node>> clusters = clustering.clusterize(2);
         List<Set<Edge>> edgeDistribution = clustering.generateEdgeDistribution(2);
 
-        System.out.println("edgeDistribution0: " + edgeDistribution.get(0).size());
-        System.out.println("edgeDistribution1: " + edgeDistribution.get(1).size());
+        //System.out.println("edgeDistribution0: " + edgeDistribution.get(0).size());
+        //System.out.println("edgeDistribution1: " + edgeDistribution.get(1).size());
 
         // Checking that there is the same distribution in both clusters
         assertEquals(2, edgeDistribution.size());
@@ -104,8 +104,8 @@ public class HierarchicalClusteringTest {
         }
         assertTrue(duplicate);
 
-        System.out.println("edgeDistribution0: " + edgeDistribution.get(0).size());
-        System.out.println("edgeDistribution1: " + edgeDistribution.get(1).size());
+        //System.out.println("edgeDistribution0: " + edgeDistribution.get(0).size());
+        //System.out.println("edgeDistribution1: " + edgeDistribution.get(1).size());
 
         assertTrue(Math.abs(edgeDistribution.get(0).size() - edgeDistribution.get(1).size()) <= 30);
 

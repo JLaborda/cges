@@ -17,23 +17,40 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 public class ExperimentBNBuilderTest {
+    String[] KEYS = {
+        "algName", "netName", "netPath", "databasePath",
+        "clusteringName", "numberOfRealThreads", "convergence", "broadcasting"
+    };
+    // cges andes /home/jorlabs/projects/cges/res/networks/andes/andes.xbif /home/jorlabs/projects/cges/res/datasets/andes/andes00.csv HierarchicalClustering 8 c2 NO_BROADCASTING
+    String[] values = { "cges", "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH, "HierarchicalClustering", "4", "c2", "NO_BROADCASTING"};
 
+
+    private String [] createParameters(){
+        String[] parameters = new String[values.length * 2];
+        for (int i = 0; i < values.length; i++) {
+            parameters[i * 2] = KEYS[i];
+            parameters[i * 2 + 1] = values[i];
+        }
+        return parameters;
+    }    
+
+    private LinkedMap<String,String> createMap(){
+        LinkedMap<String,String> paramsMap = new LinkedMap<>();
+        for (int i = 0; i < values.length; i++) {
+            paramsMap.put(KEYS[i], values[i]);
+        }
+        return paramsMap;
+    }
 
     @Test
     public void experimentsNormalBehaviorConstructorTest() throws Exception {
 
-        String[] KEYS = {
-            "algName", "netName", "netPath", "databasePath",
-            "clusteringName", "numberOfRealThreads", "convergence", "broadcasting"
-        };
-        // cges andes /home/jorlabs/projects/cges/res/networks/andes/andes.xbif /home/jorlabs/projects/cges/res/datasets/andes/andes00.csv HierarchicalClustering 8 c2 NO_BROADCASTING
-
-        Map<String,String> paramsMap = new LinkedMap<>();
-        String[] parameters = {"cges", "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH, "HierarchicalClustering", "4", "c2", "NO_BROADCASTING"};
+        Map<String,String> paramsMap = createMap();
         
-        for (int i = 0; i < parameters.length; i++) {
-            paramsMap.put(KEYS[i], parameters[i]);
-        }
+
+        // parameters is an array of strings of pairs key value ["algName", "cges", ...]
+        String[] parameters = createParameters();
+
 
         Clustering clustering = new HierarchicalClustering();
         BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2", CGES.Broadcasting.NO_BROADCASTING);
@@ -57,8 +74,10 @@ public class ExperimentBNBuilderTest {
     @Test
     public void runExperimentTest() {
         Clustering clustering = new RandomClustering();
-        String[] parameters = {"cges", "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH, "RandomClustering", "4", "c2", "NO_BROADCASTING"};
         
+        // parameters is an array of strings of pairs key value ["algName", "cges", ...]
+        String[] parameters = createParameters();
+
         BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2", CGES.Broadcasting.NO_BROADCASTING);
         ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, parameters);
 
@@ -76,7 +95,7 @@ public class ExperimentBNBuilderTest {
     @Test
     public void saveExperimentTest() {
         Clustering clustering = new RandomClustering();
-        String[] parameters = {"cges", "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH, "RandomClustering", "4", "c2", "NO_BROADCASTING"};
+        String[] parameters = createParameters();
         
         BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2", CGES.Broadcasting.NO_BROADCASTING);
         ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm,parameters);

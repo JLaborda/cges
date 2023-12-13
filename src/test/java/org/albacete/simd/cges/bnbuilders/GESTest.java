@@ -67,10 +67,10 @@ public class GESTest {
         BNBuilder ges = new GES(Resources.CANCER_BBDD_PATH, false);
         Utils.setSeed(42);
 
-        System.out.println("Searching...");
+        //System.out.println("Searching...");
         ges.search();
 
-        //System.out.println((alg1.getCurrentGraph()));
+        ////System.out.println((alg1.getCurrentGraph()));
 
         assertNotNull(ges.getCurrentGraph());
         assertTrue(ges.getCurrentGraph() instanceof Dag_n);

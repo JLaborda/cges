@@ -272,7 +272,7 @@ public class FESThreadTest {
         Edge goodEdge2 = Edges.directedEdge(this.cancer, this.smoker);
         Edge goodEdge3 = Edges.directedEdge(this.smoker, this.cancer);
 
-        System.out.println(edgesResult);
+        //System.out.println(edgesResult);
 
         assertFalse(edgesResult.contains(badEdge1));
         assertFalse(edgesResult.contains(badEdge2));

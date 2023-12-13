@@ -76,7 +76,7 @@ public class CGES extends BNBuilder {
         currentGraph = bestCircularProcess.dag;
         
         //4. Do a final GES with all the data
-        System.out.println("\n\n\n FINAL GES");
+        Utils.println("\n\n\n FINAL GES");
         finalGES();
         
         return currentGraph;
@@ -148,7 +148,7 @@ public class CGES extends BNBuilder {
                     // Applying cges process
                     cdag.allFusedBroadcastingSearch();
                 } catch (InterruptedException ex) {
-                    System.out.println("Error with InterruptedException: " +
+                    Utils.println("Error with InterruptedException: " +
                             "\n Dag_n Id: " + cdag.id +
                             "\n Dag_n graph: " + cdag.dag);
                 }
@@ -186,7 +186,7 @@ public class CGES extends BNBuilder {
                     // Applying cges process
                     cdag.noBroadcastingSearch();
                 } catch (InterruptedException ex) {
-                    System.out.println("Error with InterruptedException: " +
+                    Utils.println("Error with InterruptedException: " +
                             "\n Dag_n Id: " + cdag.id +
                             "\n Dag_n graph: " + cdag.dag);
                 }
@@ -203,7 +203,7 @@ public class CGES extends BNBuilder {
                 try {
                     cdag.pairBroadcastSearch();
                 } catch (InterruptedException e) {
-                    System.out.println("Error with InterruptedException: " +
+                    Utils.println("Error with InterruptedException: " +
                     "\n Dag_n Id: " + cdag.id +
                     "\n Dag_n graph: " + cdag.dag);
                     throw new RuntimeException(e);
@@ -224,7 +224,7 @@ public class CGES extends BNBuilder {
                 try {
                     cdag.noBroadcastingSearch();
                 } catch (InterruptedException e) {
-                    System.out.println("Error with InterruptedException: " +
+                    Utils.println("Error with InterruptedException: " +
                             "\n Dag_n Id: " + cdag.id +
                             "\n Dag_n graph: " + cdag.dag);
                     throw new RuntimeException(e);
@@ -249,7 +249,7 @@ public class CGES extends BNBuilder {
                 try {
                     cdag.noBroadcastingSearch();
                 } catch (InterruptedException e) {
-                    System.out.println("Error with InterruptedException: " +
+                    Utils.println("Error with InterruptedException: " +
                             "\n Dag_n Id: " + cdag.id +
                             "\n Dag_n graph: " + cdag.dag);
                     throw new RuntimeException(e);
@@ -343,7 +343,7 @@ public class CGES extends BNBuilder {
             currentGraph = Utils.removeInconsistencies(currentGraph);
         } catch (InterruptedException ex) {
             ex.printStackTrace();
-            System.out.println("Error in FinalGES step");
+            Utils.println("Error in FinalGES step");
         }
     }
 

@@ -39,7 +39,7 @@ public class FESFusion extends FusionStage{
             flag = true;
             this.currentGraph = new EdgeListGraph(new LinkedList<>(fusionGraph.getNodes()));
         }
-        System.out.println("FES to obtain the fusion: ");
+        Utils.println("FES to obtain the fusion: ");
         
 
         Set<Edge> candidates = new HashSet<>();
@@ -72,7 +72,7 @@ public class FESFusion extends FusionStage{
             if (fusionScore > currentScore) {
                 flag = true;
                 this.currentGraph = fusionGraph;
-                System.out.println("  FESFusion -> FUSION, " + fusionScore);
+                Utils.println("  FESFusion -> FUSION, " + fusionScore);
                 return (Dag_n) this.currentGraph;
             }
         }

@@ -80,9 +80,9 @@ public abstract class ThreadStage extends Stage{
                 this.graphs.add(gdag);
             } catch (Exception e) {
                 e.printStackTrace();
-                System.out.println("Error in dagFromCPDAG");
-                System.out.println("Trying to convert the graph " + i + " to a DAG");
-                System.out.println("The original graph is: " + g);
+                Utils.println("Error in dagFromCPDAG");
+                Utils.println("Trying to convert the graph " + i + " to a DAG");
+                Utils.println("The original graph is: " + g);
                 System.exit(-1);
             }
             //Dag_n gdag = new Dag_n(g);
@@ -92,7 +92,7 @@ public abstract class ThreadStage extends Stage{
             //this.graphs.add(gdag);
 
             //Debug
-            //System.out.println("Graph of Thread " + (i +1) + ": \n" + gdag);
+            //Utils.println("Graph of Thread " + (i +1) + ": \n" + gdag);
 
         }
     }

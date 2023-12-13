@@ -28,7 +28,7 @@ public class BESFusion extends FusionStage{
     protected Dag_n fusion() {
         Dag_n fusionGraph = this.fusionIntersection();
 
-        System.out.println("BES to obtain the fusion: ");
+        Utils.println("BES to obtain the fusion: ");
 
         Set<Edge> candidates = new HashSet<>();
 
@@ -64,14 +64,14 @@ public class BESFusion extends FusionStage{
             // If the fusion doesn't improve the result, we check if any previous BESThread has improved the results.
             else {
                 GESThread thread = besStage.getMaxBDeuThread();
-                System.out.println("thread"  + thread);
+                Utils.println("thread"  + thread);
                 if (thread.getScoreBDeu() != 0 && thread.getScoreBDeu() > currentScore) {
                     try {
                         this.currentGraph = thread.getCurrentGraph();
-                        System.out.println(this.currentGraph);
+                        Utils.println(this.currentGraph.toString());
                         flag = true;
                     } catch (InterruptedException ex) {
-                        System.out.println("\n\n\n EXCEPTION º\n\n\n");}
+                        Utils.println("\n\n\n EXCEPTION º\n\n\n");}
                     return (Dag_n) this.currentGraph;
                 }
             }
