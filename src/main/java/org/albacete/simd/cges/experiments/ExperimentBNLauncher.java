@@ -23,13 +23,13 @@ public class ExperimentBNLauncher {
         ExperimentBNLauncher experimentBNLauncher = getExperimentBNLauncherFromCommandLineArguments(args);
         String[] parameters = experimentBNLauncher.readParameters();
 
-        Utils.println("Creating experiment object...");
+        System.out.println("Creating experiment object...");
         experimentBNLauncher.createExperiment(parameters);
         
-        Utils.println("Starting experiment...");
+        System.out.println("Starting experiment...");
         experimentBNLauncher.runExperiment();
         experimentBNLauncher.saveExperiment();
-        Utils.println("Experiment finished!");
+        System.out.println("Experiment finished!");
         
     }
 
@@ -86,7 +86,7 @@ public class ExperimentBNLauncher {
     }
 
     private void saveExperiment() {
-        String savePath = EXPERIMENTS_FOLDER  + experiment.getSaveFileName();
+        String savePath = EXPERIMENTS_FOLDER  + experiment.getSaveFileName(index);
         experiment.saveExperiment(savePath);
     }
     

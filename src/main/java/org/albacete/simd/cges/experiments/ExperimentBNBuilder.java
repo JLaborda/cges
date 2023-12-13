@@ -241,8 +241,7 @@ public class ExperimentBNBuilder {
     }
 
     public void printResults() {
-        System.out.println("-------------------------\nExperiment " + paramsMap.get("algName"));
-        System.out.println("Parameters: ");
+        System.out.println("\nPrinting Results: ");
         System.out.println(this.toString());
         System.out.println("-------------------------\nMetrics: ");
         System.out.println("SHD: "+ structuralHamiltonDistanceValue);
@@ -271,7 +270,7 @@ public class ExperimentBNBuilder {
             }
 
             // Obtener los valores del mapa y agregar las medidas
-            String bodyLine = getBodyParams() + "," + getBodyMeasurements();
+            String bodyLine = getBodyParams() + "," + getBodyMeasurements() + "\n";
 
             csvWriter.append(bodyLine);
         } catch (IOException e) {
@@ -412,10 +411,13 @@ public class ExperimentBNBuilder {
         return paramsMap.get("netName");
     }
 
-    public String getSaveFileName(){
+    public String getSaveFileName(int id){
         StringBuilder fileNameBuilder = new StringBuilder();
         fileNameBuilder.append("exp_");
         fileNameBuilder.append(paramsMap.get("algName"));
+        fileNameBuilder.append("_");
+        fileNameBuilder.append(id);
+        /*
         fileNameBuilder.append("_");
         fileNameBuilder.append(paramsMap.get("netName"));
         fileNameBuilder.append("_");
@@ -432,7 +434,7 @@ public class ExperimentBNBuilder {
     
         fileNameBuilder.append("_");
         fileNameBuilder.append(datasetIdentifier);
-    
+        */
         
         fileNameBuilder.append(".csv");
         return fileNameBuilder.toString();

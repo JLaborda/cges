@@ -44,10 +44,10 @@ public class SimpleBNExperiment {
         ExperimentBNBuilder experiment = new ExperimentBNBuilder(parameters);
 
         // 4. Launch Experiment
-        System.out.println("Alg Name: " + experiment.getAlgName());
+        System.out.println("Running experiment...");
         experiment.runExperiment();
         experiment.printResults();
-        String savePath = "results/pruebas/" + experiment.getSaveFileName();//String savePath = "results/prueba.txt";
+        String savePath = "results/pruebas/" + experiment.getSaveFileName(1);//String savePath = "results/prueba.txt";
 
         // 5. Save Experiment
         //System.out.println("Number of times broadcasting fusion is used: " + CircularProcess.fusionWinCounter);
