@@ -38,7 +38,7 @@ title, date
                <br>
                <div class="text-center">
                  <h1>Your report</h1>
-                 <h3>2023-12-12</h3>
+                 <h3>2023-12-16</h3>
                </div>
                <br>
                <hr>
@@ -59,10 +59,11 @@ title, methods, problems, parameters, outputs, history
     </div>
     <ul>
     </br>
-        <li><strong>Methods:</strong> cges-2-ALL_BROADCASTING,2, cges-2-NO_BROADCASTING,2, cges-2-PAIR_BROADCASTING,2, cges-4-ALL_BROADCASTING,4, cges-4-NO_BROADCASTING,4, cges-4-PAIR_BROADCASTING,4, cges-8-ALL_BROADCASTING,8, cges-8-NO_BROADCASTING,8, cges-8-PAIR_BROADCASTING,8</li>
-        <li><strong>Problems:</strong> andes, link, munin, pigs</li>
+        <li><strong>Methods:</strong> cges,ALL_BROADCASTING,2, cges,ALL_BROADCASTING,4, cges,ALL_BROADCASTING,8, cges,BEST_BROADCASTING,2, cges,BEST_BROADCASTING,4, cges,BEST_BROADCASTING,8, cges,NO_BROADCASTING,2, cges,NO_BROADCASTING,4, cges,NO_BROADCASTING,8, cges,PAIR_BROADCASTING,2, cges,PAIR_BROADCASTING,4, cges,PAIR_BROADCASTING,8, cges,RANDOM_BROADCASTING,2, cges,RANDOM_BROADCASTING,4, cges,RANDOM_BROADCASTING,8</li>
+        <li><strong>Problems:</strong> andes, link, pigs</li>
         <li><strong>Parameters:</strong>
         <ul>
+<li>broadcasting [ALL_BROADCASTING,BEST_BROADCASTING,NO_BROADCASTING,PAIR_BROADCASTING,RANDOM_BROADCASTING] (instantiated)</li>
 <li>threads [2,4,8] (instantiated)</li>
 
 </ul>
@@ -72,7 +73,7 @@ title, methods, problems, parameters, outputs, history
     <h5>History:</h5>
         <ol>
 <li>Experiment cges loaded from a data set.</li>
-<li>Methods has been instanciated with the parameters: threads</li>
+<li>Methods has been instanciated with the parameters: broadcasting, threads</li>
 
 </ol>
     </br>
@@ -103,8 +104,8 @@ title, context, target, objetive, distribution, statistic, pvalue, alpha, outcom
 
     <ul>
         <li>Strategy for ranks: maximize</li>
-        <li>Computed Chi squared statistic with 8 degrees of freedom: 19.65</li>
-        <li>Computed p-value: 0.0117445118450557</li>
+        <li>Computed Chi squared statistic with 14 degrees of freedom: 33.675</li>
+        <li>Computed p-value: 0.00230022413810941</li>
         <li>Outcome for &alpha; = 0.05: H<sub>0</sub> <span class="label label-info">Rejected</span></li>
     </ul>
     </br>
@@ -142,31 +143,49 @@ title, context, scope, method, alpha, htmlTable, id, latexTable
 <tr>
 <th style="text-align:left">config</th><th style="text-align:right">pvalue</th><th style="text-align:right">rank</th><th style="text-align:right">win</th><th style="text-align:right">tie</th><th style="text-align:right">loss</th></tr>
 <tr>
-<td style="text-align:left">cges-2-NO_BROADCASTING,2</td><td style="text-align:right">-</td><td style="text-align:right">1.88</td><td style="text-align:right">-</td><td style="text-align:right">-</td><td style="text-align:right">-</td>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,8</td><td style="text-align:right">-</td><td style="text-align:right">2.00</td><td style="text-align:right">-</td><td style="text-align:right">-</td><td style="text-align:right">-</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-2-ALL_BROADCASTING,2</td><td style="text-align:right"><strong>8.0277e-01</strong></td><td style="text-align:right">2.38</td><td style="text-align:right">2</td><td style="text-align:right">1</td><td style="text-align:right">1</td>
+<td style="text-align:left">cges,BEST_BROADCASTING,8</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.33</td><td style="text-align:right">2</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-NO_BROADCASTING,4</td><td style="text-align:right"><strong>8.0277e-01</strong></td><td style="text-align:right">3.50</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
+<td style="text-align:left">cges,NO_BROADCASTING,2</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">4.83</td><td style="text-align:right">2</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-NO_BROADCASTING,8</td><td style="text-align:right"><strong>5.5055e-01</strong></td><td style="text-align:right">4.50</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,4</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">5.00</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-2-PAIR_BROADCASTING,2</td><td style="text-align:right"><strong>5.5055e-01</strong></td><td style="text-align:right">4.75</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+<td style="text-align:left">cges,ALL_BROADCASTING,2</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">5.17</td><td style="text-align:right">2</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-ALL_BROADCASTING,4</td><td style="text-align:right"><strong>1.1934e-01</strong></td><td style="text-align:right">6.25</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+<td style="text-align:left">cges,BEST_BROADCASTING,4</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">5.67</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-PAIR_BROADCASTING,4</td><td style="text-align:right"><strong>7.0927e-02</strong></td><td style="text-align:right">6.75</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+<td style="text-align:left">cges,NO_BROADCASTING,4</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">5.67</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-PAIR_BROADCASTING,8</td><td style="text-align:right"><strong>5.6924e-02</strong></td><td style="text-align:right">7.00</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+<td style="text-align:left">cges,NO_BROADCASTING,8</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">6.33</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-ALL_BROADCASTING,8</td><td style="text-align:right">1.2495e-02</td><td style="text-align:right">8.00</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+<td style="text-align:left">cges,BEST_BROADCASTING,2</td><td style="text-align:right"><strong>6.6270e-01</strong></td><td style="text-align:right">8.33</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,2</td><td style="text-align:right"><strong>4.0149e-01</strong></td><td style="text-align:right">9.33</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,PAIR_BROADCASTING,2</td><td style="text-align:right"><strong>1.0587e-01</strong></td><td style="text-align:right">11.33</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,ALL_BROADCASTING,4</td><td style="text-align:right"><strong>6.7869e-02</strong></td><td style="text-align:right">12.00</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,PAIR_BROADCASTING,4</td><td style="text-align:right">3.1095e-02</td><td style="text-align:right">13.00</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,ALL_BROADCASTING,8</td><td style="text-align:right">1.4210e-02</td><td style="text-align:right">14.00</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,PAIR_BROADCASTING,8</td><td style="text-align:right">1.4210e-02</td><td style="text-align:right">14.00</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
 </tr>
 </table>
       </div>
@@ -187,15 +206,21 @@ title, context, scope, method, alpha, htmlTable, id, latexTable
 \hline
 config & pvalue & rank & win & tie & loss\\
 \hline
-cges-2-NO_BROADCASTING,2 & - & 1.88 & - & - & -\\
-cges-2-ALL_BROADCASTING,2 & \bf 8.0277e-01 & 2.38 & 2 & 1 & 1\\
-cges-4-NO_BROADCASTING,4 & \bf 8.0277e-01 & 3.50 & 3 & 0 & 1\\
-cges-8-NO_BROADCASTING,8 & \bf 5.5055e-01 & 4.50 & 3 & 0 & 1\\
-cges-2-PAIR_BROADCASTING,2 & \bf 5.5055e-01 & 4.75 & 4 & 0 & 0\\
-cges-4-ALL_BROADCASTING,4 & \bf 1.1934e-01 & 6.25 & 4 & 0 & 0\\
-cges-4-PAIR_BROADCASTING,4 & \bf 7.0927e-02 & 6.75 & 4 & 0 & 0\\
-cges-8-PAIR_BROADCASTING,8 & \bf 5.6924e-02 & 7.00 & 4 & 0 & 0\\
-cges-8-ALL_BROADCASTING,8 & 1.2495e-02 & 8.00 & 4 & 0 & 0\\
+cges,RANDOM_BROADCASTING,8 & - & 2.00 & - & - & -\\
+cges,BEST_BROADCASTING,8 & \bf 1.0000e+00 & 3.33 & 2 & 0 & 1\\
+cges,NO_BROADCASTING,2 & \bf 1.0000e+00 & 4.83 & 2 & 0 & 1\\
+cges,RANDOM_BROADCASTING,4 & \bf 1.0000e+00 & 5.00 & 3 & 0 & 0\\
+cges,ALL_BROADCASTING,2 & \bf 1.0000e+00 & 5.17 & 2 & 0 & 1\\
+cges,BEST_BROADCASTING,4 & \bf 1.0000e+00 & 5.67 & 3 & 0 & 0\\
+cges,NO_BROADCASTING,4 & \bf 1.0000e+00 & 5.67 & 3 & 0 & 0\\
+cges,NO_BROADCASTING,8 & \bf 1.0000e+00 & 6.33 & 3 & 0 & 0\\
+cges,BEST_BROADCASTING,2 & \bf 6.6270e-01 & 8.33 & 3 & 0 & 0\\
+cges,RANDOM_BROADCASTING,2 & \bf 4.0149e-01 & 9.33 & 3 & 0 & 0\\
+cges,PAIR_BROADCASTING,2 & \bf 1.0587e-01 & 11.33 & 3 & 0 & 0\\
+cges,ALL_BROADCASTING,4 & \bf 6.7869e-02 & 12.00 & 3 & 0 & 0\\
+cges,PAIR_BROADCASTING,4 & 3.1095e-02 & 13.00 & 3 & 0 & 0\\
+cges,ALL_BROADCASTING,8 & 1.4210e-02 & 14.00 & 3 & 0 & 0\\
+cges,PAIR_BROADCASTING,8 & 1.4210e-02 & 14.00 & 3 & 0 & 0\\
 \hline
 \end{tabular}
 </pre>
@@ -270,64 +295,100 @@ title, context, htmlTable, id, latexTable
 <tr>
 <th style="text-align:left">config</th><th style="text-align:right">andes</th><th style="text-align:right">link</th></tr>
 <tr>
-<td style="text-align:left">cges-2-ALL_BROADCASTING,2</td><td style="text-align:right">-471974.5370</td><td style="text-align:right">-1138428.0287</td>
+<td style="text-align:left">cges,ALL_BROADCASTING,2</td><td style="text-align:right">-471974.5370</td><td style="text-align:right">-1138428.0287</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-2-NO_BROADCASTING,2</td><td style="text-align:right">-471906.7706</td><td style="text-align:right">-1138428.0287</td>
+<td style="text-align:left">cges,BEST_BROADCASTING,2</td><td style="text-align:right">-472201.9726</td><td style="text-align:right">-1138340.6089</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-2-PAIR_BROADCASTING,2</td><td style="text-align:right">-473013.9936</td><td style="text-align:right">-1145685.8621</td>
+<td style="text-align:left">cges,NO_BROADCASTING,2</td><td style="text-align:right">-471906.7706</td><td style="text-align:right">-1138428.0287</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-ALL_BROADCASTING,4</td><td style="text-align:right">-472992.7373</td><td style="text-align:right">-1143935.8682</td>
+<td style="text-align:left">cges,PAIR_BROADCASTING,2</td><td style="text-align:right">-473013.9936</td><td style="text-align:right">-1145685.8621</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-NO_BROADCASTING,4</td><td style="text-align:right"><strong>-471846.0907</strong></td><td style="text-align:right">-1140594.5554</td>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,2</td><td style="text-align:right">-472432.1334</td><td style="text-align:right">-1138339.3486</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-PAIR_BROADCASTING,4</td><td style="text-align:right">-475057.0044</td><td style="text-align:right">-1149181.5579</td>
+<td style="text-align:left">cges,ALL_BROADCASTING,4</td><td style="text-align:right">-472992.7373</td><td style="text-align:right">-1143935.8682</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-ALL_BROADCASTING,8</td><td style="text-align:right">-474078.9246</td><td style="text-align:right">-1154863.7727</td>
+<td style="text-align:left">cges,BEST_BROADCASTING,4</td><td style="text-align:right">-471980.0631</td><td style="text-align:right">-1138109.2312</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-NO_BROADCASTING,8</td><td style="text-align:right">-471987.7638</td><td style="text-align:right"><strong>-1136900.5296</strong></td>
+<td style="text-align:left">cges,NO_BROADCASTING,4</td><td style="text-align:right">-471846.0907</td><td style="text-align:right">-1140594.5554</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-PAIR_BROADCASTING,8</td><td style="text-align:right">-474329.3540</td><td style="text-align:right">-1193763.4729</td>
+<td style="text-align:left">cges,PAIR_BROADCASTING,4</td><td style="text-align:right">-475057.0044</td><td style="text-align:right">-1149181.5579</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,4</td><td style="text-align:right">-471967.8261</td><td style="text-align:right">-1137601.2160</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,ALL_BROADCASTING,8</td><td style="text-align:right">-474078.9246</td><td style="text-align:right">-1154863.7727</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,BEST_BROADCASTING,8</td><td style="text-align:right">-471834.3737</td><td style="text-align:right"><strong>-1134817.4760</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">cges,NO_BROADCASTING,8</td><td style="text-align:right">-471987.7638</td><td style="text-align:right">-1136900.5296</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,PAIR_BROADCASTING,8</td><td style="text-align:right">-474329.3540</td><td style="text-align:right">-1193763.4729</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,8</td><td style="text-align:right"><strong>-471765.7736</strong></td><td style="text-align:right">-1135155.8733</td>
 </tr>
 </table>
 <br/><br/>
 <table class="table table-hover">
 <tr>
 <tr>
-<th style="text-align:left">config</th><th style="text-align:right">munin</th><th style="text-align:right">pigs</th></tr>
+<th style="text-align:left">config</th><th style="text-align:right">pigs</th></tr>
 <tr>
-<td style="text-align:left">cges-2-ALL_BROADCASTING,2</td><td style="text-align:right">-935983.5701</td><td style="text-align:right"><strong>-1675319.6039</strong></td>
+<td style="text-align:left">cges,ALL_BROADCASTING,2</td><td style="text-align:right"><strong>-1675319.6039</strong></td>
 </tr>
 <tr>
-<td style="text-align:left">cges-2-NO_BROADCASTING,2</td><td style="text-align:right"><strong>-935021.6579</strong></td><td style="text-align:right">-1675343.6398</td>
+<td style="text-align:left">cges,BEST_BROADCASTING,2</td><td style="text-align:right">-1676167.0158</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-2-PAIR_BROADCASTING,2</td><td style="text-align:right">-935242.2592</td><td style="text-align:right">-1676167.9939</td>
+<td style="text-align:left">cges,NO_BROADCASTING,2</td><td style="text-align:right">-1675343.6398</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-ALL_BROADCASTING,4</td><td style="text-align:right">-</td><td style="text-align:right">-1677162.8849</td>
+<td style="text-align:left">cges,PAIR_BROADCASTING,2</td><td style="text-align:right">-1676167.9939</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-NO_BROADCASTING,4</td><td style="text-align:right">-942502.7550</td><td style="text-align:right">-1675666.2649</td>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,2</td><td style="text-align:right">-1676256.4295</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-PAIR_BROADCASTING,4</td><td style="text-align:right">-937798.5442</td><td style="text-align:right">-1676175.3344</td>
+<td style="text-align:left">cges,ALL_BROADCASTING,4</td><td style="text-align:right">-1677162.8849</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-ALL_BROADCASTING,8</td><td style="text-align:right">-</td><td style="text-align:right">-1680349.5642</td>
+<td style="text-align:left">cges,BEST_BROADCASTING,4</td><td style="text-align:right">-1675819.5629</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-NO_BROADCASTING,8</td><td style="text-align:right">-</td><td style="text-align:right">-1676032.7620</td>
+<td style="text-align:left">cges,NO_BROADCASTING,4</td><td style="text-align:right">-1675666.2649</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-PAIR_BROADCASTING,8</td><td style="text-align:right">-936368.6718</td><td style="text-align:right">-1676784.0627</td>
+<td style="text-align:left">cges,PAIR_BROADCASTING,4</td><td style="text-align:right">-1676175.3344</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,4</td><td style="text-align:right">-1675913.2588</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,ALL_BROADCASTING,8</td><td style="text-align:right">-1680349.5642</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,BEST_BROADCASTING,8</td><td style="text-align:right">-1676014.0174</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,NO_BROADCASTING,8</td><td style="text-align:right">-1676032.7620</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,PAIR_BROADCASTING,8</td><td style="text-align:right">-1676784.0627</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,8</td><td style="text-align:right">-1675534.6913</td>
 </tr>
 </table>
       </div>
@@ -348,32 +409,44 @@ title, context, htmlTable, id, latexTable
 \hline
 config & andes & link\\
 \hline
-cges-2-ALL_BROADCASTING,2 & -471974.5370 & -1138428.0287\\
-cges-2-NO_BROADCASTING,2 & -471906.7706 & -1138428.0287\\
-cges-2-PAIR_BROADCASTING,2 & -473013.9936 & -1145685.8621\\
-cges-4-ALL_BROADCASTING,4 & -472992.7373 & -1143935.8682\\
-cges-4-NO_BROADCASTING,4 & \bf -471846.0907 & -1140594.5554\\
-cges-4-PAIR_BROADCASTING,4 & -475057.0044 & -1149181.5579\\
-cges-8-ALL_BROADCASTING,8 & -474078.9246 & -1154863.7727\\
-cges-8-NO_BROADCASTING,8 & -471987.7638 & \bf -1136900.5296\\
-cges-8-PAIR_BROADCASTING,8 & -474329.3540 & -1193763.4729\\
+cges,ALL_BROADCASTING,2 & -471974.5370 & -1138428.0287\\
+cges,BEST_BROADCASTING,2 & -472201.9726 & -1138340.6089\\
+cges,NO_BROADCASTING,2 & -471906.7706 & -1138428.0287\\
+cges,PAIR_BROADCASTING,2 & -473013.9936 & -1145685.8621\\
+cges,RANDOM_BROADCASTING,2 & -472432.1334 & -1138339.3486\\
+cges,ALL_BROADCASTING,4 & -472992.7373 & -1143935.8682\\
+cges,BEST_BROADCASTING,4 & -471980.0631 & -1138109.2312\\
+cges,NO_BROADCASTING,4 & -471846.0907 & -1140594.5554\\
+cges,PAIR_BROADCASTING,4 & -475057.0044 & -1149181.5579\\
+cges,RANDOM_BROADCASTING,4 & -471967.8261 & -1137601.2160\\
+cges,ALL_BROADCASTING,8 & -474078.9246 & -1154863.7727\\
+cges,BEST_BROADCASTING,8 & -471834.3737 & \bf -1134817.4760\\
+cges,NO_BROADCASTING,8 & -471987.7638 & -1136900.5296\\
+cges,PAIR_BROADCASTING,8 & -474329.3540 & -1193763.4729\\
+cges,RANDOM_BROADCASTING,8 & \bf -471765.7736 & -1135155.8733\\
 \hline
 \end{tabular}
 
 
-\begin{tabular}{lrr}
+\begin{tabular}{lr}
 \hline
-config & munin & pigs\\
+config & pigs\\
 \hline
-cges-2-ALL_BROADCASTING,2 & -935983.5701 & \bf -1675319.6039\\
-cges-2-NO_BROADCASTING,2 & \bf -935021.6579 & -1675343.6398\\
-cges-2-PAIR_BROADCASTING,2 & -935242.2592 & -1676167.9939\\
-cges-4-ALL_BROADCASTING,4 & - & -1677162.8849\\
-cges-4-NO_BROADCASTING,4 & -942502.7550 & -1675666.2649\\
-cges-4-PAIR_BROADCASTING,4 & -937798.5442 & -1676175.3344\\
-cges-8-ALL_BROADCASTING,8 & - & -1680349.5642\\
-cges-8-NO_BROADCASTING,8 & - & -1676032.7620\\
-cges-8-PAIR_BROADCASTING,8 & -936368.6718 & -1676784.0627\\
+cges,ALL_BROADCASTING,2 & \bf -1675319.6039\\
+cges,BEST_BROADCASTING,2 & -1676167.0158\\
+cges,NO_BROADCASTING,2 & -1675343.6398\\
+cges,PAIR_BROADCASTING,2 & -1676167.9939\\
+cges,RANDOM_BROADCASTING,2 & -1676256.4295\\
+cges,ALL_BROADCASTING,4 & -1677162.8849\\
+cges,BEST_BROADCASTING,4 & -1675819.5629\\
+cges,NO_BROADCASTING,4 & -1675666.2649\\
+cges,PAIR_BROADCASTING,4 & -1676175.3344\\
+cges,RANDOM_BROADCASTING,4 & -1675913.2588\\
+cges,ALL_BROADCASTING,8 & -1680349.5642\\
+cges,BEST_BROADCASTING,8 & -1676014.0174\\
+cges,NO_BROADCASTING,8 & -1676032.7620\\
+cges,PAIR_BROADCASTING,8 & -1676784.0627\\
+cges,RANDOM_BROADCASTING,8 & -1675534.6913\\
 \hline
 \end{tabular}
 </pre>
@@ -411,8 +484,8 @@ title, context, target, objetive, distribution, statistic, pvalue, alpha, outcom
 
     <ul>
         <li>Strategy for ranks: minimize</li>
-        <li>Computed Chi squared statistic with 8 degrees of freedom: 22.2833333333333</li>
-        <li>Computed p-value: 0.00441716695664521</li>
+        <li>Computed Chi squared statistic with 14 degrees of freedom: 36.4416666666666</li>
+        <li>Computed p-value: 0.000895729646654584</li>
         <li>Outcome for &alpha; = 0.05: H<sub>0</sub> <span class="label label-info">Rejected</span></li>
     </ul>
     </br>
@@ -450,31 +523,49 @@ title, context, scope, method, alpha, htmlTable, id, latexTable
 <tr>
 <th style="text-align:left">config</th><th style="text-align:right">pvalue</th><th style="text-align:right">rank</th><th style="text-align:right">win</th><th style="text-align:right">tie</th><th style="text-align:right">loss</th></tr>
 <tr>
-<td style="text-align:left">cges-2-NO_BROADCASTING,2</td><td style="text-align:right">-</td><td style="text-align:right">1.62</td><td style="text-align:right">-</td><td style="text-align:right">-</td><td style="text-align:right">-</td>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,8</td><td style="text-align:right">-</td><td style="text-align:right">2.00</td><td style="text-align:right">-</td><td style="text-align:right">-</td><td style="text-align:right">-</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-2-ALL_BROADCASTING,2</td><td style="text-align:right"><strong>8.9728e-01</strong></td><td style="text-align:right">1.88</td><td style="text-align:right">1</td><td style="text-align:right">1</td><td style="text-align:right">2</td>
+<td style="text-align:left">cges,NO_BROADCASTING,2</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">2.50</td><td style="text-align:right">2</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-NO_BROADCASTING,4</td><td style="text-align:right"><strong>6.6584e-01</strong></td><td style="text-align:right">3.50</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+<td style="text-align:left">cges,BEST_BROADCASTING,8</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">3.00</td><td style="text-align:right">2</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-NO_BROADCASTING,8</td><td style="text-align:right"><strong>3.2544e-01</strong></td><td style="text-align:right">4.75</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+<td style="text-align:left">cges,ALL_BROADCASTING,2</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">4.17</td><td style="text-align:right">2</td><td style="text-align:right">0</td><td style="text-align:right">1</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-2-PAIR_BROADCASTING,2</td><td style="text-align:right"><strong>3.2544e-01</strong></td><td style="text-align:right">5.00</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+<td style="text-align:left">cges,NO_BROADCASTING,4</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">5.33</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-ALL_BROADCASTING,4</td><td style="text-align:right"><strong>5.9106e-02</strong></td><td style="text-align:right">6.50</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+<td style="text-align:left">cges,BEST_BROADCASTING,4</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">6.00</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-PAIR_BROADCASTING,4</td><td style="text-align:right">4.8792e-02</td><td style="text-align:right">6.75</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+<td style="text-align:left">cges,NO_BROADCASTING,8</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">6.33</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-PAIR_BROADCASTING,8</td><td style="text-align:right">3.8565e-02</td><td style="text-align:right">7.00</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,4</td><td style="text-align:right"><strong>1.0000e+00</strong></td><td style="text-align:right">7.33</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-ALL_BROADCASTING,8</td><td style="text-align:right">7.9572e-03</td><td style="text-align:right">8.00</td><td style="text-align:right">4</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+<td style="text-align:left">cges,BEST_BROADCASTING,2</td><td style="text-align:right"><strong>2.5614e-01</strong></td><td style="text-align:right">10.00</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,2</td><td style="text-align:right"><strong>2.5614e-01</strong></td><td style="text-align:right">10.00</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,PAIR_BROADCASTING,2</td><td style="text-align:right"><strong>1.3711e-01</strong></td><td style="text-align:right">11.00</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,ALL_BROADCASTING,4</td><td style="text-align:right"><strong>5.5875e-02</strong></td><td style="text-align:right">12.33</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,PAIR_BROADCASTING,4</td><td style="text-align:right"><strong>5.5875e-02</strong></td><td style="text-align:right">12.33</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,PAIR_BROADCASTING,8</td><td style="text-align:right">1.8175e-02</td><td style="text-align:right">13.67</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,ALL_BROADCASTING,8</td><td style="text-align:right">1.4210e-02</td><td style="text-align:right">14.00</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">0</td>
 </tr>
 </table>
       </div>
@@ -495,15 +586,21 @@ title, context, scope, method, alpha, htmlTable, id, latexTable
 \hline
 config & pvalue & rank & win & tie & loss\\
 \hline
-cges-2-NO_BROADCASTING,2 & - & 1.62 & - & - & -\\
-cges-2-ALL_BROADCASTING,2 & \bf 8.9728e-01 & 1.88 & 1 & 1 & 2\\
-cges-4-NO_BROADCASTING,4 & \bf 6.6584e-01 & 3.50 & 4 & 0 & 0\\
-cges-8-NO_BROADCASTING,8 & \bf 3.2544e-01 & 4.75 & 4 & 0 & 0\\
-cges-2-PAIR_BROADCASTING,2 & \bf 3.2544e-01 & 5.00 & 4 & 0 & 0\\
-cges-4-ALL_BROADCASTING,4 & \bf 5.9106e-02 & 6.50 & 4 & 0 & 0\\
-cges-4-PAIR_BROADCASTING,4 & 4.8792e-02 & 6.75 & 4 & 0 & 0\\
-cges-8-PAIR_BROADCASTING,8 & 3.8565e-02 & 7.00 & 4 & 0 & 0\\
-cges-8-ALL_BROADCASTING,8 & 7.9572e-03 & 8.00 & 4 & 0 & 0\\
+cges,RANDOM_BROADCASTING,8 & - & 2.00 & - & - & -\\
+cges,NO_BROADCASTING,2 & \bf 1.0000e+00 & 2.50 & 2 & 0 & 1\\
+cges,BEST_BROADCASTING,8 & \bf 1.0000e+00 & 3.00 & 2 & 0 & 1\\
+cges,ALL_BROADCASTING,2 & \bf 1.0000e+00 & 4.17 & 2 & 0 & 1\\
+cges,NO_BROADCASTING,4 & \bf 1.0000e+00 & 5.33 & 3 & 0 & 0\\
+cges,BEST_BROADCASTING,4 & \bf 1.0000e+00 & 6.00 & 3 & 0 & 0\\
+cges,NO_BROADCASTING,8 & \bf 1.0000e+00 & 6.33 & 3 & 0 & 0\\
+cges,RANDOM_BROADCASTING,4 & \bf 1.0000e+00 & 7.33 & 3 & 0 & 0\\
+cges,BEST_BROADCASTING,2 & \bf 2.5614e-01 & 10.00 & 3 & 0 & 0\\
+cges,RANDOM_BROADCASTING,2 & \bf 2.5614e-01 & 10.00 & 3 & 0 & 0\\
+cges,PAIR_BROADCASTING,2 & \bf 1.3711e-01 & 11.00 & 3 & 0 & 0\\
+cges,ALL_BROADCASTING,4 & \bf 5.5875e-02 & 12.33 & 3 & 0 & 0\\
+cges,PAIR_BROADCASTING,4 & \bf 5.5875e-02 & 12.33 & 3 & 0 & 0\\
+cges,PAIR_BROADCASTING,8 & 1.8175e-02 & 13.67 & 3 & 0 & 0\\
+cges,ALL_BROADCASTING,8 & 1.4210e-02 & 14.00 & 3 & 0 & 0\\
 \hline
 \end{tabular}
 </pre>
@@ -578,64 +675,100 @@ title, context, htmlTable, id, latexTable
 <tr>
 <th style="text-align:left">config</th><th style="text-align:right">andes</th><th style="text-align:right">link</th></tr>
 <tr>
-<td style="text-align:left">cges-2-ALL_BROADCASTING,2</td><td style="text-align:right">167.4545</td><td style="text-align:right"><strong>927.7273</strong></td>
+<td style="text-align:left">cges,ALL_BROADCASTING,2</td><td style="text-align:right">167.4545</td><td style="text-align:right">927.7273</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-2-NO_BROADCASTING,2</td><td style="text-align:right"><strong>160.0909</strong></td><td style="text-align:right"><strong>927.7273</strong></td>
+<td style="text-align:left">cges,BEST_BROADCASTING,2</td><td style="text-align:right">170.7273</td><td style="text-align:right">954.0909</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-2-PAIR_BROADCASTING,2</td><td style="text-align:right">201.9091</td><td style="text-align:right">972.0000</td>
+<td style="text-align:left">cges,NO_BROADCASTING,2</td><td style="text-align:right">160.0909</td><td style="text-align:right">927.7273</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-ALL_BROADCASTING,4</td><td style="text-align:right">188.0000</td><td style="text-align:right">998.9091</td>
+<td style="text-align:left">cges,PAIR_BROADCASTING,2</td><td style="text-align:right">201.9091</td><td style="text-align:right">972.0000</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-NO_BROADCASTING,4</td><td style="text-align:right">161.9091</td><td style="text-align:right">952.5455</td>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,2</td><td style="text-align:right">172.8232</td><td style="text-align:right">949.9909</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-PAIR_BROADCASTING,4</td><td style="text-align:right">238.3636</td><td style="text-align:right">1025.1111</td>
+<td style="text-align:left">cges,ALL_BROADCASTING,4</td><td style="text-align:right">188.0000</td><td style="text-align:right">998.9091</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-ALL_BROADCASTING,8</td><td style="text-align:right">218.3636</td><td style="text-align:right">1190.8182</td>
+<td style="text-align:left">cges,BEST_BROADCASTING,4</td><td style="text-align:right">164.6364</td><td style="text-align:right">935.0000</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-NO_BROADCASTING,8</td><td style="text-align:right">164.2727</td><td style="text-align:right">947.6364</td>
+<td style="text-align:left">cges,NO_BROADCASTING,4</td><td style="text-align:right">161.9091</td><td style="text-align:right">952.5455</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-PAIR_BROADCASTING,8</td><td style="text-align:right">235.2727</td><td style="text-align:right">1251.5000</td>
+<td style="text-align:left">cges,PAIR_BROADCASTING,4</td><td style="text-align:right">238.3636</td><td style="text-align:right">1025.1111</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,4</td><td style="text-align:right">163.6848</td><td style="text-align:right">952.5697</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,ALL_BROADCASTING,8</td><td style="text-align:right">218.3636</td><td style="text-align:right">1190.8182</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,BEST_BROADCASTING,8</td><td style="text-align:right">161.0909</td><td style="text-align:right"><strong>921.0909</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">cges,NO_BROADCASTING,8</td><td style="text-align:right">164.2727</td><td style="text-align:right">947.6364</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,PAIR_BROADCASTING,8</td><td style="text-align:right">235.2727</td><td style="text-align:right">1251.5000</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,8</td><td style="text-align:right"><strong>158.0212</strong></td><td style="text-align:right">927.5767</td>
 </tr>
 </table>
 <br/><br/>
 <table class="table table-hover">
 <tr>
 <tr>
-<th style="text-align:left">config</th><th style="text-align:right">munin</th><th style="text-align:right">pigs</th></tr>
+<th style="text-align:left">config</th><th style="text-align:right">pigs</th></tr>
 <tr>
-<td style="text-align:left">cges-2-ALL_BROADCASTING,2</td><td style="text-align:right"><strong>1508.8000</strong></td><td style="text-align:right"><strong>1.6364</strong></td>
+<td style="text-align:left">cges,ALL_BROADCASTING,2</td><td style="text-align:right"><strong>1.6364</strong></td>
 </tr>
 <tr>
-<td style="text-align:left">cges-2-NO_BROADCASTING,2</td><td style="text-align:right">1512.5000</td><td style="text-align:right">2.0000</td>
+<td style="text-align:left">cges,BEST_BROADCASTING,2</td><td style="text-align:right">9.1818</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-2-PAIR_BROADCASTING,2</td><td style="text-align:right">1540.0000</td><td style="text-align:right">7.5455</td>
+<td style="text-align:left">cges,NO_BROADCASTING,2</td><td style="text-align:right">2.0000</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-ALL_BROADCASTING,4</td><td style="text-align:right">-</td><td style="text-align:right">14.0000</td>
+<td style="text-align:left">cges,PAIR_BROADCASTING,2</td><td style="text-align:right">7.5455</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-NO_BROADCASTING,4</td><td style="text-align:right">1569.0000</td><td style="text-align:right">4.0000</td>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,2</td><td style="text-align:right">9.4667</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-4-PAIR_BROADCASTING,4</td><td style="text-align:right">1649.0000</td><td style="text-align:right">6.6364</td>
+<td style="text-align:left">cges,ALL_BROADCASTING,4</td><td style="text-align:right">14.0000</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-ALL_BROADCASTING,8</td><td style="text-align:right">-</td><td style="text-align:right">24.7000</td>
+<td style="text-align:left">cges,BEST_BROADCASTING,4</td><td style="text-align:right">6.0909</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-NO_BROADCASTING,8</td><td style="text-align:right">-</td><td style="text-align:right">6.3636</td>
+<td style="text-align:left">cges,NO_BROADCASTING,4</td><td style="text-align:right">4.0000</td>
 </tr>
 <tr>
-<td style="text-align:left">cges-8-PAIR_BROADCASTING,8</td><td style="text-align:right">1559.0000</td><td style="text-align:right">9.4545</td>
+<td style="text-align:left">cges,PAIR_BROADCASTING,4</td><td style="text-align:right">6.6364</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,4</td><td style="text-align:right">6.4485</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,ALL_BROADCASTING,8</td><td style="text-align:right">24.7000</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,BEST_BROADCASTING,8</td><td style="text-align:right">6.0000</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,NO_BROADCASTING,8</td><td style="text-align:right">6.3636</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,PAIR_BROADCASTING,8</td><td style="text-align:right">9.4545</td>
+</tr>
+<tr>
+<td style="text-align:left">cges,RANDOM_BROADCASTING,8</td><td style="text-align:right">2.7818</td>
 </tr>
 </table>
       </div>
@@ -656,32 +789,44 @@ title, context, htmlTable, id, latexTable
 \hline
 config & andes & link\\
 \hline
-cges-2-ALL_BROADCASTING,2 & 167.4545 & \bf 927.7273\\
-cges-2-NO_BROADCASTING,2 & \bf 160.0909 & \bf 927.7273\\
-cges-2-PAIR_BROADCASTING,2 & 201.9091 & 972.0000\\
-cges-4-ALL_BROADCASTING,4 & 188.0000 & 998.9091\\
-cges-4-NO_BROADCASTING,4 & 161.9091 & 952.5455\\
-cges-4-PAIR_BROADCASTING,4 & 238.3636 & 1025.1111\\
-cges-8-ALL_BROADCASTING,8 & 218.3636 & 1190.8182\\
-cges-8-NO_BROADCASTING,8 & 164.2727 & 947.6364\\
-cges-8-PAIR_BROADCASTING,8 & 235.2727 & 1251.5000\\
+cges,ALL_BROADCASTING,2 & 167.4545 & 927.7273\\
+cges,BEST_BROADCASTING,2 & 170.7273 & 954.0909\\
+cges,NO_BROADCASTING,2 & 160.0909 & 927.7273\\
+cges,PAIR_BROADCASTING,2 & 201.9091 & 972.0000\\
+cges,RANDOM_BROADCASTING,2 & 172.8232 & 949.9909\\
+cges,ALL_BROADCASTING,4 & 188.0000 & 998.9091\\
+cges,BEST_BROADCASTING,4 & 164.6364 & 935.0000\\
+cges,NO_BROADCASTING,4 & 161.9091 & 952.5455\\
+cges,PAIR_BROADCASTING,4 & 238.3636 & 1025.1111\\
+cges,RANDOM_BROADCASTING,4 & 163.6848 & 952.5697\\
+cges,ALL_BROADCASTING,8 & 218.3636 & 1190.8182\\
+cges,BEST_BROADCASTING,8 & 161.0909 & \bf 921.0909\\
+cges,NO_BROADCASTING,8 & 164.2727 & 947.6364\\
+cges,PAIR_BROADCASTING,8 & 235.2727 & 1251.5000\\
+cges,RANDOM_BROADCASTING,8 & \bf 158.0212 & 927.5767\\
 \hline
 \end{tabular}
 
 
-\begin{tabular}{lrr}
+\begin{tabular}{lr}
 \hline
-config & munin & pigs\\
+config & pigs\\
 \hline
-cges-2-ALL_BROADCASTING,2 & \bf 1508.8000 & \bf 1.6364\\
-cges-2-NO_BROADCASTING,2 & 1512.5000 & 2.0000\\
-cges-2-PAIR_BROADCASTING,2 & 1540.0000 & 7.5455\\
-cges-4-ALL_BROADCASTING,4 & - & 14.0000\\
-cges-4-NO_BROADCASTING,4 & 1569.0000 & 4.0000\\
-cges-4-PAIR_BROADCASTING,4 & 1649.0000 & 6.6364\\
-cges-8-ALL_BROADCASTING,8 & - & 24.7000\\
-cges-8-NO_BROADCASTING,8 & - & 6.3636\\
-cges-8-PAIR_BROADCASTING,8 & 1559.0000 & 9.4545\\
+cges,ALL_BROADCASTING,2 & \bf 1.6364\\
+cges,BEST_BROADCASTING,2 & 9.1818\\
+cges,NO_BROADCASTING,2 & 2.0000\\
+cges,PAIR_BROADCASTING,2 & 7.5455\\
+cges,RANDOM_BROADCASTING,2 & 9.4667\\
+cges,ALL_BROADCASTING,4 & 14.0000\\
+cges,BEST_BROADCASTING,4 & 6.0909\\
+cges,NO_BROADCASTING,4 & 4.0000\\
+cges,PAIR_BROADCASTING,4 & 6.6364\\
+cges,RANDOM_BROADCASTING,4 & 6.4485\\
+cges,ALL_BROADCASTING,8 & 24.7000\\
+cges,BEST_BROADCASTING,8 & 6.0000\\
+cges,NO_BROADCASTING,8 & 6.3636\\
+cges,PAIR_BROADCASTING,8 & 9.4545\\
+cges,RANDOM_BROADCASTING,8 & 2.7818\\
 \hline
 \end{tabular}
 </pre>

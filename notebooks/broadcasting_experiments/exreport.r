@@ -7,7 +7,7 @@ csv <- read.csv("exreport.csv")
 # print info of variables
 str(csv)
 
-experiment <- expCreate(csv, name="cges", methods="config", problems="netName", parameters=c("threads"))
+experiment <- expCreate(csv, name="cges", methods="config", problems="netName", parameters=c("threads", "broadcasting"))
 summary(experiment)
 
 experiment <- expInstantiate(experiment, removeUnary = T)
