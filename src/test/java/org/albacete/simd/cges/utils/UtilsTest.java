@@ -8,6 +8,8 @@ import org.albacete.simd.cges.Resources;
 import org.junit.Test;
 import weka.classifiers.bayes.net.BIFReader;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -26,6 +28,8 @@ public class UtilsTest {
     //final DataSet datasetRepeated = Utils.readData(path1);
     final DataSet dataset = Utils.readData(path);
 
+    // Output stream for verbose tests
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
 
 
 
@@ -399,5 +403,41 @@ public void shuffleCollectionTest() {
     assertTrue(collection.containsAll(expected));
     assertTrue(expected.containsAll(collection));
 }
+
+    @Test
+    public void testSetVerbose() {
+        System.setOut(new PrintStream(outputStreamCaptor));
+        // Verifica que se pueda activar verbose
+        Utils.setVerbose(true);
+        assertTrue(Utils.isVerbose());
+
+        // Verifica que se pueda desactivar verbose
+        Utils.setVerbose(false);
+        assertFalse(Utils.isVerbose());
+    }
+
+    @Test
+    public void testPrintlnWhenVerboseIsTrue() {
+        System.setOut(new PrintStream(outputStreamCaptor));
+        // Activa verbose
+        Utils.setVerbose(true);
+
+        // Llama a println y verifica que la salida se imprima correctamente
+        Utils.println("Test message");
+        assertEquals("Test message\n", outputStreamCaptor.toString());
+    }
+
+    @Test
+    public void testPrintlnWhenVerboseIsFalse() {
+        System.setOut(new PrintStream(outputStreamCaptor));
+        // Desactiva verbose
+        Utils.setVerbose(false);
+
+        // Llama a println y verifica que la salida esté vacía
+        Utils.println("Test message");
+        assertEquals("", outputStreamCaptor.toString());
+    }
+
+
 
 }

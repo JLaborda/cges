@@ -7,8 +7,10 @@ import org.albacete.simd.cges.bnbuilders.CircularProcess;
 import org.albacete.simd.cges.threads.BESThread;
 import org.albacete.simd.cges.threads.GESThread;
 import org.albacete.simd.cges.utils.Problem;
+import java.util.AbstractMap;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class PairCombinedFusion extends FusionStage{
 
@@ -20,22 +22,22 @@ public class PairCombinedFusion extends FusionStage{
     public Dag_n fusion() throws InterruptedException {
 
         Dag_n result = graphs.parallelStream()
-                // Apply a fusion to each pair of dags.
+                // Check if the graph is the current one
+                .filter(dag -> !dag.equals(currentGraph))
+                // Apply the fusion and calculate its complexity
                 .map(dag -> {
                     ArrayList<Dag_n> pairDags = new ArrayList<>();
                     pairDags.add(dag);
                     pairDags.add(new Dag_n(currentGraph));
                     ConsensusUnion fusion = new ConsensusUnion(pairDags);
-                    return fusion.union();})
-                // Calculate the score of each graph and keep the best graph
-                .reduce(((dag1, dag2) -> {
-                    double score1 = GESThread.scoreGraph(dag1, problem);
-                    double score2 = GESThread.scoreGraph(dag2, problem);
-                    if(score1 > score2)
-                        return dag1;
-                    else
-                        return dag2;
-                })).orElse(null);
+                    Dag_n fusedDag = fusion.union();
+                    double complexity = fusion.getNumberOfInsertedEdges();
+                    return new AbstractMap.SimpleEntry<>(fusedDag, complexity);//fusion.union();
+                })
+                // Get the one with the lowest complexity
+                .min(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
 
         if(result == null)
             return null;

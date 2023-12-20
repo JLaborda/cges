@@ -435,7 +435,7 @@ public class Utils {
 
     public static void println(String output){
         if(verbose)
-            Utils.println(output);
+            System.out.println(output);
     }
 
 }

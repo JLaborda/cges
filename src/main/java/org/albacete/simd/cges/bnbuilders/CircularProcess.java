@@ -107,9 +107,10 @@ public class CircularProcess {
         setup();
 
         //2. Apply pairCombinedFusion
-        PairCombinedFusion pairCombinedFusion = new PairCombinedFusion(problem, this.dag, inputDags);
-        dag = pairCombinedFusion.fusion();
-
+        if(this.dag != null && !this.dag.getEdges().isEmpty()) {
+            PairCombinedFusion pairCombinedFusion = new PairCombinedFusion(problem, this.dag, inputDags);
+            dag = pairCombinedFusion.fusion();
+        }
         //3. Apply GES Stage
         applyGES();
 

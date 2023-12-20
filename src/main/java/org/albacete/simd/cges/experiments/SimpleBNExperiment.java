@@ -33,7 +33,19 @@ public class SimpleBNExperiment {
         paramsMap.put(ExperimentBNBuilder.KEYS[6], "c2");
         paramsMap.put(ExperimentBNBuilder.KEYS[7], "BEST_BROADCASTING");
         */
-        String paramString = "algName cges netName andes clusteringName HierarchicalClustering numberOfRealThreads 8 convergence c2 broadcasting RANDOM_BROADCASTING seed 103 databasePath /home/jorlabs/projects/cges/res/datasets/andes/andes08.csv netPath /home/jorlabs/projects/cges/res/networks/andes/andes.xbif";
+        System.out.println("Starting experiment...");
+        String algParmString = "algName cges";
+        String netNameParamString = "netName andes";
+        String clusteringNameString = "clusteringName HierarchicalClustering";
+        String numberOfRealThreadsString = "numberOfRealThreads 8";
+        String convergenceString = "convergence c2";
+        String broadcastingString = "broadcasting PAIR_BROADCASTING";
+        String randomParamString = "";//"seed 103";
+        String databasePathString = "databasePath /Users/jdls/developer/projects/cges/res/datasets/andes/andes08.csv";
+        String netPathString = "netPath /Users/jdls/developer/projects/cges/res/networks/andes/andes.xbif";
+
+        //String paramString = "algName cges netName andes clusteringName HierarchicalClustering numberOfRealThreads 8 convergence c2 broadcasting PAIR_BROADCASTING seed 103 databasePath /home/jorlabs/projects/cges/res/datasets/andes/andes08.csv netPath /home/jorlabs/projects/cges/res/networks/andes/andes.xbif";
+        String paramString = algParmString + " " + netNameParamString + " " + clusteringNameString + " " + numberOfRealThreadsString + " " + convergenceString + " " + broadcastingString  + " " + databasePathString + " " + netPathString;
         String[] parameters = paramString.split(" ");
 
         // 2. Setting Algorithm
@@ -44,6 +56,8 @@ public class SimpleBNExperiment {
         ExperimentBNBuilder experiment = new ExperimentBNBuilder(parameters);
 
         // 4. Launch Experiment
+        System.out.println("Setting verbose");
+        Utils.setVerbose(true);
         System.out.println("Running experiment...");
         experiment.runExperiment();
         experiment.printResults();
