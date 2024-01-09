@@ -121,6 +121,30 @@ public class CircularProcess {
         checkConvergence();
     }
 
+        public void bestBroadcastingSearch() throws InterruptedException {
+        // Setup
+        // 1. Update bdeu and convergence variables
+        setup();
+
+        // 2. Check if the input dag is empty
+        if ((inputDag != null) && (!inputDag.getEdges().isEmpty())) {
+            // 3. Merge dags into an arraylist
+            ArrayList<Dag_n> dags = mergeBothDags(inputDag);
+
+            // 4. FES Fusion (Consensus Fusion + FES)
+            applyFESFusion(dags);
+        }
+        
+        // 5. GES Stage
+        applyGES();
+
+        // 6. Update bdeu value
+        updateResults();
+
+        // 7. Convergence
+        checkConvergence();
+    }
+
     
     private void setup() {
         lastScore = score;

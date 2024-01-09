@@ -241,13 +241,36 @@ public class CGES extends BNBuilder {
     }
 
     private void bestBroadcastingSearch(){
+
         do{
+            // apply circular processes
+            bestCircularProcess = cgesProcesses.parallelStream()
+            .map(cdag -> {
+                try {
+                    cdag.bestBroadcastingSearch();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return new AbstractMap.SimpleEntry<>(cdag, cdag.getBDeu());
+            })
+                    // Get the one with the largest bdeu score
+            .max(Map.Entry.comparingByValue())
+            .map(Map.Entry::getKey)
+            .orElse(null);
+
+          // Add best dag to each process  
+            addBestInput();
+
+        }while(notConverged());
+        
+        /*do{
             it++;
             // Add inputDag List
             addBestInput();
             cgesProcesses.parallelStream().forEach(cdag -> {
                 try {
-                    cdag.noBroadcastingSearch();
+                    //Adding best
+                    cdag.bestBroadcastingSearch();
                 } catch (InterruptedException e) {
                     Utils.println("Error with InterruptedException: " +
                             "\n Dag_n Id: " + cdag.id +
@@ -256,11 +279,12 @@ public class CGES extends BNBuilder {
                 }
             });
         }while(notConverged());
+        */
     }
 
     private void addBestInput(){
         // Calculate best graph
-        calculateBestGraph();
+        // calculateBestGraph();
         // Add best input to all cgesProcesses
         cgesProcesses.forEach((dag) -> {
             dag.setInputDag(bestCircularProcess.dag);
