@@ -9,6 +9,8 @@ import org.albacete.simd.cges.clustering.Clustering;
 import org.albacete.simd.cges.framework.BNBuilder;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.albacete.simd.cges.threads.BESThread;
 import org.albacete.simd.cges.threads.FESThread;
@@ -240,57 +242,42 @@ public class CGES extends BNBuilder {
         this.putInputGraphs();
     }
 
-    private void bestBroadcastingSearch(){
-
-        do{
+    private void bestBroadcastingSearch() {
+        do {
             // apply circular processes
-            bestCircularProcess = cgesProcesses.parallelStream()
-            .map(cdag -> {
-                try {
-                    cdag.bestBroadcastingSearch();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                return new AbstractMap.SimpleEntry<>(cdag, cdag.getBDeu());
-            })
-                    // Get the one with the largest bdeu score
-            .max(Map.Entry.comparingByValue())
-            .map(Map.Entry::getKey)
-            .orElse(null);
+            List<CircularProcess> bestInputs = cgesProcesses.parallelStream()
+                    .map(cdag -> {
+                        try {
+                            cdag.bestBroadcastingSearch();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        return cdag;
+                    })
+                    // Get the best input for each process
+                    .map(process -> getBestInput(process))
+                    .collect(Collectors.toList());
 
-          // Add best dag to each process  
-            addBestInput();
+            // Set the best input for each process
+            setBestInputs(bestInputs);
 
-        }while(notConverged());
-        
-        /*do{
-            it++;
-            // Add inputDag List
-            addBestInput();
-            cgesProcesses.parallelStream().forEach(cdag -> {
-                try {
-                    //Adding best
-                    cdag.bestBroadcastingSearch();
-                } catch (InterruptedException e) {
-                    Utils.println("Error with InterruptedException: " +
-                            "\n Dag_n Id: " + cdag.id +
-                            "\n Dag_n graph: " + cdag.dag);
-                    throw new RuntimeException(e);
-                }
-            });
-        }while(notConverged());
-        */
+        } while (notConverged());
     }
 
-    private void addBestInput(){
-        // Calculate best graph
-        // calculateBestGraph();
-        // Add best input to all cgesProcesses
-        cgesProcesses.forEach((dag) -> {
-            dag.setInputDag(bestCircularProcess.dag);
-        });
-
+    private CircularProcess getBestInput(CircularProcess process) {
+        // Get the best input excluding the current process
+        return cgesProcesses.stream()
+                .filter(p -> !p.equals(process))
+                .max(Comparator.comparingDouble(CircularProcess::getBDeu))
+                .orElse(null);
     }
+
+    private void setBestInputs(List<CircularProcess> bestInputs) {
+        // Set the best input for each process
+        IntStream.range(0, cgesProcesses.size())
+                .forEach(i -> cgesProcesses.get(i).setInputDag(bestInputs.get(i).dag));
+    }
+
 
     private void addInputDagList() {
         ArrayList<Dag_n> inputDags = getInputDags();
