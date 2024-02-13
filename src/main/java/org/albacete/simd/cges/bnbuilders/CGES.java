@@ -117,11 +117,11 @@ public class CGES extends BNBuilder {
             case NO_BROADCASTING:
                 noBroadcastingSearch();
                 break;
-            case PAIR_BROADCASTING:
-                pairBroadcastingSearch();
-                break;
             case ALL_BROADCASTING:
                 allBroadcastingSearch();
+                break;
+            case PAIR_BROADCASTING:
+                pairBroadcastingSearch();
                 break;
             case RANDOM_BROADCASTING:
                 randomBroadcastingSearch();
@@ -130,6 +130,45 @@ public class CGES extends BNBuilder {
                 bestBroadcastingSearch();
                 break;
         }
+    }
+
+    /**
+     * Search loop that executes in parallel k processes of CGES processes. It only takes into account the results
+     * of the CGES processes to pass to the posterior process, performing a cycle.
+     */
+    private void noBroadcastingSearch(){
+        do{
+            it++;
+            putInputGraphs();
+            cgesProcesses.parallelStream().forEach((cdag) -> {
+                try {
+                    // Applying cges process
+                    cdag.noBroadcastingSearch();
+                } catch (InterruptedException ex) {
+                    Utils.println("Error with InterruptedException: " +
+                            "\n Dag_n Id: " + cdag.id +
+                            "\n Dag_n graph: " + cdag.dag);
+                }
+            });
+        } while (notConverged());
+    }
+
+    private void putInputGraphs() {
+        for (int i = 0; i < cgesProcesses.size(); i++) {
+            CircularProcess inputProcess, currentProcess;
+
+            currentProcess = cgesProcesses.get(i);
+            if(i==0){
+                inputProcess = cgesProcesses.get(cgesProcesses.size()-1);
+            } else {
+                inputProcess = cgesProcesses.get(i-1);
+            }
+            currentProcess.setInputDag(inputProcess.dag);
+        }
+        /*cgesProcesses.forEach((dag) -> {
+            CircularProcess cd = getInputDag(dag.id);
+            dag.setInputDag(cd.dag);
+        });*/
     }
 
     /**
@@ -158,13 +197,6 @@ public class CGES extends BNBuilder {
         } while (notConverged());
     }
 
-    private void putInputGraphs() {
-        cgesProcesses.forEach((dag) -> {
-            CircularProcess cd = getInputDag(dag.id);
-            dag.setInputDag(cd.dag);
-        });
-    }
-
     private Dag_n fuseAllInputDags(){
         ArrayList<Dag_n> graphs = new ArrayList<>();
         for (CircularProcess cdag: cgesProcesses) {
@@ -173,27 +205,6 @@ public class CGES extends BNBuilder {
 
         ConsensusUnion fusion = new ConsensusUnion(graphs);
         return fusion.union();
-    }
-
-    /**
-     * Search loop that executes in parallel k processes of CGES processes. It only takes into account the results
-     * of the CGES processes to pass to the posterior process, performing a cycle.
-     */
-    private void noBroadcastingSearch(){
-        do{
-            it++;
-            putInputGraphs();
-            cgesProcesses.parallelStream().forEach((cdag) -> {
-                try {
-                    // Applying cges process
-                    cdag.noBroadcastingSearch();
-                } catch (InterruptedException ex) {
-                    Utils.println("Error with InterruptedException: " +
-                            "\n Dag_n Id: " + cdag.id +
-                            "\n Dag_n graph: " + cdag.dag);
-                }
-            });
-        } while (notConverged());
     }
 
     private void pairBroadcastingSearch(){
