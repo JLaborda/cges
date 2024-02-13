@@ -14,8 +14,7 @@ public class CGESTest {
         // Create an instance of the CGES class
         Clustering clustering = new HierarchicalClustering();
         int nThreads = 4;
-        int nItInterleaving = 100000;
-        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, nItInterleaving, "c1", CGES.Broadcasting.NO_BROADCASTING);
+        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, CGES.Broadcasting.NO_BROADCASTING);
 
         // Execute the search() method
         Graph result = builder.search();
@@ -29,9 +28,8 @@ public class CGESTest {
         // Create an instance of the CGES class
         Clustering clustering = new HierarchicalClustering();
         int nThreads = 4;
-        int nItInterleaving = 100000;
-        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, nItInterleaving, "c2", CGES.Broadcasting.NO_BROADCASTING);
-
+        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, CGES.Broadcasting.NO_BROADCASTING);
+        
         // Execute the search() method
         Graph result = builder.search();
 
@@ -44,9 +42,8 @@ public class CGESTest {
         // Create an instance of the CGES class
         Clustering clustering = new HierarchicalClustering();
         int nThreads = 4;
-        int nItInterleaving = 100000;
-        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, nItInterleaving, "c2", CGES.Broadcasting.PAIR_BROADCASTING);
-
+        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, CGES.Broadcasting.NO_BROADCASTING);
+        
         // Execute the search() method
         Graph result = builder.search();
 
@@ -59,8 +56,7 @@ public class CGESTest {
         // Create an instance of the CGES class
         Clustering clustering = new HierarchicalClustering();
         int nThreads = 4;
-        int nItInterleaving = 100000;
-        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, nItInterleaving, "c2", CGES.Broadcasting.ALL_BROADCASTING);
+        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, CGES.Broadcasting.NO_BROADCASTING);
 
         // Execute the search() method
         Graph result = builder.search();
@@ -74,8 +70,7 @@ public class CGESTest {
         // Create an instance of the CGES class
         Clustering clustering = new HierarchicalClustering();
         int nThreads = 4;
-        int nItInterleaving = 100000;
-        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, nItInterleaving, "c2", CGES.Broadcasting.RANDOM_BROADCASTING);
+        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, CGES.Broadcasting.NO_BROADCASTING);
 
         // Execute the search() method
         Graph result = builder.search();
@@ -89,8 +84,7 @@ public class CGESTest {
         // Create an instance of the CGES class
         Clustering clustering = new HierarchicalClustering();
         int nThreads = 4;
-        int nItInterleaving = 100000;
-        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, nItInterleaving, "c2", CGES.Broadcasting.BEST_BROADCASTING);
+        CGES builder = new CGES(Resources.ALARM_BBDD_PATH, clustering, nThreads, CGES.Broadcasting.NO_BROADCASTING);
 
         // Execute the search() method
         Graph result = builder.search();

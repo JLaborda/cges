@@ -18,50 +18,30 @@ import org.albacete.simd.cges.utils.Utils;
 
 
 public class CGES extends BNBuilder {
-    
-    private final String typeConvergence;
-    
     private List<Set<Edge>> subsetEdges;
     private final Clustering clustering;
     private final List<CircularProcess> cgesProcesses;
     private CircularProcess bestCircularProcess;
     private double lastBestBDeu = Double.NEGATIVE_INFINITY;
-    private boolean convergence;
 
     public enum Broadcasting {NO_BROADCASTING, PAIR_BROADCASTING, ALL_BROADCASTING, RANDOM_BROADCASTING, BEST_BROADCASTING}
     private final Broadcasting typeBroadcasting;
 
-    private Random random = new Random(getSeed());
     
-    public CGES(DataSet data, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence, Broadcasting typeBroadcasting) {
-        super(data, nThreads, -1, nItInterleaving);
+    public CGES(DataSet data, Clustering clustering, int numberOfProcesses, Broadcasting typeBroadcasting) {
+        super(data, numberOfProcesses);
 
         this.clustering = clustering;
         clustering.setProblem(problem);
-        this.cgesProcesses = new ArrayList<>(nThreads);
-        this.typeConvergence = typeConvergence;
+        this.cgesProcesses = new ArrayList<>(numberOfProcesses);
         this.typeBroadcasting = typeBroadcasting;
-        setHyperParamsHeader("clustering,nThreads,interleaving,typeConvergence,typeBroadcasting");
-        setHyperParamsBody(clustering.getClass().getSimpleName() + "," + nThreads + "," + nItInterleaving + "," + typeConvergence + "," + typeBroadcasting);
+        this.interleaving = (int) (10 / numberOfProcesses * Math.sqrt(problem.getVariables().size()));
+        setHyperParamsHeader("clustering,numberOfProcesses,interleaving,typeBroadcasting");
+        setHyperParamsBody(clustering.getClass().getSimpleName() + "," + numberOfProcesses + "," + interleaving + "," + typeBroadcasting.toString());
     }
 
-    public CGES(String path, Clustering clustering, int nThreads, int nItInterleaving, String typeConvergence, Broadcasting typeBroadcasting) {
-        this(Utils.readData(path), clustering, nThreads, nItInterleaving, typeConvergence, typeBroadcasting);
-    }
-
-    public CGES(String path, Clustering clustering, int nThreads, String typeConvergence, Broadcasting typeBroadcasting) {
-        super(path, nThreads, -1, -1);
-        this.clustering = clustering;
-        clustering.setProblem(problem);
-        this.cgesProcesses = new ArrayList<>(nThreads);
-        this.typeConvergence = typeConvergence;
-        this.typeBroadcasting = typeBroadcasting;
-        this.interleaving = (int) (10 / nThreads * Math.sqrt(problem.getVariables().size()));
-        setHyperParamsHeader("clustering,nThreads,interleaving,typeConvergence,typeBroadcasting");
-        setHyperParamsBody(clustering.getClass().getSimpleName() + "," + nThreads + "," + this.interleaving + "," + typeConvergence + "," + typeBroadcasting);
-        
-        this.interleaving = (int) (10 / nThreads * Math.sqrt(problem.getVariables().size()));
-
+    public CGES(String path, Clustering clustering, int numberOfProcesses, Broadcasting typeBroadcasting) {
+        this(Utils.readData(path), clustering, numberOfProcesses, typeBroadcasting);
     }
 
     
@@ -96,14 +76,14 @@ public class CGES extends BNBuilder {
     protected void repartition() {
         // Splitting edges with the clustering algorithm and assigning them to the subsetEdges attribute.
         clustering.setProblem(this.problem);
-        subsetEdges = clustering.generateEdgeDistribution(numberOfThreads);
+        subsetEdges = clustering.generateEdgeDistribution(numberOfPartitions);
     }
 
     /**
      * Initializes each CGES process with a starting empty graph
      */
     private void initializeThreads(){
-        for (int i = 0; i < numberOfThreads; i++) {
+        for (int i = 0; i < numberOfPartitions; i++) {
             cgesProcesses.add(new CircularProcess(problem,subsetEdges.get(i), interleaving,i));
         }
     }
@@ -306,7 +286,7 @@ public class CGES extends BNBuilder {
 
     private CircularProcess getInputDag(int i) {
         if(i == 0) {
-            return cgesProcesses.get(numberOfThreads - 1);
+            return cgesProcesses.get(numberOfPartitions - 1);
         } else {
             return cgesProcesses.get(i - 1);
         }
@@ -330,26 +310,11 @@ public class CGES extends BNBuilder {
      * @return boolean value stating if the search loop can continue (true) or not (false).
      */
     private boolean notConverged() {
-        switch (typeConvergence) {
-            // When any DAG changes in the iteration, there is no convergence
-            case "c1":
-            default:
-                convergence = true;
-                
-                cgesProcesses.forEach(dag -> convergence = convergence && dag.convergence);
-                
-                return !convergence;
-                
-            // When any DAG improves the previous best DAG, there is no convergence
-            case "c2":
-                calculateBestGraph();
-
-                boolean max = lastBestBDeu >= bestCircularProcess.getBDeu();
-                
-                lastBestBDeu = bestCircularProcess.getBDeu();
-                        
-                return !max;
-        }
+        // When any DAG improves the previous best DAG, there is no convergence
+        calculateBestGraph();
+        boolean max = lastBestBDeu >= bestCircularProcess.getBDeu();        
+        lastBestBDeu = bestCircularProcess.getBDeu();
+        return !max;
     }
     
     private void finalGES() {

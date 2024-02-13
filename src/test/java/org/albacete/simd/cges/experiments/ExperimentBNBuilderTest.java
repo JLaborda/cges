@@ -53,7 +53,7 @@ public class ExperimentBNBuilderTest {
 
 
         Clustering clustering = new HierarchicalClustering();
-        BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2", CGES.Broadcasting.NO_BROADCASTING);
+        BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, CGES.Broadcasting.NO_BROADCASTING);
         
         ExperimentBNBuilder[] experiments = {
             new ExperimentBNBuilder(parameters),
@@ -78,7 +78,7 @@ public class ExperimentBNBuilderTest {
         // parameters is an array of strings of pairs key value ["algName", "cges", ...]
         String[] parameters = createParameters();
 
-        BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2", CGES.Broadcasting.NO_BROADCASTING);
+        BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, CGES.Broadcasting.NO_BROADCASTING);
         ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm, parameters);
 
         exp.runExperiment();
@@ -97,7 +97,7 @@ public class ExperimentBNBuilderTest {
         Clustering clustering = new RandomClustering();
         String[] parameters = createParameters();
         
-        BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, 100000, "c2", CGES.Broadcasting.NO_BROADCASTING);
+        BNBuilder algorithm = new CGES(Resources.ALARM_BBDD_PATH, clustering, 4, CGES.Broadcasting.NO_BROADCASTING);
         ExperimentBNBuilder exp = new ExperimentBNBuilder(algorithm,parameters);
 
         String savePath = "./src/test/res/testBN.txt";

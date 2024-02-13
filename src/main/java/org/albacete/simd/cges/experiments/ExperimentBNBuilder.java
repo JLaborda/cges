@@ -114,7 +114,6 @@ public class ExperimentBNBuilder {
         algorithm = new CGES(paramsMap.get("databasePath"),
                         clustering,
                         Integer.parseInt(paramsMap.get("numberOfRealThreads")),
-                        paramsMap.get("convergence"),
                         Broadcasting.valueOf(paramsMap.get("broadcasting"))
                         );
         //Setting seed

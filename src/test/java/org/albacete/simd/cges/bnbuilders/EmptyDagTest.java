@@ -13,7 +13,7 @@ public class EmptyDagTest {
     public void testSearch() {
         // Create an Empty object and a CGES object to compare
         EmptyDag emptyDag = new EmptyDag(Resources.ALARM_BBDD_PATH);
-        CGES cges = new CGES(Resources.ALARM_BBDD_PATH, new RandomClustering(42), 4, 10000, "c2", CGES.Broadcasting.NO_BROADCASTING);
+        CGES cges = new CGES(Resources.ALARM_BBDD_PATH, new RandomClustering(42), 4, CGES.Broadcasting.NO_BROADCASTING);
         // Execute the search method
         Graph resultEmpty = emptyDag.search();
         Graph resultCGES = cges.search();

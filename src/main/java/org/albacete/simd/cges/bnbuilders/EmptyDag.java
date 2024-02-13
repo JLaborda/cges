@@ -13,7 +13,7 @@ import org.albacete.simd.cges.utils.Utils;
 public class EmptyDag extends BNBuilder {
     
     public EmptyDag(DataSet data) {
-        super(data, 1, -1, -1);
+        super(data, 1);
     }
 
     public EmptyDag(String path) {

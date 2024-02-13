@@ -6,7 +6,6 @@ import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.cges.Resources;
 import org.albacete.simd.cges.bnbuilders.CircularProcess;
 import org.albacete.simd.cges.threads.BESThread;
-import org.albacete.simd.cges.threads.GESThread;
 import org.albacete.simd.cges.utils.Problem;
 import org.albacete.simd.cges.utils.Utils;
 import org.junit.Test;

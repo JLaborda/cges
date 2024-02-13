@@ -25,7 +25,7 @@ public abstract class BNBuilder {
     /**
      * The number of threads the algorithm is going to use.
      */
-    protected int numberOfThreads = 1;
+    protected int numberOfPartitions = 1;
 
     /**
      * Seed for the random number generator.
@@ -33,15 +33,15 @@ public abstract class BNBuilder {
     private long seed = 42;
 
     /**
-     * Number of iterations allowed inside the FES stage. This is a hyper parameter used in experimentation.
+     * Number of iterations allowed inside the FES stage. This is a parameter used in experimentation.
      */
-    protected int interleaving;
+    protected int interleaving = -1;
 
 
     /**
      * The maximum number of iterations allowed for the algorithm.
      */
-    protected int maxIterations;
+    protected int maxIterations = -1;
 
     /**
      * The {@link GESThread GESThread} array that will be executed in each stage.
@@ -101,44 +101,40 @@ public abstract class BNBuilder {
     protected String databaseName;
 
 
-    public BNBuilder(DataSet data, int numberOfThreads, int maxIterations, int interleaving){
+    public BNBuilder(DataSet data, int numberOfPartitions){
         this.problem = new Problem(data);
-        this.maxIterations = maxIterations;
-        this.interleaving = interleaving;
-        initialize(numberOfThreads);
+        initialize(numberOfPartitions);
     }
 
-    public BNBuilder(String path, int numberOfThreads, int maxIterations, int interleaving) {
-        this(Utils.readData(path), numberOfThreads, maxIterations, interleaving);
+    public BNBuilder(String path, int numberOfPartitions) {
+        this(Utils.readData(path), numberOfPartitions);
     }
 
-    public BNBuilder(Graph initialGraph, DataSet data, int numberOfThreads, int maxIterations, int interleaving) {
-        this(data, numberOfThreads, maxIterations, interleaving);
+    public BNBuilder(Graph initialGraph, DataSet data, int numberOfPartitions) {
+        this(data, numberOfPartitions);
         this.initialGraph = new EdgeListGraph_n(initialGraph);
         checkForConsistenciesInInitialGraphWithProblem(initialGraph);
     }
 
 
-    public BNBuilder(Graph initialGraph, String path, int numberOfThreads, int maxIterations, int interleaving) {
-        this(initialGraph, Utils.readData(path), numberOfThreads, maxIterations, interleaving);
+    public BNBuilder(Graph initialGraph, String path, int numberOfPartitions) {
+        this(initialGraph, Utils.readData(path), numberOfPartitions);
     }
 
-    public BNBuilder(Graph initialGraph, Problem problem, int numberOfThreads, int maxIterations, int interleaving) {
+    public BNBuilder(Graph initialGraph, Problem problem, int numberOfPartitions) {
         this.problem = problem;
-        this.maxIterations = maxIterations;
-        this.interleaving = interleaving;
         this.initialGraph = initialGraph;
-        initialize(numberOfThreads);
+        initialize(numberOfPartitions);
 
         checkForConsistenciesInInitialGraphWithProblem(initialGraph);
 
     }
 
     private void initialize(int nThreads) {
-        this.numberOfThreads = nThreads;
-        this.gesThreads = new FESThread[this.numberOfThreads];
-        this.threads = new Thread[this.numberOfThreads];
-        this.subSets = new ArrayList<>(this.numberOfThreads);
+        this.numberOfPartitions = nThreads;
+        this.gesThreads = new FESThread[this.numberOfPartitions];
+        this.threads = new Thread[this.numberOfPartitions];
+        this.subSets = new ArrayList<>(this.numberOfPartitions);
 
         //The total number of arcs of a graph is n*(n-1)/2, where n is the number of nodes in the graph.
         this.setOfArcs = new HashSet<>(this.problem.getData().getNumColumns() * (this.problem.getData().getNumColumns() - 1));
@@ -258,7 +254,7 @@ public abstract class BNBuilder {
 
 
     public int getNumberOfThreads() {
-        return numberOfThreads;
+        return numberOfPartitions;
     }
 
     public int getItInterleaving() {

@@ -15,13 +15,13 @@ public class GES extends BNBuilder {
     private final boolean parallel;
 
     public GES(DataSet data, boolean parallel) {
-        super(data, 1, -1, -1);
+        super(data, 1);
         initialGraph = new EdgeListGraph(new LinkedList<>(problem.getVariables()));
         this.parallel = parallel;
     }
 
     public GES(String path, boolean parallel) {
-        super(path, 1, -1, -1);
+        super(path, 1);
         initialGraph = new EdgeListGraph(new LinkedList<>(problem.getVariables()));
         this.parallel = parallel;
     }
@@ -33,7 +33,7 @@ public class GES extends BNBuilder {
     }
 
     public GES(Graph initialDag, String path, boolean parallel) {
-        super(initialDag,path,1, -1, -1);
+        super(initialDag,path,1);
         this.parallel = parallel;
         this.currentGraph = new EdgeListGraph(initialDag);
     }
