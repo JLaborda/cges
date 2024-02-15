@@ -27,6 +27,9 @@ public class CGES extends BNBuilder {
     public enum Broadcasting {NO_BROADCASTING, PAIR_BROADCASTING, ALL_BROADCASTING, RANDOM_BROADCASTING, BEST_BROADCASTING}
     private final Broadcasting typeBroadcasting;
 
+    private double cgesScore;
+    private long timeFineTuning;
+
     
     public CGES(DataSet data, Clustering clustering, int numberOfProcesses, Broadcasting typeBroadcasting) {
         super(data, numberOfProcesses);
@@ -57,9 +60,16 @@ public class CGES extends BNBuilder {
         calculateBestGraph();
         currentGraph = bestCircularProcess.dag;
         
+        // Save score before fine-tuning
+        cgesScore = bestCircularProcess.getBDeu();
+
         //4. Do a final GES with all the data
         Utils.println("\n\n\n FINAL GES");
+        long start = System.currentTimeMillis();
         finalGES();
+        long end = System.currentTimeMillis();
+        timeFineTuning = end - start;
+
         
         return currentGraph;
     }
@@ -284,14 +294,6 @@ public class CGES extends BNBuilder {
     }
 
 
-    private CircularProcess getInputDag(int i) {
-        if(i == 0) {
-            return cgesProcesses.get(numberOfPartitions - 1);
-        } else {
-            return cgesProcesses.get(i - 1);
-        }
-    }
-
     public void calculateBestGraph(){
         cgesProcesses.forEach(this::calculateBestGraph);
     }
@@ -346,4 +348,11 @@ public class CGES extends BNBuilder {
         super.setSeed(seed);
     }
 
+    public double getCgesScore() {
+        return cgesScore;
+    }
+
+    public long getTimeFineTuning() {
+        return timeFineTuning;
+    }
 }

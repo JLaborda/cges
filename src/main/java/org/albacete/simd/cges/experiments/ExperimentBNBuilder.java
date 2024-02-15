@@ -66,6 +66,7 @@ public class ExperimentBNBuilder {
     protected int numberOfIterations;
 
     public Dag_n resultingBayesianNetwork;
+    
 
 
     public ExperimentBNBuilder(String[] parameters) throws Exception {
@@ -228,7 +229,7 @@ public class ExperimentBNBuilder {
         this.differencesOfMalkovsBlanket = Utils.avgMarkovBlanketDelta(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag());
         this.numberOfIterations = algorithm.getIterations();
         this.bdeuScore = GESThread.scoreGraph(algorithm.getCurrentDag(), algorithm.getProblem());
-
+        
         measurementsMap.put("elapsedTime(s)", (double) stopWatch.getTime(TimeUnit.MILLISECONDS) / 1000);
         measurementsMap.put("shd", (double)Utils.SHD(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag()));
         measurementsMap.put("dfMM_avg", differencesOfMalkovsBlanket[0]);
@@ -236,6 +237,11 @@ public class ExperimentBNBuilder {
         measurementsMap.put("dfMM_minus", differencesOfMalkovsBlanket[1]);
         measurementsMap.put("iterations", (double) algorithm.getIterations());
         measurementsMap.put("bdeu", GESThread.scoreGraph(algorithm.getCurrentDag(), algorithm.getProblem()));
+
+        if(this.algorithm instanceof CGES){
+            measurementsMap.put("cgesScore", ((CGES) this.algorithm).getCgesScore());
+            measurementsMap.put("fineTuningTime(s)", (double)((CGES) this.algorithm).getTimeFineTuning()/1000);
+        }
 
     }
 
