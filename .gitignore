@@ -41,3 +41,15 @@ cov.xml
 
 # .idea folder
 .idea/
+
+#.DS_Store
+.DS_Store
+
+# large_datasets
+res/large_datasets/
+
+# parameters folder
+res/parameters/
+
+#scripts
+res/scripts/
