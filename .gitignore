@@ -53,3 +53,4 @@ res/parameters/
 
 #scripts
 res/scripts/
+!res/scripts/experiments/

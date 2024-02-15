@@ -9,6 +9,16 @@ PARAMS_FILE="/home/jorlabs/projects/cges/res/parameters/prueba.txt"
 # Save Folder
 SAVE_FOLDER="/home/jorlabs/projects/cges/results/pruebas/"
 
+# Build script
+BUILD_SCRIPT="/home/jorlabs/projects/cges/res/scripts/experiments/build.bash"
+
+# Ask if the user wants to compile and package
+read -p "Run mvn clean package?(Y/N): " BUILD
+if [ $BUILD == "Y" ] || [ $BUILD == "y" ] ;
+then
+  bash $BUILD_SCRIPT
+fi
+
 # Verificar si los archivos existen
 if [ ! -f "$JAR_PATH" ] || [ ! -f "$PARAMS_FILE" ]; then
     echo "Error: Archivos no encontrados."
