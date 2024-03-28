@@ -1,50 +1,58 @@
 #!/bin/bash
 
-algorithm_names=("cges" "ges" "fes")
-net_names=("andes" "link" "munin")
-net_paths=("./res/networks/andes/andes.xbif" "./res/networks/link/link.xbif" "./res/networks/munin/munin.xbif")
-dataset_paths=()
-for net_name in "${net_names[@]}"
-do
-    for i in {0..10}
-    do
-      if (( i < 10 )); then
-          dataset_paths+=("./res/datasets/${net_name}/${net_name}0${i}.csv")
+# Este script genera los parámetros para cada experimento.
+# Cada línea en el archivo de salida representa un conjunto de parámetros.
+
+# Rutas base
+PROJECT_DIR="/home/jorlabs/projects/cges/"
+NETWORKS_DIR="res/networks/"
+DATASETS_DIR="res/datasets/"
+
+# Redes disponibles
+NETWORKS=("alarm" "andes" "barley" "child" "hailfinder" "hepar2" "insurance" "link" "mildew" "munin" "pigs" "water" "win95pts")
+# Algorithms
+ALGORITHMS=("cges" "ges" "fges" "fges-faithfulness")
+# Otros parámetros fijos
+CLUSTERING="HierarchicalClustering"
+NCLUSTERS=("2" "4" "8" "16")
+BROADCASTING=("NO_BROADCASTING" "PAIR_BROADCASTING" "ALL_BROADCASTING" "RANDOM_BROADCASTING" "BEST_BROADCASTING")
+SEEDS=(2 3 5 7 11 13 17 19 23 29) # Semillas aleatorias (10 primeros números primos)
+
+# Remove files of parameters if they exist
+rm -f /home/jorlabs/projects/cges/res/parameters/params_*.txt
+
+
+# Genera todas las combinaciones de parámetros
+for algName in "${ALGORITHMS[@]}"; do
+  for network in "${NETWORKS[@]}"; do
+    # Conjunto de datasets para la red actual
+    DATASETS=()
+    for i in {1..10}; do
+      DATASETS+=("${PROJECT_DIR}${DATASETS_DIR}${network}/${network}${i}.csv")
+    done
+    DATASETS+=("${PROJECT_DIR}${DATASETS_DIR}${network}/${network}ALL.csv")
+    for dataset in "${DATASETS[@]}"; do
+      netpath="${PROJECT_DIR}${NETWORKS_DIR}${network}/${network}.xbif"    
+      if [ $algName == "cges" ]; then  
+        for nclusters in "${NCLUSTERS[@]}"; do
+          for broadcasting in "${BROADCASTING[@]}"; do
+            # if $broadcasting is equal to RANDOM_BROADCASTING, then loop over seeds and add them to parameters line
+            if [ $broadcasting == "RANDOM_BROADCASTING" ]; then
+              for seed in "${SEEDS[@]}"; do
+                #echo "cges ${network} ${netpath} ${dataset} ${CLUSTERING} ${nthreads} ${CONVERGENCE} ${broadcasting} ${seed}" > "/home/jorlabs/projects/cges/res/parameters/params_${broadcasting}.txt"
+                echo "algName cges netName ${network} clusteringName ${CLUSTERING} numberOfClusters ${nclusters} broadcasting ${broadcasting} seed ${seed} databasePath ${dataset} netPath ${netpath}" >> "/home/jorlabs/projects/cges/res/parameters/params_${algName}_${broadcasting}.txt"
+              done
+              continue        
+            else
+              echo "algName cges netName ${network} clusteringName ${CLUSTERING} numberOfClusters ${nclusters} broadcasting ${broadcasting} databasePath ${dataset} netPath ${netpath}" >> "/home/jorlabs/projects/cges/res/parameters/params_${algName}_${broadcasting}.txt"
+              continue
+            fi
+          done
+        done
       else
-          dataset_paths+=("./res/datasets/${net_name}/${net_name}${i}.csv")
+        echo "algName ${algName} netName ${network} databasePath ${dataset} netPath ${netpath}" >> "/home/jorlabs/projects/cges/res/parameters/params_${algName}.txt"
+        continue
       fi
     done
-done
-number_cges_threads=("1" "2" "4" "8")
-
-for ((i=0; i<${#net_names[@]}; i++))
-do
-    net_name="${net_names[i]}"
-    net_path="${net_paths[i]}"
-
-    # edge_limitation_calc = 10 /k*sqrt(n)
-    if [[ $net_name == "link" ]]; then
-        edge_limitation_calc=$(bc -l <<< "scale=0; 10/${number_cges_threads[i]} * sqrt(724)")
-    elif [[ $net_name == "andes" ]]; then
-        edge_limitation_calc=$(bc -l <<< "scale=0; 10/${number_cges_threads[i]} * sqrt(223)")
-    elif [[ $net_name == "munin" ]]; then
-        edge_limitation_calc=$(bc -l <<< "scale=0; 10/${number_cges_threads[i]} * sqrt(1041)")
-    fi
-
-    echo "algorithm_name net_name net_path dataset_path number_cges_threads edge_limitation" > "${net_name}_parameters.txt"
-
-    for algorithm_name in "${algorithm_names[@]}"
-    do
-        for dataset_path in "${dataset_paths[@]}"
-        do
-            for number_cges_thread in "${number_cges_threads[@]}"
-            do
-                # Saving both the edge_limitation configuration and the non_edge_limitation configuration
-                echo "$algorithm_name $net_name $net_path $dataset_path $number_cges_thread $edge_limitation_calc" >> "${net_name}_parameters.txt"
-                echo "$algorithm_name $net_name $net_path $dataset_path $number_cges_thread 2147483647" >> "${net_name}_parameters.txt"
-            done
-        done
-    done
-
-    echo "Parameters file for ${net_name} generated successfully!"
+  done 
 done

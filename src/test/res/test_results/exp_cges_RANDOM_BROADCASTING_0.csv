@@ -1,0 +1,2 @@
+algName,netName,clusteringName,numberOfClusters,broadcasting,seed,database,elapsedTime(s),shd,dfMM_avg,dfMM_plus,dfMM_minus,iterations,bdeu,ncpus,cgesScore,fineTuningTime(s)
+cges,alarm,HierarchicalClustering,16,RANDOM_BROADCASTING,13,alarm.xbif_,0.677,8.0,16.0,2.0,2.0,2.0,-54082.05112115014,48.0,-102455.76899797595,0.208

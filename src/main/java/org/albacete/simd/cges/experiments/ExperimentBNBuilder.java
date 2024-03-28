@@ -48,7 +48,7 @@ public class ExperimentBNBuilder {
     // Definir las claves como constantes de la clase
     public static final String[] KEYS = {
             "algName", "netName", "netPath", "databasePath",
-            "clusteringName", "numberOfRealThreads", "convergence", "broadcasting", "seed"
+            "clusteringName", "numberOfClusters", "convergence", "broadcasting", "seed"
     };
     
 
@@ -105,22 +105,43 @@ public class ExperimentBNBuilder {
     }
 
     private void createBNBuilder() throws Exception {
-        String clusteringName = paramsMap.get("clusteringName");        
-        Clustering clustering;
-        if(clusteringName.equals("HierarchicalClustering"))
-            clustering = new HierarchicalClustering();
-        else
-            clustering = new RandomClustering();
+
+        String algName = paramsMap.get("algName");
+        switch (algName) {
+            case "cges":
+                String clusteringName = paramsMap.get("clusteringName");        
+                Clustering clustering;
+                if(clusteringName.equals("HierarchicalClustering"))
+                    clustering = new HierarchicalClustering();
+                else
+                    clustering = new RandomClustering();
+                
+                algorithm = new CGES(paramsMap.get("databasePath"),
+                                clustering,
+                                Integer.parseInt(paramsMap.get("numberOfClusters")),
+                                Broadcasting.valueOf(paramsMap.get("broadcasting"))
+                                );
+                //Setting seed
+                if(paramsMap.containsKey("seed")){
+                    algorithm.setSeed(Long.parseLong(paramsMap.get("seed")));
+                }
+                break;
         
-        algorithm = new CGES(paramsMap.get("databasePath"),
-                        clustering,
-                        Integer.parseInt(paramsMap.get("numberOfRealThreads")),
-                        Broadcasting.valueOf(paramsMap.get("broadcasting"))
-                        );
-        //Setting seed
-        if(paramsMap.containsKey("seed")){
-            algorithm.setSeed(Long.parseLong(paramsMap.get("seed")));
+            case "ges":
+                algorithm = new GES(paramsMap.get("databasePath"), true);
+                break;
+            case "fges":
+                algorithm = new FGES(paramsMap.get("databasePath"), true, false);
+                break;
+            case "fges-faithfulness":
+                algorithm = new FGES(paramsMap.get("databasePath"), false, false);
+                break;
+
+            default:
+                break;
         }
+
+
         
         /*
         switch(algName) {
@@ -132,20 +153,20 @@ public class ExperimentBNBuilder {
                 break;
             case "circular_ges_c1":
                 clustering = new HierarchicalClustering();
-                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, edgeLimitation, "c1", CGES.Broadcasting.NO_BROADCASTING);
+                algorithm = new CGES(databasePath, clustering, numberOfClusters, edgeLimitation, "c1", CGES.Broadcasting.NO_BROADCASTING);
                 break;
             case "cges":
             case "circular_ges_c2":
                 clustering = new HierarchicalClustering();
-                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, edgeLimitation, "c2", CGES.Broadcasting.NO_BROADCASTING);
+                algorithm = new CGES(databasePath, clustering, numberOfClusters, edgeLimitation, "c2", CGES.Broadcasting.NO_BROADCASTING);
                 break;
             case "circular_ges_c3":
                 clustering = new HierarchicalClustering();
-                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, edgeLimitation, "c3", CGES.Broadcasting.NO_BROADCASTING);
+                algorithm = new CGES(databasePath, clustering, numberOfClusters, edgeLimitation, "c3", CGES.Broadcasting.NO_BROADCASTING);
                 break;
             case "circular_ges_c4":
                 clustering = new HierarchicalClustering();
-                algorithm = new CGES(databasePath, clustering, numberOfRealThreads, edgeLimitation, "c4", CGES.Broadcasting.NO_BROADCASTING);
+                algorithm = new CGES(databasePath, clustering, numberOfClusters, edgeLimitation, "c4", CGES.Broadcasting.NO_BROADCASTING);
                 break;
             case "fges":
                 algorithm = new FGES(databasePath, true, false);
@@ -199,7 +220,10 @@ public class ExperimentBNBuilder {
             calcuateMeasurements(controlBayesianNetwork);
 
         } catch (Exception e) {
+            System.out.println("Error when running the experiment");
+            System.out.println("Experiment: " + this.toString());
             e.printStackTrace();
+            System.exit(-1);
         }
 
     }
@@ -237,6 +261,7 @@ public class ExperimentBNBuilder {
         measurementsMap.put("dfMM_minus", differencesOfMalkovsBlanket[1]);
         measurementsMap.put("iterations", (double) algorithm.getIterations());
         measurementsMap.put("bdeu", GESThread.scoreGraph(algorithm.getCurrentDag(), algorithm.getProblem()));
+        measurementsMap.put("ncpus", (double) Runtime.getRuntime().availableProcessors());
 
         if(this.algorithm instanceof CGES){
             measurementsMap.put("cgesScore", ((CGES) this.algorithm).getCgesScore());
@@ -279,7 +304,10 @@ public class ExperimentBNBuilder {
 
             csvWriter.append(bodyLine);
         } catch (IOException e) {
+            System.out.println("Error when saving the experiment");
+            System.out.println("File: " + savePath);
             e.printStackTrace();
+            System.exit(-1);
             // Manejar la excepción según tus necesidades
         }
     }
@@ -389,7 +417,7 @@ public class ExperimentBNBuilder {
         return  this.paramsMap.get("algName") + ","
                 + this.paramsMap.get("netName") + ","
                 + getDatabaseNameFromPattern(paramsMap.get("databasePath")) + ","
-                + paramsMap.get("numberOfRealThreads") + ","
+                + paramsMap.get("numberOfClusters") + ","
                 + this.algorithm.getItInterleaving() + ","
                 + this.structuralHamiltonDistanceValue + ","
                 + this.bdeuScore + ","
@@ -421,13 +449,18 @@ public class ExperimentBNBuilder {
         fileNameBuilder.append("exp_");
         fileNameBuilder.append(paramsMap.get("algName"));
         fileNameBuilder.append("_");
+
+        if(this.algorithm instanceof CGES){
+            fileNameBuilder.append(paramsMap.get("broadcasting"));
+            fileNameBuilder.append("_");
+        }
         fileNameBuilder.append(id);
         /*
         fileNameBuilder.append("_");
         fileNameBuilder.append(paramsMap.get("netName"));
         fileNameBuilder.append("_");
         fileNameBuilder.append("T");
-        fileNameBuilder.append(paramsMap.get("numberOfRealThreads"));
+        fileNameBuilder.append(paramsMap.get("numberOfClusters"));
         fileNameBuilder.append("_");
         fileNameBuilder.append(paramsMap.get("convergence"));
         fileNameBuilder.append("_");
@@ -456,6 +489,10 @@ public class ExperimentBNBuilder {
             result.append("\t");
         }
         return  result.toString();
+    }
+
+    public Map<String, String> getParamsMap() {
+        return paramsMap;
     }
 }
 

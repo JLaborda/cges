@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 public class ExperimentBNBuilderTest {
     String[] KEYS = {
         "algName", "netName", "netPath", "databasePath",
-        "clusteringName", "numberOfRealThreads", "convergence", "broadcasting"
+        "clusteringName", "numberOfClusters", "convergence", "broadcasting"
     };
     // cges andes /home/jorlabs/projects/cges/res/networks/andes/andes.xbif /home/jorlabs/projects/cges/res/datasets/andes/andes00.csv HierarchicalClustering 8 c2 NO_BROADCASTING
     String[] values = { "cges", "alarm", Resources.ALARM_NET_PATH, Resources.ALARM_BBDD_PATH, "HierarchicalClustering", "4", "c2", "NO_BROADCASTING"};

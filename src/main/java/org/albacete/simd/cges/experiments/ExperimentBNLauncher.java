@@ -15,6 +15,9 @@ public class ExperimentBNLauncher {
     public ExperimentBNLauncher(int index, String paramsFileName, String saveFolder){
         this.index = index;
         this.paramsFileName = paramsFileName;
+        if(!saveFolder.endsWith("/")){
+            saveFolder = saveFolder + "/";
+        }
         this.EXPERIMENTS_FOLDER = saveFolder;
     }
 
@@ -56,7 +59,11 @@ public class ExperimentBNLauncher {
             line = br.readLine();
             parameterStrings = line.split(" ");
         } catch(IOException e){
+            System.out.println("Parameters could not be read");
+            System.out.println("File: " + paramsFileName);
+            System.out.println("Index: " + index);
             e.printStackTrace();
+            System.exit(-1);
         }
         
         Utils.println("Parameters read:");
@@ -78,6 +85,7 @@ public class ExperimentBNLauncher {
                 i++;
             }
             e.printStackTrace();
+            System.exit(-1);
         }
     }
     
@@ -88,6 +96,10 @@ public class ExperimentBNLauncher {
     private void saveExperiment() {
         String savePath = EXPERIMENTS_FOLDER  + experiment.getSaveFileName(index);
         experiment.saveExperiment(savePath);
+    }
+
+    public ExperimentBNBuilder getExperiment() {
+        return experiment;
     }
     
 }
