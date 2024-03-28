@@ -38,9 +38,16 @@ public class CGES extends BNBuilder {
         clustering.setProblem(problem);
         this.cgesProcesses = new ArrayList<>(numberOfProcesses);
         this.typeBroadcasting = typeBroadcasting;
-        this.interleaving = (int) (10 / numberOfProcesses * Math.sqrt(problem.getVariables().size()));
+        this.interleaving = (int) (10.0 / numberOfProcesses * Math.sqrt(problem.getVariables().size()));
         setHyperParamsHeader("clustering,numberOfProcesses,interleaving,typeBroadcasting");
         setHyperParamsBody(clustering.getClass().getSimpleName() + "," + numberOfProcesses + "," + interleaving + "," + typeBroadcasting.toString());
+        System.out.println("************************************************");
+        System.out.println("CGES created with params:");
+        System.out.println("Clustering: " + clustering.getClass().getSimpleName());
+        System.out.println("Number of Processes: " + numberOfProcesses);
+        System.out.println("Interleaving: " + interleaving);
+        System.out.println("Type Broadcasting: " + typeBroadcasting);
+        System.out.println("************************************************");
     }
 
     public CGES(String path, Clustering clustering, int numberOfProcesses, Broadcasting typeBroadcasting) {
