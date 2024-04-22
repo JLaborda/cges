@@ -239,7 +239,7 @@ public class ExperimentBNBuilder {
         return new MlBayesIm(bayesPm);
     }
 
-    private void calcuateMeasurements(MlBayesIm controlBayesianNetwork) {
+    public void calcuateMeasurements(MlBayesIm controlBayesianNetwork) {
         // Getting time
         this.elapsedTime = stopWatch.getTime(TimeUnit.MILLISECONDS);
         

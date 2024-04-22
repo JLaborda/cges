@@ -1,6 +1,7 @@
 package org.albacete.simd.cges.experiments;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import org.albacete.simd.cges.utils.Utils;
@@ -29,6 +30,9 @@ public class ExperimentBNLauncher {
         System.out.println("Creating experiment object...");
         experimentBNLauncher.createExperiment(parameters);
         
+        // Checking if experiment has been already run
+        checkExperiment(experimentBNLauncher);
+
         System.out.println("Starting experiment...");
         experimentBNLauncher.runExperiment();
         experimentBNLauncher.saveExperiment();
@@ -48,6 +52,17 @@ public class ExperimentBNLauncher {
         String saveFolder = args.length == 3 ? args[2] : "results/";
         
         return new ExperimentBNLauncher(index, paramsFileName, saveFolder);
+    }
+
+    private static void checkExperiment(ExperimentBNLauncher experimentBNLauncher) {
+        //Check if experiment has been already run
+        String savePath = experimentBNLauncher.EXPERIMENTS_FOLDER + experimentBNLauncher.getExperiment().getSaveFileName(experimentBNLauncher.index);
+        File file = new File(savePath);
+        if(file.exists() && !file.isDirectory()){
+            System.out.println("Experiment already run. Skipping...");
+            System.out.println("Skipping Experiment at: " + savePath);
+            System.exit(0);
+        }
     }
 
     public String[] readParameters(){

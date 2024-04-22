@@ -30,6 +30,9 @@ public class CGES extends BNBuilder {
     private double cgesScore;
     private long timeFineTuning;
 
+    private static int LIMIT_ITERATIONS;
+    private static final long LIMIT_TIME = 24 * 3600 *1000; // Limit of one day in miliseconds
+    private long startingTime;
     
     public CGES(DataSet data, Clustering clustering, int numberOfProcesses, Broadcasting typeBroadcasting) {
         super(data, numberOfProcesses);
@@ -39,6 +42,7 @@ public class CGES extends BNBuilder {
         this.cgesProcesses = new ArrayList<>(numberOfProcesses);
         this.typeBroadcasting = typeBroadcasting;
         this.interleaving = (int) (10.0 / numberOfProcesses * Math.sqrt(problem.getVariables().size()));
+        LIMIT_ITERATIONS = numberOfProcesses * 10;
         setHyperParamsHeader("clustering,numberOfProcesses,interleaving,typeBroadcasting");
         setHyperParamsBody(clustering.getClass().getSimpleName() + "," + numberOfProcesses + "," + interleaving + "," + typeBroadcasting.toString());
         System.out.println("************************************************");
@@ -83,6 +87,7 @@ public class CGES extends BNBuilder {
 
     protected void initialConfig() {
         it = 0;
+        startingTime = System.currentTimeMillis();
         repartition();
         initializeThreads();
     }
@@ -252,6 +257,7 @@ public class CGES extends BNBuilder {
 
     private void bestBroadcastingSearch() {
         do {
+            it++;
             // apply circular processes
             List<CircularProcess> bestInputs = cgesProcesses.parallelStream()
                     .map(cdag -> {
@@ -319,6 +325,17 @@ public class CGES extends BNBuilder {
      * @return boolean value stating if the search loop can continue (true) or not (false).
      */
     private boolean notConverged() {
+
+        // When iterations is greater than the limit, there is a convergence: return false
+        if (it >= LIMIT_ITERATIONS) {
+            return false;
+        }
+        
+        // When the time spent is greater than the limit, there is a convergence: return false
+        if(System.currentTimeMillis() - startingTime >= LIMIT_TIME){
+            return false;
+        }
+
         // When any DAG improves the previous best DAG, there is no convergence
         calculateBestGraph();
         boolean max = lastBestBDeu >= bestCircularProcess.getBDeu();        
