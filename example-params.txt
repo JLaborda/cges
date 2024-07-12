@@ -1,0 +1,3 @@
+algName cges netName alarm clusteringName HierarchicalClustering numberOfClusters 16 broadcasting RANDOM_BROADCASTING seed 11 databasePath ./res/datasets/alarm/alarm5.csv netPath ./res/networks/alarm/alarm.xbif
+algName ges netName win95pts databasePath ./res/datasets/win95pts/win95ptsALL.csv netPath ./res/networks/win95pts/win95pts.xbif
+algName cges netName alarm clusteringName HierarchicalClustering numberOfClusters 16 broadcasting RANDOM_BROADCASTING seed 19 databasePath ./res/datasets/alarm/alarm5.csv netPath ./res/networks/alarm/alarm.xbif
