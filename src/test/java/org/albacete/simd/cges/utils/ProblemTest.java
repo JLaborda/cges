@@ -93,7 +93,7 @@ public class ProblemTest {
 
         //Checking cases
         assertEquals(5000, cases.length);
-        //System.out.println(cases.length);
+        ////System.out.println(cases.length);
         for(int[] caseRow : cases){
             assertEquals(5, caseRow.length);
         }
@@ -112,13 +112,12 @@ public class ProblemTest {
         String path2 = Resources.EARTHQUAKE_BBDD_PATH;
         Problem p = new Problem(path1);
         Problem p2 = new Problem(path2);
-        Problem p3 = p;
-        Problem p4 = new Problem(path1);
+        Problem p3 = new Problem(path1);
         Object obj1 = new Object();
-        assertEquals(p, p3);
+        assertEquals(p, p);
         assertNotEquals(p, p2);
         assertNotEquals(null, p);
-        assertEquals(p, p4);
+        assertEquals(p, p3);
         assertNotEquals(p, obj1);
 
     }

@@ -19,8 +19,8 @@ public class EdgeListGraph_n extends EdgeListGraph {
         
     public EdgeListGraph_n(){
         super();
-        this.neighboursMap = new HashMap();
-        this.nodesHash = new HashSet();
+        this.neighboursMap = new HashMap<>();
+        this.nodesHash = new HashSet<>();
     }
     
     public EdgeListGraph_n(Graph graph){
@@ -30,8 +30,8 @@ public class EdgeListGraph_n extends EdgeListGraph {
             throw new NullPointerException("Graph must not be null.");
         }
         
-        this.neighboursMap = new HashMap(graph.getNumNodes());
-        this.nodesHash = new HashSet(graph.getNumNodes());
+        this.neighboursMap = new HashMap<>(graph.getNumNodes());
+        this.nodesHash = new HashSet<>(graph.getNumNodes());
         this.namesHash = new HashMap<>(graph.getNumNodes());
 
         transferNodesAndEdges(graph);
@@ -64,8 +64,8 @@ public class EdgeListGraph_n extends EdgeListGraph {
             throw new NullPointerException();
         }
         
-        this.neighboursMap = new HashMap(nodes.size());
-        this.nodesHash = new HashSet(nodes.size());
+        this.neighboursMap = new HashMap<>(nodes.size());
+        this.nodesHash = new HashSet<>(nodes.size());
 
         for (Node variable : nodes) {
             if (!addNode(variable)) {
@@ -76,9 +76,9 @@ public class EdgeListGraph_n extends EdgeListGraph {
     
     /**
      * Determines whether some edge or other exists between two nodes.
-     * @param node1
-     * @param node2
-     * @return 
+     * @param node1 Node 1
+     * @param node2 Node 2
+     * @return True if they are adjacent, false otherwise.
      */
     @Override
     public boolean isAdjacentTo(Node node1, Node node2) {
@@ -97,7 +97,7 @@ public class EdgeListGraph_n extends EdgeListGraph {
      */
     @Override
     public List<Node> getAdjacentNodes(Node node) {
-        return new ArrayList(neighboursMap.get(node));
+        return new ArrayList<>(neighboursMap.get(node));
     }
     
     /**
@@ -108,12 +108,6 @@ public class EdgeListGraph_n extends EdgeListGraph {
      */
     public Set<Node> getAdjacentNodesSet(Node node) {
         return neighboursMap.get(node);
-    }
-    
-    public Set<Node> getCommonAdjacents(Node x, Node y) {
-        Set<Node> adj = this.getAdjacentNodesSet(x);
-        adj.retainAll(this.getAdjacentNodes(y));
-        return adj;
     }
 
     /**
@@ -201,9 +195,9 @@ public class EdgeListGraph_n extends EdgeListGraph {
     
     /**
      * Removes the edge connecting the two given nodes.
-     * @param node1
-     * @param node2
-     * @return 
+     * @param node1 Node tail of the edge
+     * @param node2 Node head of the edge
+     * @return true if the edge has been deleted, false otherwise.
      */
     @Override
     public boolean removeEdge(Node node1, Node node2) {
@@ -237,8 +231,8 @@ public class EdgeListGraph_n extends EdgeListGraph {
     }
     
     /**
-     * @param node1
-     * @param node2
+     * @param node1 Node 1
+     * @param node2 Node 2
      * @return the edges connecting node1 and node2.
      */
     @Override
@@ -254,15 +248,13 @@ public class EdgeListGraph_n extends EdgeListGraph {
 
         List<Edge> _edges = new ArrayList<>();
 
-        edges.stream().filter(edge -> (edge.getDistalNode(node1) == node2)).forEachOrdered(edge -> {
-            _edges.add(edge);
-        });
+        edges.stream().filter(edge -> (edge.getDistalNode(node1) == node2)).forEachOrdered(_edges::add);
 
         return _edges;
     }
     
      /**
-     * @param node
+     * @param node Node to check edges from.
      * @return the list of edges connected to a particular node. No particular
      * ordering of the edges in the list is guaranteed.
      */
@@ -289,7 +281,7 @@ public class EdgeListGraph_n extends EdgeListGraph {
      * cannot already be used by any other node in the same graph.
      *
      * @param node the node to be added.
-     * @return true if the the node was added, false if not.
+     * @return true if the node was added, false if not.
      */
     @Override
     public boolean addNode(Node node) {
@@ -315,8 +307,8 @@ public class EdgeListGraph_n extends EdgeListGraph {
     
     /**
      * Removes a node from the graph.
-     * @param node
-     * @return 
+     * @param node Node to remove from graph
+     * @return true if it has been removed, false otherwise.
      */
     @Override
     public boolean removeNode(Node node) {
@@ -354,8 +346,8 @@ public class EdgeListGraph_n extends EdgeListGraph {
     
     /**
      * Determines whether the graph contains a particular node.
-     * @param node
-     * @return 
+     * @param node Node to check from.
+     * @return true if the graph contains the node.
      */
     @Override
     public boolean containsNode(Node node) {
@@ -368,7 +360,7 @@ public class EdgeListGraph_n extends EdgeListGraph {
      */
     @Override
     public Endpoint[][] getEndpointMatrix() {
-        Node[] arrNodes = (Node[])this.nodesHash.toArray();
+        Node[] arrNodes = this.nodesHash.toArray(new Node[0]);
         int size = arrNodes.length;
         Endpoint[][] endpoints = new Endpoint[size][size];
 
@@ -388,7 +380,7 @@ public class EdgeListGraph_n extends EdgeListGraph {
     /**
      * Resets the graph so that it is fully connects it using #-# edges, where #
      * is the given endpoint.
-     * @param endpoint
+     * @param endpoint Endpoint to apply to graph.
      */
     @Override
     public void fullyConnect(Endpoint endpoint) {
@@ -399,7 +391,7 @@ public class EdgeListGraph_n extends EdgeListGraph {
             this.edgeLists.put(node, new HashSet<>());
         }
         
-        Node[] arrNodes = (Node[])this.nodesHash.toArray();
+        Node[] arrNodes = this.nodesHash.toArray(new Node[0]);
         int size = arrNodes.length;
 
         for (int i = 0; i < size; i++) {

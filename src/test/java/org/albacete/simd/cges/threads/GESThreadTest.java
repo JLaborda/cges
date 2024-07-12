@@ -3,12 +3,9 @@ package org.albacete.simd.cges.threads;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import org.albacete.simd.cges.Resources;
-import org.albacete.simd.cges.framework.BackwardStage;
-import org.albacete.simd.cges.framework.ForwardStage;
 import org.albacete.simd.cges.utils.LocalScoreCacheConcurrent;
 import org.albacete.simd.cges.utils.Problem;
 import org.albacete.simd.cges.utils.Utils;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -106,8 +103,7 @@ public class GESThreadTest {
 
     /**
      * Testing the insert method.
-     *
-     * @result insert(X, Y, S, G) adds {X-Y, A-Y, B-Y} to the graph (in this case S is composed by two nodes A and B)
+     * insert(X, Y, S, G) adds {X-Y, A-Y, B-Y} to the graph (in this case S is composed by two nodes A and B)
      */
     @Test
     public void insertTest() {
@@ -140,9 +136,8 @@ public class GESThreadTest {
     }
 
     /**
-     * Testing that we get the correct neighbors of nodes for Y that are not adjacent to X. Directed nodes should not be added
-     *
-     * @result Y should only have as neighbors nodes Z and T
+     * Testing that we get the correct neighbors of nodes for Y that are not adjacent to X. Directed nodes should not be added.
+     * Y should only have as neighbors nodes Z and T.
      */
     @Test
     public void getSubsetOfUndirectedNeighborsTest() {
@@ -188,8 +183,6 @@ public class GESThreadTest {
 
     /**
      * Testing that we get no neighbors for only one node
-     *
-     * @result An empty set of neighbors.
      */
     @Test
     public void getEmptySubsetOfNeighborsTest() {
@@ -211,8 +204,6 @@ public class GESThreadTest {
     /**
      * Testing that in the graph X-Y-Z, when delete(X,Y,{Z}) is executed, the resulting edges are two directed edges X-Z
      * and Y-Z.
-     *
-     * @result A graph with X-Y deleted and two directed edges added: X-Z and Y-Z
      */
     @Test
     public void deleteTest() {
@@ -254,8 +245,6 @@ public class GESThreadTest {
     /**
      * Tests that for the graph {X-Z, X-T, Z-Y, T-Y (directed)} the nodes connected to Y by an undirected edge adjacent
      * to X is only Z.
-     *
-     * @result A list with only the Node Z
      */
     @Test
     public void findNaYXTest() {
@@ -295,8 +284,6 @@ public class GESThreadTest {
 
     /**
      * Tests that the isClique detects cliques correctly both true cliques and false cliques
-     *
-     * @result true for the graph that has a clique, false for the graph that doesn't have one.
      */
     @Test
     public void isCliqueTest() {
@@ -340,8 +327,6 @@ public class GESThreadTest {
 
     /**
      * Tests that the isSemiDirectedBlocked function returns true when the list has the Y Node
-     *
-     * @result This test should be true
      */
     @Test
     public void ifNaYXTListContainsYisSemiDirectedBlockedShouldBeTrueTest() {
@@ -371,8 +356,6 @@ public class GESThreadTest {
 
     /**
      * Tests that the isSemiDirectedBlocked function returns true when X and Y are the same.
-     *
-     * @result This test should be true
      */
     @Test
     public void ifNaYXTListContainsOnlyXisSemiDirectedBlockedShouldBeTrueTest() {
@@ -402,8 +385,6 @@ public class GESThreadTest {
 
     /**
      * Tests that for all the paths from X and Y contain a node from the list naYXT.
-     *
-     * @result Test should be true
      */
     @Test
     public void isSemiDirectedBlockedShouldBeTrueForTest() {
@@ -439,8 +420,6 @@ public class GESThreadTest {
 
     /**
      * Tests that there is a path from X and Y that doesn't contain a node from the list naYXT.
-     *
-     * @result Test should be false
      */
 
     @Test
@@ -473,29 +452,8 @@ public class GESThreadTest {
         assertFalse(result);
     }
 
-
-
-    /*
-     * Testing that a buildingIndexing is built when asked to.
-     * @result Test should be true
-    @Test
-    public void buildIndexingNotBuiltTest(){
-        // Arrange
-        GESThread thread = new ThFES(problem, subset1, 15);
-        thread.varNames = new String[0];
-
-        // Act
-        thread.buildIndexing(thread.initialDag);
-
-        // Assert
-        assertTrue(thread.hashIndices.isEmpty());
-    }
-    */
-
     /**
      * Tests that the maximum number of edges is modified.
-     *
-     * @result The max number of edges is changed to 5
      */
     @Test
     public void setMaxNumEdgesNormalTest() {
@@ -512,8 +470,6 @@ public class GESThreadTest {
 
     /**
      * Tests that if a negative number is set as the maximum number of edges, an IllegalArgumentException is thrown
-     *
-     * @result An IllegalArgumenException is thrown
      */
     @Test(expected = IllegalArgumentException.class)
     public void setMaxNumEdgesErrorTest() {

@@ -3,11 +3,8 @@ package org.albacete.simd.cges.threads;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import org.albacete.simd.cges.Resources;
-import org.albacete.simd.cges.framework.BackwardStage;
-import org.albacete.simd.cges.framework.ForwardStage;
 import org.albacete.simd.cges.utils.Problem;
 import org.albacete.simd.cges.utils.Utils;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -131,7 +128,6 @@ public class FESThreadTest {
 
     /**
      * Checks that both constructors work perfectly.
-     * @result  Both constructors create a FESThread object.
      * @throws InterruptedException Exception caused by thread interruption.
      */
     @Test
@@ -150,12 +146,11 @@ public class FESThreadTest {
 
     /**
      * Checks the first iteration of the Cancer problem for the FES stage
-     * @result Each expected node is in the resulting graph after executing the first iteration of FES stage
      * @throws InterruptedException Exception caused by thread interruption
      */
     @Test
     public void searchTwoThreadsTest() throws InterruptedException {
-        // ThFES objects
+        // thread objects
         FESThread thread1 = new FESThread(problem, subset1, 15, false,true,true);
         FESThread thread2 = new FESThread(problem, subset2, 15, false,true,true);
 
@@ -185,12 +180,11 @@ public class FESThreadTest {
 
     /**
      * Checking that fes stops when there are no more edges to be added.
-     * @result The number of iterations is less than the maximum iterations set
      */
     @Test
     public void noMoreEdgesToAddInFESTest(){
 
-        // ThFES objects
+        // thread objects
         FESThread thread1 = new FESThread(problem, subset1, 1000, false,true,true);
 
         //Act
@@ -202,12 +196,11 @@ public class FESThreadTest {
 
     /**
      * Testing that fes stops when the maximum number of edges is reached.
-     * @result The resulting graph has the same number of edges as the set maximum number of edges.
      * @throws InterruptedException Caused by an external interruption.
      */
     @Test
     public void maximumNumberOfEdgesReachedTest() throws InterruptedException {
-        // ThFES objects
+        // thread objects
         FESThread thread1 = new FESThread(problem, subset1, 1000, false,true,true);
         thread1.setMaxNumEdges(2);
 
@@ -223,11 +216,10 @@ public class FESThreadTest {
      * Tests that the algorithm works correct with the Alarm network.
      *
      * @throws InterruptedException Caused by an external interruption.
-     * @result The resulting graph has the same number of edges as the set maximum number of edges.
      */
     @Test
     public void cancerExecutionTest() throws InterruptedException {
-        // ThFES objects
+        // thread objects
         String alarmPath = Resources.CANCER_BBDD_PATH;
         DataSet alarmDataset = Utils.readData(alarmPath);
         Set<Edge> setOfArcs = Utils.calculateArcs(alarmDataset);
@@ -254,7 +246,6 @@ public class FESThreadTest {
 
     /**
      * Tests that if two nodes X and Y are equal in the subset S, then it should not be considered in the fes stage.
-     * @result The resulting graph must not contain an edge formed by the same Node.
      */
     @Test
     public void xAndYAreEqualShouldContinueTest() throws InterruptedException {
@@ -281,7 +272,7 @@ public class FESThreadTest {
         Edge goodEdge2 = Edges.directedEdge(this.cancer, this.smoker);
         Edge goodEdge3 = Edges.directedEdge(this.smoker, this.cancer);
 
-        System.out.println(edgesResult);
+        //System.out.println(edgesResult);
 
         assertFalse(edgesResult.contains(badEdge1));
         assertFalse(edgesResult.contains(badEdge2));
@@ -294,102 +285,95 @@ public class FESThreadTest {
 
     /**
      * Checking that getter works correctly for AggressivelyPreventCycles variable
-     * @result Checks that the boolean value is false.
      */
     @Test
     public void isAggressivelyPreventCyclesTest(){
-        FESThread thfes = new FESThread(problem, subset1, 15, false,true,true);
-        assertFalse(thfes.isAggressivelyPreventCycles());
+        FESThread thread = new FESThread(problem, subset1, 15, false,true,true);
+        assertFalse(thread.isAggressivelyPreventCycles());
     }
     /**
      * Checking that setter works correctly for AggressivelyPreventCycles variable
-     * @result Checking that the value has changed to true
      */
     @Test
     public void setAggresivelyPreventCyclesTest(){
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false,true,true);
+        FESThread thread = new FESThread(problem, subset1, 15, false,true,true);
         // Act
-        thfes.setAggressivelyPreventCycles(true);
+        thread.setAggressivelyPreventCycles(true);
         // Assert
-        assertTrue(thfes.isAggressivelyPreventCycles());
+        assertTrue(thread.isAggressivelyPreventCycles());
     }
 
     /**
      * Checking that getter works correctly for currentGraph variable
-     * @result CurrentGraph is not null
      */
     @Test
     public void getCurrentGraphTest() throws InterruptedException {
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false,true,true);
+        FESThread thread = new FESThread(problem, subset1, 15, false,true,true);
         // Act
-        thfes.run();
-        Graph result = thfes.getCurrentGraph();
+        thread.run();
+        Graph result = thread.getCurrentGraph();
         // Assert
         assertNotNull(result);
     }
     /**
      * Checking that getter works correctly for flag variable
-     * @result flag is true when we create a new ThFES
      */
     @Test
     public void getFlagTest() throws InterruptedException {
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false,true,true);
+        FESThread thread = new FESThread(problem, subset1, 15, false,true,true);
         // Act
-        thfes.run();
-        boolean result = thfes.getFlag();
+        thread.run();
+        boolean result = thread.getFlag();
         // Assert
         assertTrue(result);
     }
     /**
      * Checking that resetting the flag works correctly
-     * @result flag should be false since we have done a reset.
      */
     @Test
     public void resetFlagTest() throws InterruptedException {
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false,true,true);
+        FESThread thread = new FESThread(problem, subset1, 15, false,true,true);
         // Act
-        thfes.run();
-        thfes.resetFlag();
-        boolean result = thfes.getFlag();
+        thread.run();
+        thread.resetFlag();
+        boolean result = thread.getFlag();
         // Assert
         assertFalse(result);
     }
 
     /**
      * Checking that the bdeu score works correctly
-     * @result The value of the score is the same for the same problem and subset no matter how many times we run it.
      */
     @Test
     public void getBDeuScoreTest(){
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false,true,true);
+        FESThread thread = new FESThread(problem, subset1, 15, false,true,true);
         // Act
-        thfes.run();
-        thfes.resetFlag();
-        double result = Double.NEGATIVE_INFINITY;
-        result = thfes.getScoreBDeu();
+        thread.run();
+        thread.resetFlag();
+        double result = thread.getScoreBDeu();
+
         // Assert
         assertNotEquals(result, Double.NEGATIVE_INFINITY);
     }
 
     /**
      * Checking that setting the initial graph works correctly
-     * @result Changing the graph should give us a new graph not equal to the previous currentGraph.
      */
     @Test
     public void setterAndGetterOfInitialGraphTest() throws InterruptedException {
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false,true,true);
+        FESThread thread = new FESThread(problem, subset1, 15, false,true,true);
         // Act
-        thfes.run();
-        Graph expected = thfes.getCurrentGraph();
+        thread.run();
+        Graph expected = thread.getCurrentGraph();
 
-        thfes.setInitialGraph(null);
-        Graph result = thfes.getInitialGraph();
+        thread.setInitialGraph(null);
+        Graph result = thread.getInitialGraph();
         // Assert
         assertNotEquals(expected, result);
         assertNull(result);
@@ -397,32 +381,30 @@ public class FESThreadTest {
 
     /**
      * Checking structurePrior getter and setter
-     * @result the value is changed
      */
     @Test
     public void setterAndGetterOfStructurePriorTest(){
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false,true,true);
+        FESThread thread = new FESThread(problem, subset1, 15, false,true,true);
         // Act
         double expected = 2.3;
-        thfes.setStructurePrior(expected);
-        double actual = thfes.getStructurePrior();
+        thread.setStructurePrior(expected);
+        double actual = thread.getStructurePrior();
         // Assert
         assertEquals(expected, actual, 0);
     }
 
     /**
      * Checking samplePrior getter and setter
-     * @result  the samplePrior is changed
      */
     @Test
     public void setterAndGetterOfSamplePriorTest(){
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false,true,true);
+        FESThread thread = new FESThread(problem, subset1, 15, false,true,true);
         // Act
         double expected = 2.3;
-        thfes.setSamplePrior(expected);
-        double actual = thfes.getSamplePrior();
+        thread.setSamplePrior(expected);
+        double actual = thread.getSamplePrior();
         // Assert
         assertEquals(expected, actual, 0);
     }
@@ -430,31 +412,29 @@ public class FESThreadTest {
 
     /**
      * Checking elapsed time getter and setter
-     * @result the ElapsedTime has changed
      */
     @Test
     public void setterAndGetterOfElapsedTimeTest(){
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false,true,true);
+        FESThread thread = new FESThread(problem, subset1, 15, false,true,true);
         // Act
         long expected = 0;
-        long actual = thfes.getElapsedTime();
+        long actual = thread.getElapsedTime();
         // Assert
         assertEquals(expected, actual, 0);
     }
 
     /**
      * Checking maxNumEdges getter and setter
-     * @result the maxNumEdges has changed its value.
      */
     @Test
     public void setterAndGetterOfMaxNumEdges(){
         // Arrange
-        FESThread thfes = new FESThread(problem, subset1, 15, false,true,true);
+        FESThread thread = new FESThread(problem, subset1, 15, false,true,true);
         // Act
         int expected = 23;
-        thfes.setMaxNumEdges(expected);
-        int actual = thfes.getMaxNumEdges();
+        thread.setMaxNumEdges(expected);
+        int actual = thread.getMaxNumEdges();
         // Assert
         assertEquals(expected, actual);
     }

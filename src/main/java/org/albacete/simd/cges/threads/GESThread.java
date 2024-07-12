@@ -5,18 +5,16 @@ import edu.cmu.tetrad.graph.*;
 import edu.cmu.tetrad.search.MeekRules;
 import edu.cmu.tetrad.search.SearchGraphUtils;
 import edu.cmu.tetrad.util.NumberFormatUtil;
-import org.albacete.simd.cges.framework.ForwardStage;
 import org.albacete.simd.cges.utils.LocalScoreCacheConcurrent;
 import org.albacete.simd.cges.utils.Problem;
 import org.albacete.simd.cges.utils.Utils;
-import org.albacete.simd.cges.framework.BackwardStage;
 
 import java.text.NumberFormat;
 import java.util.*;
 
 /*
   GESThread is an abstract class that encapsulates the common attributes and methods of the threads executed in both the FES
-  and BES stage. For future versions, there could be more types of threads other than {@link ThFES ThFES} and {@link ThBES ThBES}.
+  and BES stage. For future versions, there could be more types of threads other than {@link FESThread} and {@link BESThread}.
  */
 //@SuppressWarnings({"DuplicatedCode", "unused"})
 public abstract class GESThread implements Runnable{
@@ -133,7 +131,7 @@ public abstract class GESThread implements Runnable{
     protected SubSet h_0;
 
     /**
-     * Id of the thread
+     * ID of the thread
      */
     protected int id = -1;
 
@@ -178,14 +176,15 @@ public abstract class GESThread implements Runnable{
      * @param graph Current {@link Graph Graph} of the stage where the edge will be inserted into.
      */
     public static void insert(Node x, Node y, Set<Node> subset, Graph graph) {
-        //System.out.println("Insert: " + x + " -> " + y);
+        Utils.println("Insert: " + x + " -> " + y);
         graph.addDirectedEdge(x, y);
 
         for (Node node : subset) {
-            //System.out.println("Delete: " + node + " -- " + y);
             graph.removeEdge(node, y);
-            //System.out.println("Insert: " + node + " -> " + y);
             graph.addDirectedEdge(node, y);
+            Utils.println("Delete: " + node + " -- " + y);
+            Utils.println("Insert: " + node + " -> " + y);
+        
         }
     }
 
@@ -197,20 +196,23 @@ public abstract class GESThread implements Runnable{
      * @param graph Current {@link Graph Graph} of the stage where the edge will be deleted from.
      */
     public static void delete(Node x, Node y, Set<Node> subset, Graph graph) {
-        //System.out.println("Delete: " + x + " -- " + y);
+        Utils.println("Delete: " + x + " -- " + y);
         graph.removeEdges(x, y);
 
         for (Node aSubset : subset) {
-            //System.out.println("Deleting Edges in subset");
+
+            Utils.println("Deleting Edges in subset");
             if (!graph.isParentOf(aSubset, x) && !graph.isParentOf(x, aSubset)) {
-                //System.out.println("Delete: " + x + " -- " + aSubset);
+                Utils.println("Delete: " + x + " -- " + aSubset);
                 graph.removeEdge(x, aSubset);
-                //System.out.println("Insert: " + x + " -> " + aSubset);
+                
+                Utils.println("Insert: " + x + " -> " + aSubset);
                 graph.addDirectedEdge(x, aSubset);
             }
-            //System.out.println("Delete: " + y + " -- " + aSubset);
+            Utils.println("Delete: " + y + " -- " + aSubset);
             graph.removeEdge(y, aSubset);
-            //System.out.println("Insert: " + y + " -> " + aSubset);
+
+            Utils.println("Insert: " + y + " -> " + aSubset);
             graph.addDirectedEdge(y, aSubset);
         }
     }
@@ -320,23 +322,6 @@ public abstract class GESThread implements Runnable{
         }
         return true;
 
-        /*for (Node node1 : graph.getNodes()) {
-            if (node1 == y || marked.contains(node1)) {
-                continue;
-            }
-            
-            if (graph.isAdjacentTo(y, node1) && !graph.isParentOf(node1, y)) {
-                marked.add(node1);
-
-                if (!isSemiDirectedBlocked(x, node1, naYXT, graph, marked)) {
-                    return false;
-                }
-
-                marked.remove(node1);
-            }
-        }
-
-        return true;*/
     }
     
     /**
@@ -378,7 +363,7 @@ public abstract class GESThread implements Runnable{
      * @return score of the graph.
      */
     public static double scoreGraph(Graph graph, Problem problem) {
-
+        /*
         if (graph == null){
             return Double.NEGATIVE_INFINITY;
         }
@@ -386,7 +371,7 @@ public abstract class GESThread implements Runnable{
 //        Graph dag = SearchGraphUtils.dagFromPattern(graph);
         Graph dag = new EdgeListGraph_n(graph);
         Utils.pdagToDag(dag);
-        double score = 0.;
+        double score = 0.0;
 
         for (Node next : dag.getNodes()) {
             Set<Node> parents = new HashSet<>(dag.getParents(next));
@@ -414,11 +399,11 @@ public abstract class GESThread implements Runnable{
                 score += localBdeuScore(nextIndex, parentIndices, parents, problem);
             }
         return score;
-    }
-    
-    public double scoreDag(Graph graph) {
-        
+        */
         if (graph == null){
+            return Double.NEGATIVE_INFINITY;
+        }
+        if (problem == null){
             return Double.NEGATIVE_INFINITY;
         }
         
@@ -426,10 +411,12 @@ public abstract class GESThread implements Runnable{
         Utils.pdagToDag(dag);
         HashMap<Node,Integer> hashIndices = problem.getHashIndices();
 
-        double _score = 0;
+        double score = 0;
 
-        for (Node node : getVariables()) {
+        for (Node node : problem.getVariables()) {
+            int indexNode = hashIndices.get(node);
             List<Node> x = dag.getParents(node);
+            Set<Node> setParents = new HashSet<>(x);
 
             int[] parentIndices = new int[x.size()];
 
@@ -438,11 +425,45 @@ public abstract class GESThread implements Runnable{
                 parentIndices[count++] = hashIndices.get(parent);
             }
 
-            final double nodeScore = problem.getBDeu().localScore(hashIndices.get(node), parentIndices);
+            final double nodeScore = localBdeuScore(indexNode, parentIndices, setParents, problem);//problem.getBDeu().localScore(hashIndices.get(node), parentIndices);
 
-            _score += nodeScore;
+            score += nodeScore;
         }
-        return _score;
+        return score;
+    }
+    
+    public double scoreGraph(Graph graph) {
+        
+        if (graph == null){
+            return Double.NEGATIVE_INFINITY;
+        }
+        if (problem == null){
+            return Double.NEGATIVE_INFINITY;
+        }
+        
+        Graph dag = new EdgeListGraph_n(graph);
+        Utils.pdagToDag(dag);
+        HashMap<Node,Integer> hashIndices = problem.getHashIndices();
+
+        double score = 0;
+
+        for (Node node : getVariables()) {
+            int indexNode = hashIndices.get(node);
+            List<Node> x = dag.getParents(node);
+            Set<Node> setParents = new HashSet<>(x);
+
+            int[] parentIndices = new int[x.size()];
+
+            int count = 0;
+            for (Node parent : x) {
+                parentIndices[count++] = hashIndices.get(parent);
+            }
+
+            final double nodeScore = localBdeuScore(indexNode, parentIndices, setParents, problem);//problem.getBDeu().localScore(hashIndices.get(node), parentIndices);
+
+            score += nodeScore;
+        }
+        return score;
     }
 
     /**
@@ -455,39 +476,8 @@ public abstract class GESThread implements Runnable{
     public static double scoreGraphChange(Node y, Set<Node> parents1,
                                    Set<Node> parents2, Graph graph, Problem problem) {
 
-        /*
-        // Creating hashindeces map
-        HashMap<Node, Integer> index = new HashMap<>();
-
-        // Building map
-        for (Node next : graph.getNodes()) {
-            for (int i = 0; i < varNames.length; i++) {
-                if (varNames[i].equals(next.getName())) {
-                    index.put(next, i);
-                    break;
-                }
-            }
-        }
-        */
-
-/*
-        System.out.println("DEBUG Score Graph Change of:");
-        System.out.println("Node: " + y);
-        System.out.println("Parents1: " + parents1);
-        System.out.println("Parents2: " + parents2);
-        System.out.println("HashIndices: " + index);
-        System.out.println("-------------------------------");
-*/
-
         HashMap<Node, Integer> index = problem.getHashIndices();
-/*
-        if(index == null){
-            System.out.println("REBUILDING HASHINDECES IN GRAPHSCORESCHANGE");
-            problem.buildIndexing(graph);
-            index = problem.getHashIndices();
-        }
-*/
-        // Getting indexes
+// Getting indexes
         int yIndex = index.get(y);
         int[] parentIndices1 = new int[parents1.size()];
 
@@ -532,63 +522,6 @@ public abstract class GESThread implements Runnable{
         numNonCachedCalls++;
 
         double fLogScore = problem.getBDeu().localScore(nNode, nParents);
-        
-        /*  int[] nValues = problem.getnValues();
-            int[][] cases = problem.getCases();
-
-
-            int numValues=nValues[nNode];
-            int numParents=nParents.length;
-
-            double ess= problem.getSamplePrior();
-            double essPenalty = 1.0;
-            double kappa= problem.getStructurePrior();
-
-            int[] numValuesParents=new int[nParents.length];
-            int cardinality=1;
-            for(int i=0;i<numValuesParents.length;i++) {
-
-                numValuesParents[i]=nValues[nParents[i]];
-                cardinality*=numValuesParents[i];
-            }
-
-            int[][] Ni_jk = new int[cardinality][numValues];
-    
-            double Np_ijk = (essPenalty * ess) / (numValues*cardinality);
-            double Np_ij = (essPenalty *ess) / cardinality;
-
-            // initialize
-            for (int j = 0; j < cardinality;j++)
-                for(int k= 0; k<numValues; k++)
-                    Ni_jk[j][k] = 0;
-
-            for (int[] aCase : cases) {
-                int iCPT = 0;
-                for (int iParent = 0; iParent < numParents; iParent++) {
-                    iCPT = iCPT * numValuesParents[iParent] + aCase[nParents[iParent]];
-                }
-                Ni_jk[iCPT][aCase[nNode]]++;
-            }
-
-            for (int iParent = 0; iParent < cardinality; iParent++) {
-                double N_ij = 0;
-                double N_ijk;
-
-                for (int iSymbol = 0; iSymbol < numValues; iSymbol++) {
-                    if (Ni_jk[iParent][iSymbol] != 0) {
-                        N_ijk = Ni_jk[iParent][iSymbol];
-                        fLogScore += ProbUtils.lngamma(N_ijk + Np_ijk);
-                        fLogScore -= ProbUtils.lngamma(Np_ijk);
-                        N_ij += N_ijk;
-                    }
-                }
-                if (Np_ij != 0)
-                    fLogScore += ProbUtils.lngamma(Np_ij);
-                if (Np_ij + N_ij != 0)
-                    fLogScore -= ProbUtils.lngamma(Np_ij + N_ij);
-            }
-            fLogScore += Math.log(kappa) * cardinality * (numValues - 1);
-        */
 
         localScoreCache.add(nNode, setParents, fLogScore);
         return fLogScore;
@@ -729,7 +662,7 @@ public abstract class GESThread implements Runnable{
     //-----------------------------THREAD METHODS--------------------------------//
 
     /**
-     * Gets the flag of the thread that indicates if the thread has added or deleted an edge in it's algorithm stage.
+     * Gets the flag of the thread that indicates if the thread has added or deleted an edge in its algorithm stage.
      * @return the flag of the thread
      * @throws InterruptedException Exception caused by external interruption
      */

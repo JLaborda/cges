@@ -8,6 +8,8 @@ import org.albacete.simd.cges.Resources;
 import org.junit.Test;
 import weka.classifiers.bayes.net.BIFReader;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -26,13 +28,14 @@ public class UtilsTest {
     //final DataSet datasetRepeated = Utils.readData(path1);
     final DataSet dataset = Utils.readData(path);
 
+    // Output stream for verbose tests
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
 
 
 
 
     /**
      * Tests that the method split for tuple nodes splits an array of TupleNode into two subsets correctly.
-     * @result An ArrayList with two subset of TupleNode
      */
     @Test
     public void splitTest() {
@@ -58,7 +61,6 @@ public class UtilsTest {
 
     /**
      * Tests that the method readData loads data correctly into a DataSet.
-     * @result The DataSet is created and the number of columns and of rows correspond with what the data actually has.
      */
     @Test
     public void readDataTest(){
@@ -135,29 +137,26 @@ public class UtilsTest {
         MlBayesIm bn2 = new MlBayesIm(bayesPm2);
 
         // Acting: Getting the avgMarkovBlanquetDif:
-        double[] result = Utils.avgMarkovBlanquetdif(new Dag_n(bn1.getDag()), new Dag_n(bn2.getDag()));
+        double[] result = Utils.avgMarkovBlanketDelta(new Dag_n(bn1.getDag()), new Dag_n(bn2.getDag()));
         // Asserting
         assertNull(result);
 
         /*TEST: Same DAGs should return the following array [0.0,0.0,0.0]*/
         // Arranging dags for the same data
         bf.processFile(net_path1);
-        //Transforming the BayesNet into a BayesPm
-        BayesPm bayesPm3 = Utils.transformBayesNetToBayesPm(bf);
-        MlBayesIm bn3 = new MlBayesIm(bayesPm3);
 
         bn1 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bf));
         bn2 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bf));
 
         // Acting: Getting the avgMarkovBlanquetDif:
-        result = Utils.avgMarkovBlanquetdif(new Dag_n(bn1.getDag()), new Dag_n(bn2.getDag()));
+        result = Utils.avgMarkovBlanketDelta(new Dag_n(bn1.getDag()), new Dag_n(bn2.getDag()));
         // Asserting
         assertNotNull(result);
         for (double r : result) {
             assertEquals(0, r, 0.000001);
         }
 
-        /*TEST: Same nodes but different DAGs should return it's avg difference*/
+        /*TEST: Same nodes but different DAGs should return its avg difference*/
         // Arranging dags
         bf.processFile(net_path1);
         Dag_n dag1 = new Dag_n(new MlBayesIm(Utils.transformBayesNetToBayesPm(bf)).getDag());
@@ -167,10 +166,10 @@ public class UtilsTest {
         dag2.removeEdge(dag2.getNode("Cancer"), dag2.getNode("Dyspnoea"));
         dag2.addDirectedEdge(dag2.getNode("Xray"), dag2.getNode("Dyspnoea"));
 
-        System.out.println(dag2);
+        //System.out.println(dag2);
 
         // Acting: Calculating average MB
-        result = Utils.avgMarkovBlanquetdif(dag1, dag2);
+        result = Utils.avgMarkovBlanketDelta(dag1, dag2);
 
         // Asserting
 
@@ -188,7 +187,7 @@ public class UtilsTest {
         BIFReader bf = new BIFReader();
         bf.processFile(Resources.CANCER_NET_PATH);
 
-        System.out.println("Numero de variables: "+bf.getNrOfNodes());
+        //System.out.println("Numero de variables: "+bf.getNrOfNodes());
         MlBayesIm bn2 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bf));
 
         Dag_n dag = new Dag_n(bn2.getDag());
@@ -205,7 +204,7 @@ public class UtilsTest {
         BIFReader bf = new BIFReader();
         bf.processFile(Resources.CANCER_NET_PATH);
 
-        System.out.println("Numero de variables: "+bf.getNrOfNodes());
+        //System.out.println("Numero de variables: "+bf.getNrOfNodes());
         MlBayesIm bn2 = new MlBayesIm(Utils.transformBayesNetToBayesPm(bf));
 
         Dag_n dag = new Dag_n(bn2.getDag());
@@ -285,50 +284,160 @@ public class UtilsTest {
 
     }
 
-
-
-    /*
     @Test
-    public void scoreGraph(){
-        String path = "./res/networks/BBDD/cancer_test.csv";
-        DataSet data = Utils.readData(path);
-        Graph g = null;
+    public void moralizeGraphTest(){
+        Graph graph = new EdgeListGraph_n();
+        Node A = new GraphNode("A");
+        Node B = new GraphNode("B");
+        Node C = new GraphNode("C");
+        Node D = new GraphNode("D");
+        Node E = new GraphNode("E");
+        graph.addNode(A);
+        graph.addNode(B);
+        graph.addNode(C);
+        graph.addNode(D);
+        graph.addNode(E);
+        Edge edgeAB = new Edge(A,B,Endpoint.TAIL,Endpoint.ARROW);
+        Edge edgeAC = new Edge(A,C,Endpoint.TAIL,Endpoint.ARROW);
+        Edge edgeBC = new Edge(B,C,Endpoint.TAIL,Endpoint.ARROW);
+        Edge edgeCE = new Edge(C,E,Endpoint.TAIL,Endpoint.ARROW);
+        Edge edgeDE = new Edge(D,E,Endpoint.TAIL,Endpoint.ARROW);
 
-        double score = Utils.scoreGraph(g, data);
+        graph.addEdge(edgeAB);
+        graph.addEdge(edgeAC);
+        graph.addEdge(edgeBC);
+        graph.addEdge(edgeCE);
+        graph.addEdge(edgeDE);
 
-        assertEquals(Double.NEGATIVE_INFINITY, score, 0.000001);
+        //ACT
+        Utils.moralizeGraph(graph);
+
+        // Assert
+        assertTrue(graph.containsEdge(edgeAB));
+        assertTrue(graph.containsEdge(edgeAC));
+        assertTrue(graph.containsEdge(edgeBC));
+        assertTrue(graph.containsEdge(edgeCE));
+        assertTrue(graph.containsEdge(edgeDE));
+        // Checking that it has the new edge
+        assertTrue(graph.containsEdge(new Edge(C,D,Endpoint.TAIL, Endpoint.TAIL)));
+    }
+
+
+    @Test
+    public void shdWithDifferentDagsTest(){
+        // Same Dags
+        Dag_n dag1 = new Dag_n(createTestGraph1());
+        Dag_n dag2 = new Dag_n(createTestGraph1());
+        // Adding edge to dag2
+        dag2.addEdge(new Edge(dag2.getNode("A"), dag2.getNode("E"), Endpoint.TAIL, Endpoint.ARROW ));
+
+        int result = Utils.SHD(dag1, dag2);
+        assertEquals(2, result);
+    }
+    @Test
+    public void shdWithEmptyDagsTest(){
+        //Empty Dags
+        Dag_n empty1 = new Dag_n();
+        Dag_n empty2 = new Dag_n();
+
+        int resultEmpty = Utils.SHD(empty1, empty2);
+        assertEquals(0,resultEmpty);
+    }
+
+    @Test
+    public void shdWithNullDagsTest(){
+
+        int resultEmpty = Utils.SHD(null, null);
+        assertEquals(-1,resultEmpty);
+    }
+
+    @Test
+    public void shdWithEqualDagsTest(){
+        // Same Dags
+        Dag_n dag1 = new Dag_n(createTestGraph1());
+        Dag_n dag2 = new Dag_n(createTestGraph1());
+
+        int result = Utils.SHD(dag1, dag2);
+        assertEquals(0, result);
 
     }
-*/
 
-    /* For some reason this test doesn't get the same score always.
-    @Test
-    public void scoreGraph() throws Exception {
-        //TEST: Empty graph should give back a score of 0
-        String path = "./res/networks/BBDD/cancer_test.csv";
-        DataSet data = Utils.readData(path);
-        Graph g = new EdgeListGraph();
+    private Graph createTestGraph1(){
+        Graph graph = new EdgeListGraph_n();
+        Node A = new GraphNode("A");
+        Node B = new GraphNode("B");
+        Node C = new GraphNode("C");
+        Node D = new GraphNode("D");
+        Node E = new GraphNode("E");
+        graph.addNode(A);
+        graph.addNode(B);
+        graph.addNode(C);
+        graph.addNode(D);
+        graph.addNode(E);
+        Edge edgeAB = new Edge(A,B,Endpoint.TAIL,Endpoint.ARROW);
+        Edge edgeAC = new Edge(A,C,Endpoint.TAIL,Endpoint.ARROW);
+        Edge edgeBC = new Edge(B,C,Endpoint.TAIL,Endpoint.ARROW);
+        Edge edgeCE = new Edge(C,E,Endpoint.TAIL,Endpoint.ARROW);
+        Edge edgeDE = new Edge(D,E,Endpoint.TAIL,Endpoint.ARROW);
 
-        double score = Utils.scoreGraph(g, data);
+        graph.addEdge(edgeAB);
+        graph.addEdge(edgeAC);
+        graph.addEdge(edgeBC);
+        graph.addEdge(edgeCE);
+        graph.addEdge(edgeDE);
 
-        assertEquals(0.0, score, 0.0000001);
-
-        //TEST: Score is consistent
-        String net_path1 = "./res/networks/cancer.xbif";
-        BIFReader bf = new BIFReader();
-        bf.processFile(net_path1);
-        Dag_n dag1 = (new MlBayesIm((BayesNet) bf)).getDag();
-        Graph g2 = new EdgeListGraph(dag1);
-
-        double score2 = Utils.scoreGraph(g2, data);
-
-        assertEquals(-10701.380698450566, score2, 0.000001);
-
-        //TEST: Checking score cache gets previous scores:
-        double score3 = Utils.scoreGraph(g2, data);
-        assertEquals(-10701.380698450566, score3, 0.000001);
-
+        return graph;
     }
-*/
+
+@Test
+public void shuffleCollectionTest() {
+    // Create a collection with some elements
+    List<Integer> collection = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5));
+
+    // Shuffle the collection
+    Utils.shuffleCollection(collection);
+
+    // Verify that the collection has the same elements, but in a different order
+    List<Integer> expected = Arrays.asList(1, 2, 3, 4, 5);
+    assertNotEquals(expected, collection);
+    assertTrue(collection.containsAll(expected));
+    assertTrue(expected.containsAll(collection));
+}
+
+    @Test
+    public void testSetVerbose() {
+        System.setOut(new PrintStream(outputStreamCaptor));
+        // Verifica que se pueda activar verbose
+        Utils.setVerbose(true);
+        assertTrue(Utils.isVerbose());
+
+        // Verifica que se pueda desactivar verbose
+        Utils.setVerbose(false);
+        assertFalse(Utils.isVerbose());
+    }
+
+    @Test
+    public void testPrintlnWhenVerboseIsTrue() {
+        System.setOut(new PrintStream(outputStreamCaptor));
+        // Activa verbose
+        Utils.setVerbose(true);
+
+        // Llama a println y verifica que la salida se imprima correctamente
+        Utils.println("Test message");
+        assertEquals("Test message\n", outputStreamCaptor.toString());
+    }
+
+    @Test
+    public void testPrintlnWhenVerboseIsFalse() {
+        System.setOut(new PrintStream(outputStreamCaptor));
+        // Desactiva verbose
+        Utils.setVerbose(false);
+
+        // Llama a println y verifica que la salida esté vacía
+        Utils.println("Test message");
+        assertEquals("", outputStreamCaptor.toString());
+    }
+
+
 
 }

@@ -10,11 +10,11 @@ import org.albacete.simd.cges.utils.Utils;
 
 public class FGES extends BNBuilder {
     
-    public boolean setFaithfulnessAssumed;
-    public boolean ges;
+    public final boolean setFaithfulnessAssumed;
+    public final boolean ges;
 
     public FGES(DataSet data, boolean setFaithfulnessAssumed, boolean ges) {
-        super(data, 1, -1, -1);
+        super(data, 1);
         this.setFaithfulnessAssumed = setFaithfulnessAssumed;
         this.ges = ges;
     }

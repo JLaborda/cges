@@ -28,3 +28,29 @@ replay_pid*
 /res/networks/others/
 /scripts/
 /results/
+
+# Experiment outputs and errors
+*.e*
+*.o*
+
+# target folder
+/target/*
+
+# Code coverage
+cov.xml
+
+# .idea folder
+.idea/
+
+#.DS_Store
+.DS_Store
+
+# large_datasets
+res/large_datasets/
+
+# parameters folder
+res/parameters/
+
+#scripts
+res/scripts/
+!res/scripts/experiments/
