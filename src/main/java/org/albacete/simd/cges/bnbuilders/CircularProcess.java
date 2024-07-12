@@ -51,7 +51,7 @@ public class CircularProcess {
         this.dag = new Dag_n(problem.getVariables());
     }
 
-    public void noBroadcastingSearch() throws InterruptedException {
+    public void ringBroadcastingSearch() throws InterruptedException {
         // Setup
         // 1. Update bdeu and convergence variables
         setup();

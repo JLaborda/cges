@@ -236,6 +236,8 @@ public abstract class BNBuilder {
     }
 
     public Dag_n getCurrentDag() {
+        if(this.currentGraph == null)
+            return null;
         return Utils.removeInconsistencies(this.currentGraph);
     }
 

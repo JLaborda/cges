@@ -6,9 +6,13 @@ import edu.cmu.tetrad.graph.Dag_n;
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
 import org.albacete.simd.cges.clustering.Clustering;
+import org.albacete.simd.cges.experiments.ExperimentBNBuilder;
 import org.albacete.simd.cges.framework.BNBuilder;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -31,7 +35,7 @@ public class CGES extends BNBuilder {
     private long timeFineTuning;
 
     private static int LIMIT_ITERATIONS;
-    private static final long LIMIT_TIME = 24 * 3600 *1000; // Limit of one day in miliseconds
+    private static final long LIMIT_TIME = 24 * 3600 * 1000; // Limit of one day in miliseconds
     private long startingTime;
     
     public CGES(DataSet data, Clustering clustering, int numberOfProcesses, Broadcasting typeBroadcasting) {
@@ -117,7 +121,7 @@ public class CGES extends BNBuilder {
     private void search(Broadcasting typeBroadcasting) {
         switch (typeBroadcasting) {
             case NO_BROADCASTING:
-                noBroadcastingSearch();
+                ringBroadcastingSearch();
                 break;
             case ALL_BROADCASTING:
                 allBroadcastingSearch();
@@ -138,14 +142,15 @@ public class CGES extends BNBuilder {
      * Search loop that executes in parallel k processes of CGES processes. It only takes into account the results
      * of the CGES processes to pass to the posterior process, performing a cycle.
      */
-    private void noBroadcastingSearch(){
+    private void ringBroadcastingSearch(){
+        /*
         do{
             it++;
             putInputGraphs();
             cgesProcesses.parallelStream().forEach((cdag) -> {
                 try {
                     // Applying cges process
-                    cdag.noBroadcastingSearch();
+                    cdag.ringBroadcastingSearch();
                 } catch (InterruptedException ex) {
                     Utils.println("Error with InterruptedException: " +
                             "\n Dag_n Id: " + cdag.id +
@@ -153,6 +158,35 @@ public class CGES extends BNBuilder {
                 }
             });
         } while (notConverged());
+        */
+        ForkJoinPool pool = new ForkJoinPool(this.numberOfPartitions);
+        boolean timeout = false;
+        do {
+            it++;
+            putInputGraphs();
+            try{
+                pool.submit(() -> {
+                    cgesProcesses.parallelStream().forEach(cdag -> {
+                        try {
+                            cdag.ringBroadcastingSearch();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }).get(LIMIT_TIME, java.util.concurrent.TimeUnit.MILLISECONDS);
+            }
+            catch(TimeoutException exception){
+                System.out.println("Timeout reached");
+                timeout = true;
+                pool.shutdownNow();
+            }
+            catch(Exception exception){
+                exception.printStackTrace();
+            }
+            // Saving data
+            saveIteration();
+        } while ((notConverged()) && (!timeout));
+        pool.shutdownNow();
     }
 
     private void putInputGraphs() {
@@ -171,6 +205,30 @@ public class CGES extends BNBuilder {
             CircularProcess cd = getInputDag(dag.id);
             dag.setInputDag(cd.dag);
         });*/
+    }
+
+    private void saveIteration(){
+        try {
+            // Pause Stopwatch
+            ExperimentBNBuilder.pauseStopWatch();
+            // Calculating best graph of the iteration
+            calculateBestGraph();
+            currentGraph = bestCircularProcess.dag;
+            
+            // Caluclating its measurements
+            ExperimentBNBuilder.calcuateMeasurements(this);
+        
+            // Saving Experiment
+            ExperimentBNBuilder.saveExperiment();
+
+            // Resume Stopwatch
+            ExperimentBNBuilder.resumeStopWatch();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            System.out.println("Error in saveIteration");
+            System.out.println("Iteration: " + it);   
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -196,6 +254,8 @@ public class CGES extends BNBuilder {
                             "\n Dag_n graph: " + cdag.dag);
                 }
             });
+            // Saving best graph of the iteration to saveFile
+            saveIteration();
         } while (notConverged());
     }
 
@@ -208,6 +268,8 @@ public class CGES extends BNBuilder {
         ConsensusUnion fusion = new ConsensusUnion(graphs);
         return fusion.union();
     }
+
+
 
     private void pairBroadcastingSearch(){
         do{
@@ -225,19 +287,20 @@ public class CGES extends BNBuilder {
                 }
             });
 
-
-
+            // Saving best graph of the iteration to saveFile
+            saveIteration();
         }while(notConverged());
     }
 
-    private void randomBroadcastingSearch(){
+    /* 
+    private void originalRandomBroadcasSearch(){
         do{
             it++;
             // Add random input dags
             addRandomInput();
             cgesProcesses.parallelStream().forEach(cdag -> {
                 try {
-                    cdag.noBroadcastingSearch();
+                    cdag.ringBroadcastingSearch();
                 } catch (InterruptedException e) {
                     Utils.println("Error with InterruptedException: " +
                             "\n Dag_n Id: " + cdag.id +
@@ -246,6 +309,42 @@ public class CGES extends BNBuilder {
                 }
             });
         }while(notConverged());
+    }
+    */  
+
+    private void randomBroadcastingSearch(){
+        ForkJoinPool pool = new ForkJoinPool(this.numberOfPartitions);//ForkJoinPool.commonPool();
+        boolean timeout = false;
+        do {
+            it++;
+            addRandomInput();
+            try{
+                pool.submit(() -> {
+                    cgesProcesses.parallelStream().forEach(cdag -> {
+                        try {
+                            cdag.ringBroadcastingSearch();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }).get(LIMIT_TIME, java.util.concurrent.TimeUnit.MILLISECONDS);
+            }
+            catch(TimeoutException exception){
+                System.out.println("Timeout reached");
+                timeout = true;
+                pool.shutdownNow();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                
+            } catch (ExecutionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            // Saving best graph of the iteration to saveFile
+            saveIteration();
+        } while ((notConverged()) && (!timeout));
+        pool.shutdownNow();
     }
 
     private void addRandomInput(){
@@ -256,26 +355,42 @@ public class CGES extends BNBuilder {
     }
 
     private void bestBroadcastingSearch() {
+        ForkJoinPool pool = new ForkJoinPool(this.numberOfPartitions);
+        boolean timeout = false;
+        
         do {
             it++;
-            // apply circular processes
-            List<CircularProcess> bestInputs = cgesProcesses.parallelStream()
-                    .map(cdag -> {
+            try {
+                pool.submit(() -> {
+                    cgesProcesses.parallelStream().forEach(cdag -> {
                         try {
                             cdag.bestBroadcastingSearch();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        return cdag;
-                    })
-                    // Get the best input for each process
-                    .map(process -> getBestInput(process))
-                    .collect(Collectors.toList());
+                    });
+                }).get(LIMIT_TIME, java.util.concurrent.TimeUnit.MILLISECONDS);
+                
+                List<CircularProcess> bestInputs = cgesProcesses.parallelStream()
+                .map(process -> getBestInput(process))
+                .collect(Collectors.toList());
+                        
+                System.out.println("Best inputs size: " + bestInputs.size());
+                setBestInputs(bestInputs);
 
-            // Set the best input for each process
-            setBestInputs(bestInputs);
-
-        } while (notConverged());
+                
+            } catch (TimeoutException exception) {
+                System.out.println("Timeout reached");
+                timeout = true;
+                pool.shutdownNow();
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+            // Saving best graph of the iteration to saveFile
+            saveIteration();
+        } while ((notConverged()) && (!timeout));
+        
+        pool.shutdownNow();
     }
 
     private CircularProcess getBestInput(CircularProcess process) {

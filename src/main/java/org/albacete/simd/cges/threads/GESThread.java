@@ -363,7 +363,7 @@ public abstract class GESThread implements Runnable{
      * @return score of the graph.
      */
     public static double scoreGraph(Graph graph, Problem problem) {
-
+        /*
         if (graph == null){
             return Double.NEGATIVE_INFINITY;
         }
@@ -371,7 +371,7 @@ public abstract class GESThread implements Runnable{
 //        Graph dag = SearchGraphUtils.dagFromPattern(graph);
         Graph dag = new EdgeListGraph_n(graph);
         Utils.pdagToDag(dag);
-        double score = 0.;
+        double score = 0.0;
 
         for (Node next : dag.getNodes()) {
             Set<Node> parents = new HashSet<>(dag.getParents(next));
@@ -399,11 +399,11 @@ public abstract class GESThread implements Runnable{
                 score += localBdeuScore(nextIndex, parentIndices, parents, problem);
             }
         return score;
-    }
-    
-    public double scoreDag(Graph graph) {
-        
+        */
         if (graph == null){
+            return Double.NEGATIVE_INFINITY;
+        }
+        if (problem == null){
             return Double.NEGATIVE_INFINITY;
         }
         
@@ -411,10 +411,12 @@ public abstract class GESThread implements Runnable{
         Utils.pdagToDag(dag);
         HashMap<Node,Integer> hashIndices = problem.getHashIndices();
 
-        double _score = 0;
+        double score = 0;
 
-        for (Node node : getVariables()) {
+        for (Node node : problem.getVariables()) {
+            int indexNode = hashIndices.get(node);
             List<Node> x = dag.getParents(node);
+            Set<Node> setParents = new HashSet<>(x);
 
             int[] parentIndices = new int[x.size()];
 
@@ -423,11 +425,45 @@ public abstract class GESThread implements Runnable{
                 parentIndices[count++] = hashIndices.get(parent);
             }
 
-            final double nodeScore = problem.getBDeu().localScore(hashIndices.get(node), parentIndices);
+            final double nodeScore = localBdeuScore(indexNode, parentIndices, setParents, problem);//problem.getBDeu().localScore(hashIndices.get(node), parentIndices);
 
-            _score += nodeScore;
+            score += nodeScore;
         }
-        return _score;
+        return score;
+    }
+    
+    public double scoreGraph(Graph graph) {
+        
+        if (graph == null){
+            return Double.NEGATIVE_INFINITY;
+        }
+        if (problem == null){
+            return Double.NEGATIVE_INFINITY;
+        }
+        
+        Graph dag = new EdgeListGraph_n(graph);
+        Utils.pdagToDag(dag);
+        HashMap<Node,Integer> hashIndices = problem.getHashIndices();
+
+        double score = 0;
+
+        for (Node node : getVariables()) {
+            int indexNode = hashIndices.get(node);
+            List<Node> x = dag.getParents(node);
+            Set<Node> setParents = new HashSet<>(x);
+
+            int[] parentIndices = new int[x.size()];
+
+            int count = 0;
+            for (Node parent : x) {
+                parentIndices[count++] = hashIndices.get(parent);
+            }
+
+            final double nodeScore = localBdeuScore(indexNode, parentIndices, setParents, problem);//problem.getBDeu().localScore(hashIndices.get(node), parentIndices);
+
+            score += nodeScore;
+        }
+        return score;
     }
 
     /**

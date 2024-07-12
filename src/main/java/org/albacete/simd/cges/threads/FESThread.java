@@ -89,7 +89,7 @@ public class FESThread extends GESThread {
             //buildIndexing(graph);
 
             // Method 1-- original.
-            double scoreInitial = scoreDag(graph);
+            double scoreInitial = scoreGraph(graph);
 
             // Do backward search.
             fes(graph, scoreInitial);
@@ -97,7 +97,7 @@ public class FESThread extends GESThread {
             long endTime = System.currentTimeMillis();
             this.elapsedTime = endTime - startTime;
 
-            double newScore = scoreDag(graph);
+            double newScore = scoreGraph(graph);
             Utils.println(" [" + getId() + "] FES New Score: " + newScore + ", Initial Score: " + scoreInitial);
             // If we improve the score, return the new graph
             if (newScore > scoreInitial) {

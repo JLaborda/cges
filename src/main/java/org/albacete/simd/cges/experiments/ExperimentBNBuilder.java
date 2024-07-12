@@ -15,15 +15,10 @@ import org.albacete.simd.cges.utils.Utils;
 import org.apache.commons.lang3.time.StopWatch;
 import weka.classifiers.bayes.net.BIFReader;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -42,8 +37,8 @@ public class ExperimentBNBuilder {
 
     protected BNBuilder algorithm;
 
-    protected Map<String,String> paramsMap = new LinkedHashMap<>();
-    protected Map<String,Double> measurementsMap = new LinkedHashMap<>();
+    protected static Map<String,String> paramsMap = new LinkedHashMap<>();
+    protected static Map<String,Double> measurementsMap = new LinkedHashMap<>();
 
     // Definir las claves como constantes de la clase
     public static final String[] KEYS = {
@@ -52,21 +47,23 @@ public class ExperimentBNBuilder {
     };
     
 
-    protected int structuralHamiltonDistanceValue = Integer.MAX_VALUE;
-    protected double bdeuScore;
-    protected double [] differencesOfMalkovsBlanket;
+    protected static int structuralHamiltonDistanceValue = Integer.MAX_VALUE;
+    protected static double bdeuScore;
+    protected static double [] differencesOfMalkovsBlanket;
     /**
      * The stop watch that measures the time of the execution of the algorithm
      */
-    private static StopWatch stopWatch;
+    public static StopWatch stopWatch;
     /**
      * Time elapsed in milliseconds
      */
-    protected long elapsedTime;
-    protected int numberOfIterations;
+    protected static long elapsedTime;
+    protected static int numberOfIterations;
 
-    public Dag_n resultingBayesianNetwork;
+    public static Dag_n resultingBayesianNetwork;
     
+    public static String saveFolder;
+    public static int index = -1;
 
 
     public ExperimentBNBuilder(String[] parameters) throws Exception {
@@ -75,7 +72,7 @@ public class ExperimentBNBuilder {
         createBNBuilder();
     }
     public ExperimentBNBuilder(Map<String,String> paramsMap) throws Exception{
-        this.paramsMap = paramsMap;
+        ExperimentBNBuilder.paramsMap = paramsMap;
         createBNBuilder();
     }
     public ExperimentBNBuilder(BNBuilder algorithm, String[] parameters){
@@ -84,7 +81,7 @@ public class ExperimentBNBuilder {
     }
     public ExperimentBNBuilder(BNBuilder algorithm, Map<String,String> paramsMap){
         this.algorithm = algorithm;
-        this.paramsMap = paramsMap;
+        ExperimentBNBuilder.paramsMap = paramsMap;
     }
 
 
@@ -99,7 +96,7 @@ public class ExperimentBNBuilder {
         for (int i = 0; i < parameters.length; i+=2) {
             String key = parameters[i];
             String value = parameters[i+1];
-            this.paramsMap.put(key, value);
+            paramsMap.put(key, value);
         }
 
     }
@@ -208,8 +205,6 @@ public class ExperimentBNBuilder {
             // Printing Experiment parameters
             Utils.println(this.toString());
 
-            MlBayesIm controlBayesianNetwork = readOriginalBayesianNetwork();
-
             // Search is executed
             // Starting startWatch
             stopWatch = StopWatch.createStarted();
@@ -217,7 +212,7 @@ public class ExperimentBNBuilder {
             resultingBayesianNetwork =  this.algorithm.getCurrentDag();
             stopWatch.stop();
             // Metrics
-            calcuateMeasurements(controlBayesianNetwork);
+            calcuateMeasurements(this.algorithm);
 
         } catch (Exception e) {
             System.out.println("Error when running the experiment");
@@ -229,9 +224,9 @@ public class ExperimentBNBuilder {
     }
 
 
-    private MlBayesIm readOriginalBayesianNetwork() throws Exception {
+    private static MlBayesIm readOriginalBayesianNetwork() throws Exception {
         BIFReader bayesianReader = new BIFReader();
-        bayesianReader.processFile(this.paramsMap.get("netPath"));
+        bayesianReader.processFile(paramsMap.get("netPath"));
         Utils.println("Numero de variables: " + bayesianReader.getNrOfNodes());
 
         //Transforming the BayesNet into a BayesPm
@@ -239,23 +234,33 @@ public class ExperimentBNBuilder {
         return new MlBayesIm(bayesPm);
     }
 
-    public void calcuateMeasurements(MlBayesIm controlBayesianNetwork) {
+    public static void calcuateMeasurements(BNBuilder algorithm) throws Exception {
+        MlBayesIm controlBayesianNetwork = readOriginalBayesianNetwork();
+        resultingBayesianNetwork = algorithm.getCurrentDag();
+
         // Getting time
-        this.elapsedTime = stopWatch.getTime(TimeUnit.MILLISECONDS);
-        
+        elapsedTime = stopWatch.getTime(TimeUnit.MILLISECONDS);
+        //stopWatch.resume();
         // SHD Tetrad
         //GraphUtils.GraphComparison comparison = SearchGraphUtils.getGraphComparison(controlBayesianNetwork.getDag(), algorithm.getCurrentDag());
         //this.structuralHamiltonDistanceValue = comparison.getShd();
         
-        // "SDM": 
-        this.structuralHamiltonDistanceValue = Utils.SHD(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag());
-        
-        this.differencesOfMalkovsBlanket = Utils.avgMarkovBlanketDelta(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag());
-        this.numberOfIterations = algorithm.getIterations();
-        this.bdeuScore = GESThread.scoreGraph(algorithm.getCurrentDag(), algorithm.getProblem());
-        
+        // DAG scores
+        if(resultingBayesianNetwork != null){
+            structuralHamiltonDistanceValue = Utils.SHD(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), resultingBayesianNetwork);
+            differencesOfMalkovsBlanket = Utils.avgMarkovBlanketDelta(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), resultingBayesianNetwork);
+            bdeuScore = GESThread.scoreGraph(resultingBayesianNetwork, algorithm.getProblem());
+        }
+        else{
+            structuralHamiltonDistanceValue = Integer.MAX_VALUE;
+            differencesOfMalkovsBlanket = new double[]{Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE};
+            bdeuScore = Double.NEGATIVE_INFINITY;
+        }
+        // Iterations
+        numberOfIterations = algorithm.getIterations();
+
         measurementsMap.put("elapsedTime(s)", (double) stopWatch.getTime(TimeUnit.MILLISECONDS) / 1000);
-        measurementsMap.put("shd", (double)Utils.SHD(Utils.removeInconsistencies(controlBayesianNetwork.getDag()), algorithm.getCurrentDag()));
+        measurementsMap.put("shd", (double)Utils.SHD(Utils.removeInconsistencies(controlBayesianNetwork.getDag()),resultingBayesianNetwork));
         measurementsMap.put("dfMM_avg", differencesOfMalkovsBlanket[0]);
         measurementsMap.put("dfMM_plus", differencesOfMalkovsBlanket[1]);
         measurementsMap.put("dfMM_minus", differencesOfMalkovsBlanket[1]);
@@ -263,11 +268,33 @@ public class ExperimentBNBuilder {
         measurementsMap.put("bdeu", GESThread.scoreGraph(algorithm.getCurrentDag(), algorithm.getProblem()));
         measurementsMap.put("ncpus", (double) Runtime.getRuntime().availableProcessors());
 
-        if(this.algorithm instanceof CGES){
-            measurementsMap.put("cgesScore", ((CGES) this.algorithm).getCgesScore());
-            measurementsMap.put("fineTuningTime(s)", (double)((CGES) this.algorithm).getTimeFineTuning()/1000);
+        if(algorithm instanceof CGES){
+            measurementsMap.put("cgesScore", ((CGES) algorithm).getCgesScore());
+            measurementsMap.put("fineTuningTime(s)", (double)((CGES) algorithm).getTimeFineTuning()/1000);
         }
 
+    }
+
+    public void calcuateMeasurements()throws Exception{
+        calcuateMeasurements(this.algorithm);
+    }
+
+    public static void pauseStopWatch() {
+        if(stopWatch == null)
+            return;
+        if (stopWatch.isStarted() && !stopWatch.isSuspended()) {
+            stopWatch.suspend();
+            System.out.println("StopWatch paused.");
+        }
+    }
+
+    public static void resumeStopWatch() {
+        if(stopWatch == null)
+            return;
+        if (stopWatch.isStarted() && stopWatch.isSuspended()) {
+            stopWatch.resume();
+            System.out.println("StopWatch resumed.");
+        }
     }
 
     public void printResults() {
@@ -275,9 +302,9 @@ public class ExperimentBNBuilder {
         System.out.println(this.toString());
         System.out.println("-------------------------\nMetrics: ");
         System.out.println("SHD: "+ structuralHamiltonDistanceValue);
-        System.out.println("Final BDeu: " +this.bdeuScore);
+        System.out.println("Final BDeu: " + bdeuScore);
         System.out.println("Total execution time (s): " + (double) elapsedTime/1000);
-        System.out.println("Total number of Iterations: " + this.numberOfIterations);
+        System.out.println("Total number of Iterations: " + numberOfIterations);
         System.out.println("differencesOfMalkovsBlanket avg: "+ differencesOfMalkovsBlanket[0]);
         System.out.println("differencesOfMalkovsBlanket plus: "+ differencesOfMalkovsBlanket[1]);
         System.out.println("differencesOfMalkovsBlanket minus: "+ differencesOfMalkovsBlanket[2]);
@@ -287,7 +314,7 @@ public class ExperimentBNBuilder {
 
     }
 
-    public void saveExperiment(String savePath) {
+    public static void saveExperiment(String savePath) {
         // Verificar si el archivo ya existe
         boolean fileExists = new File(savePath).exists();
 
@@ -312,7 +339,12 @@ public class ExperimentBNBuilder {
         }
     }
 
-    private String getHeaderForParameters(){
+    public static void saveExperiment(){
+        ExperimentBNBuilder.saveExperiment(saveFolder + ExperimentBNBuilder.getSaveFileName(index));
+    }
+
+
+    private static String getHeaderForParameters(){
         StringBuilder headerBuilder = new StringBuilder();
 
         for (String key : paramsMap.keySet()) {
@@ -335,7 +367,7 @@ public class ExperimentBNBuilder {
 
     }
 
-    private String getHeaderForMeasurements(){
+    private static String getHeaderForMeasurements(){
         StringBuilder headerBuilder = new StringBuilder();
 
         // Añadiendo las claves al header
@@ -352,7 +384,7 @@ public class ExperimentBNBuilder {
         return headerBuilder.toString();
     }
 
-    private String getBodyParams(){
+    private static String getBodyParams(){
         StringBuilder builder = new StringBuilder();
 
         for (Map.Entry<String,String> entry : paramsMap.entrySet()) {
@@ -374,7 +406,7 @@ public class ExperimentBNBuilder {
         return builder.toString();
     }
 
-        private String getBodyMeasurements(){
+        private static String getBodyMeasurements(){
             StringBuilder builder = new StringBuilder();
 
             for (Double value : measurementsMap.values()) {
@@ -414,17 +446,17 @@ public class ExperimentBNBuilder {
     }
 
     public String getResults(){
-        return  this.paramsMap.get("algName") + ","
-                + this.paramsMap.get("netName") + ","
+        return  paramsMap.get("algName") + ","
+                + paramsMap.get("netName") + ","
                 + getDatabaseNameFromPattern(paramsMap.get("databasePath")) + ","
                 + paramsMap.get("numberOfClusters") + ","
-                + this.algorithm.getItInterleaving() + ","
-                + this.structuralHamiltonDistanceValue + ","
-                + this.bdeuScore + ","
-                + this.differencesOfMalkovsBlanket[0] + ","
-                + this.differencesOfMalkovsBlanket[1] + ","
-                + this.differencesOfMalkovsBlanket[2] + ","
-                + this.numberOfIterations + ","
+                + algorithm.getItInterleaving() + ","
+                + structuralHamiltonDistanceValue + ","
+                + bdeuScore + ","
+                + differencesOfMalkovsBlanket[0] + ","
+                + differencesOfMalkovsBlanket[1] + ","
+                + differencesOfMalkovsBlanket[2] + ","
+                + numberOfIterations + ","
                 + (double) elapsedTime/1000 + "\n";//this.elapsedTime + "\n";
     }
 
@@ -444,13 +476,13 @@ public class ExperimentBNBuilder {
         return paramsMap.get("netName");
     }
 
-    public String getSaveFileName(int id){
+    public static String getSaveFileName(int id){
         StringBuilder fileNameBuilder = new StringBuilder();
         fileNameBuilder.append("exp_");
         fileNameBuilder.append(paramsMap.get("algName"));
         fileNameBuilder.append("_");
 
-        if(this.algorithm instanceof CGES){
+        if(paramsMap.containsKey("broadcasting")){
             fileNameBuilder.append(paramsMap.get("broadcasting"));
             fileNameBuilder.append("_");
         }
