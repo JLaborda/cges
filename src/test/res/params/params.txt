@@ -1,0 +1,6 @@
+algName cges netName alarm clusteringName HierarchicalClustering numberOfClusters 16 broadcasting RANDOM_BROADCASTING seed 13 databasePath src/test/res/datasets/alarm/alarm.xbif_.csv netPath src/test/res/networks/alarm/alarm.xbif
+algName cges netName alarm clusteringName HierarchicalClustering numberOfClusters 16 broadcasting ALL_BROADCASTING databasePath src/test/res/datasets/alarm/alarm.xbif_.csv netPath src/test/res/networks/alarm/alarm.xbif
+algName cges netName alarm clusteringName HierarchicalClustering numberOfClusters 16 broadcasting NO_BROADCASTING databasePath src/test/res/datasets/alarm/alarm.xbif_.csv netPath src/test/res/networks/alarm/alarm.xbif
+algName cges netName alarm clusteringName HierarchicalClustering numberOfClusters 16 broadcasting BEST_BROADCASTING databasePath src/test/res/datasets/alarm/alarm.xbif_.csv netPath src/test/res/networks/alarm/alarm.xbif
+algName cges netName alarm clusteringName HierarchicalClustering numberOfClusters 16 broadcasting PAIR_BROADCASTING databasePath src/test/res/datasets/alarm/alarm.xbif_.csv netPath src/test/res/networks/alarm/alarm.xbif
+

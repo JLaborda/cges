@@ -15,7 +15,7 @@ import java.util.Set;
 
 public class BESFusion extends FusionStage{
     
-    ThreadStage besStage;
+    final ThreadStage besStage;
     
     public BESFusion(Problem problem, Graph currentGraph, ArrayList<Dag_n> graphs, BESStage besStage) {
         super(problem, currentGraph, graphs);
@@ -28,7 +28,7 @@ public class BESFusion extends FusionStage{
     protected Dag_n fusion() {
         Dag_n fusionGraph = this.fusionIntersection();
 
-        System.out.println("BES to obtain the fusion: ");
+        Utils.println("BES to obtain the fusion: ");
 
         Set<Edge> candidates = new HashSet<>();
 
@@ -43,10 +43,12 @@ public class BESFusion extends FusionStage{
 
         fuse.run();
         
-        // We obtain the flag of the BES. If true, BESThread has improve the result.
+        // We obtain the flag of the BES. If true, BESThread has improved the result.
         try {
             flag = fuse.getFlag();
-        } catch (InterruptedException ex) {}
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
         
         // If the BESThread has not improved the previous result, we check if the fusion improves it.
         if (!flag) {
@@ -59,17 +61,17 @@ public class BESFusion extends FusionStage{
                 return (Dag_n) this.currentGraph;
             } 
             
-            // If the fusion doesn´t improves the result, we check if any previous BESThread has improved the results.
+            // If the fusion doesn't improve the result, we check if any previous BESThread has improved the results.
             else {
                 GESThread thread = besStage.getMaxBDeuThread();
-                System.out.println("thread"  + thread);
+                Utils.println("thread"  + thread);
                 if (thread.getScoreBDeu() != 0 && thread.getScoreBDeu() > currentScore) {
                     try {
                         this.currentGraph = thread.getCurrentGraph();
-                        System.out.println(this.currentGraph);
+                        Utils.println(this.currentGraph.toString());
                         flag = true;
                     } catch (InterruptedException ex) {
-                        System.out.println("\n\n\n EXCEPCIÓN º\n\n\n");}
+                        Utils.println("\n\n\n EXCEPTION º\n\n\n");}
                     return (Dag_n) this.currentGraph;
                 }
             }
@@ -77,9 +79,6 @@ public class BESFusion extends FusionStage{
         
         try {
             this.currentGraph = fuse.getCurrentGraph();
-            //System.out.println("Resultado del BES de la fusion: "+ BESThread.scoreGraph(this.currentGraph, problem));
-            //this.currentGraph = Utils.removeInconsistencies(this.currentGraph);
-            //System.out.println("Score Fusion sin inconsistencias: "+ BESThread.scoreGraph(this.currentGraph, problem));
         } catch (InterruptedException e1) {
             e1.printStackTrace();
         }

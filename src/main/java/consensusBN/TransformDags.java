@@ -30,6 +30,7 @@ public class TransformDags {
 	}
 	
 	
+	@SuppressWarnings("UnusedReturnValue")
 	ArrayList<Dag_n> transform (){
 		
 		this.numberOfInsertedEdges = 0;

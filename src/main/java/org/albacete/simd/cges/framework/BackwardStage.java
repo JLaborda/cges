@@ -2,7 +2,6 @@ package org.albacete.simd.cges.framework;
 
 import edu.cmu.tetrad.graph.Edge;
 import edu.cmu.tetrad.graph.Graph;
-import org.albacete.simd.cges.threads.GESThread;
 import org.albacete.simd.cges.utils.Problem;
 
 import java.util.List;

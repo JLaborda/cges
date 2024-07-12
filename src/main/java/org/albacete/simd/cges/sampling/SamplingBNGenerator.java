@@ -10,6 +10,8 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.albacete.simd.cges.utils.Utils;
+
 /*
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -47,7 +49,7 @@ public class SamplingBNGenerator {
 
   /**
    * Constructor for BayesNetGenerator.
- * @throws Exception
+ * @throws Exception from reading wrong file.
    */
   public SamplingBNGenerator(String fileName, int nSamples, int seed) throws Exception {
 
@@ -102,11 +104,11 @@ public class SamplingBNGenerator {
     int[] order = new int[nNrOfAtts];
     boolean[] bDone = new boolean[nNrOfAtts];
     for (int iAtt = 0; iAtt < nNrOfAtts; iAtt++) {
-//	      System.out.println("at: "+bf.getNodeName(iAtt));
+//	      Utils.println("at: "+bf.getNodeName(iAtt));
       int iAtt2 = 0;
       boolean allParentsDone = false;
       while (!allParentsDone && iAtt2 < nNrOfAtts) {
-//	   	  System.out.println("con at: "+bf.getNodeName(iAtt2));
+//	   	  Utils.println("con at: "+bf.getNodeName(iAtt2));
         if (!bDone[iAtt2]) {
           allParentsDone = true;
           int iParent = 0;
@@ -158,40 +160,110 @@ public class SamplingBNGenerator {
    * Main method
    *
    * @param args the commandline parameters
- * @throws Exception
- * @throws NumberFormatException
+ * @throws Exception from Sampling
+ * @throws NumberFormatException from reading data
    */
   static public void main(String[] args) throws NumberFormatException, Exception {
-      System.out.println("Length of args: " + args.length);
-      System.out.println(args[0]);
-      System.out.println(args[1]);
-      System.out.println(args[2]);
-      File carpeta_experimentos = new File(args[0]);
-      ArrayList<String> experimentos = listarFicherosdeCarpeta(carpeta_experimentos);
-      for(String exp: experimentos){
-          System.out.println(exp);
-      }
-      for (int red = 0; red<experimentos.size(); red++){
-          for(int ndatos = 0; ndatos< 10; ndatos++) {
-              if(experimentos.get(red).contains("xbif")){
-                  int seed = Integer.parseInt(args[2])+(12*ndatos);
-                  SamplingBNGenerator b = new SamplingBNGenerator(carpeta_experimentos+"/"+experimentos.get(red),Integer.parseInt(args[1]), seed);
-                  b.generateInstances();
-                  CSVSaver csv = new CSVSaver();
-                  Instances data = b.bf.m_Instances;
-                  csv.setInstances(data);
-                  String outpath = carpeta_experimentos + "/BBDD/" + experimentos.get(red)+Integer.parseInt(args[1])+ndatos+".csv";
-                  System.out.println("Saving to: " + outpath);
-                  File fcsv = new File(outpath);
-                  FileOutputStream output = new FileOutputStream(fcsv);
-                  csv.setDestination(output);
-                  csv.setNoHeaderRow(false);
-                  csv.writeBatch();
-              }
-          }
 
+    // Definiendo los argumentos
+    // networks: pathfinder, andes, diabetes, pigs, link y munin
+    String [] inpuXbifPathStrings = {
+      "/home/jorlabs/projects/cges/res/networks/pathfinder/pathfinder.xbif",
+      "/home/jorlabs/projects/cges/res/networks/andes/andes.xbif",
+      "/home/jorlabs/projects/cges/res/networks/diabetes/diabetes.xbif",
+      "/home/jorlabs/projects/cges/res/networks/pigs/pigs.xbif",
+      "/home/jorlabs/projects/cges/res/networks/link/link.xbif",
+      "/home/jorlabs/projects/cges/res/networks/munin/munin.xbif"
+    };
+
+    // Numero de instancias
+    int [] instances = {1000, 2000, 5000, 10000, 20000, 50000, 100000};
+
+    // Semillas: 10 primeros numeros primos
+    int seed = 42;
+
+    // Carpeta de salida
+    String outputFolder = "/home/jorlabs/projects/cges/res/large_datasets/";
+    String [] outputHeaderPaths = {
+      outputFolder + "pathfinder/pathfinder",
+      outputFolder + "andes/andes",
+      outputFolder + "diabetes/diabetes",
+      outputFolder + "pigs/pigs",
+      outputFolder + "link/link",
+      outputFolder + "munin/munin"
+      };
+   for(int i = 0; i<inpuXbifPathStrings.length; i++){
+      for(int j = 0; j<instances.length; j++){
+        String outputPath = outputHeaderPaths[i] + "_" + instances[j] + ".csv";
+        sampleBN(inpuXbifPathStrings[i], instances[j], seed, outputPath);
+        System.out.println("Sampled  " + inpuXbifPathStrings[i] + " with " + instances[j] + " instances and seed " + seed + " to " + outputPath);
       }
-  } // main
+    }
+    
+
+    //Utils.println("Length of args: " + args.length);
+
+      // // Lectura de argumentos
+      // String folderExperimentsString = args[0]; // Carpeta de experimentos
+      // String nInstances = args[1]; // Numero de instancias
+      // String initialSeed = args[2];// Semilla
+
+      // // Impresion de argumentos
+      // Utils.println(folderExperimentsString); 
+      // Utils.println(nInstances); 
+      // Utils.println(initialSeed); 
+
+      // File carpeta_experimentos = new File(folderExperimentsString);
+      // ArrayList<String> experimentos = listarFicherosdeCarpeta(carpeta_experimentos);
+      // for(String exp: experimentos){
+      //     Utils.println(exp);
+      // }
+      // for (int red = 0; red<experimentos.size(); red++){
+      //     for(int ndatos = 0; ndatos< 10; ndatos++) {
+      //         if(experimentos.get(red).contains("xbif")){
+      //             int seed = Integer.parseInt(initialSeed)+(12*ndatos);
+      //             SamplingBNGenerator b = new SamplingBNGenerator(carpeta_experimentos+"/"+experimentos.get(red),Integer.parseInt(nInstances), seed);
+      //             b.generateInstances();
+      //             CSVSaver csv = new CSVSaver();
+      //             Instances data = b.bf.m_Instances;
+      //             csv.setInstances(data);
+      //             String outpath = carpeta_experimentos + "/BBDD/" + experimentos.get(red)+Integer.parseInt(nInstances)+ndatos+".csv";
+      //             Utils.println("Saving to: " + outpath);
+      //             File fcsv = new File(outpath);
+      //             FileOutputStream output = new FileOutputStream(fcsv);
+      //             csv.setDestination(output);
+      //             csv.setNoHeaderRow(false);
+      //             csv.writeBatch();
+      //         }
+      //     }
+
+      // }
+       } // main
+
+  public static void sampleBN(String inputXbifPath, int nInstances, int seed, String outputPath){
+    try {
+
+      // Generating sample of nInstances from the inputXbifPath with random seed
+      SamplingBNGenerator sampler = new SamplingBNGenerator(inputXbifPath, nInstances, seed);
+      sampler.generateInstances();
+      Instances data = sampler.bf.m_Instances;
+      
+      // Saving sampled data to outputPath
+      CSVSaver csv = new CSVSaver();
+      csv.setInstances(data);
+      Utils.println("Saving to: " + outputPath);
+      File fcsv = new File(outputPath);
+      FileOutputStream output = new FileOutputStream(fcsv);
+      csv.setDestination(output);
+      csv.setNoHeaderRow(false);
+      csv.writeBatch();
+
+    } catch (Exception e) {
+      System.out.println("Error sampling BN");
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
 
 
    public static ArrayList<String> listarFicherosPorCarpeta(final File carpeta) {
@@ -201,7 +273,7 @@ public class SamplingBNGenerator {
             if (ficheroEntrada.isDirectory()) {
                 carpetas.add(ficheroEntrada.getName());
             } else {
-                System.out.println("Se espera un subdirectorio");
+                Utils.println("Se espera un subdirectorio");
             }
         }
         return carpetas;
@@ -214,7 +286,7 @@ public class SamplingBNGenerator {
 
         for (final File ficheroEntrada : carpeta.listFiles()) {
             if (ficheroEntrada.isDirectory()) {
-                System.out.println("Se esperan ficheros");
+                Utils.println("Se esperan ficheros");
             } else {
                 ficheros.add(ficheroEntrada.getName());
             }

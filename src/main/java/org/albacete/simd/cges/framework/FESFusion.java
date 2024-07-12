@@ -39,7 +39,7 @@ public class FESFusion extends FusionStage{
             flag = true;
             this.currentGraph = new EdgeListGraph(new LinkedList<>(fusionGraph.getNodes()));
         }
-        System.out.println("FES to obtain the fusion: ");
+        Utils.println("FES to obtain the fusion: ");
         
 
         Set<Edge> candidates = new HashSet<>();
@@ -57,7 +57,7 @@ public class FESFusion extends FusionStage{
 
         fuse.run();
         
-        // We obtain the flag of the FES. If true, FESThread has improve the result.
+        // We obtain the flag of the FES. If true, FESThread has improved the result.
         try {
             flag = flag || fuse.getFlag();
         } catch (InterruptedException ex) {
@@ -72,23 +72,9 @@ public class FESFusion extends FusionStage{
             if (fusionScore > currentScore) {
                 flag = true;
                 this.currentGraph = fusionGraph;
-                System.out.println("  FESFusion -> FUSION, " + fusionScore);
+                Utils.println("  FESFusion -> FUSION, " + fusionScore);
                 return (Dag_n) this.currentGraph;
-            } 
-            /*
-            // If the fusion doesn´t improves the result, we check if any previous FESThread has improved the results.
-            else {
-                GESThread thread = fesStage.getMaxBDeuThread();
-                if (thread.getScoreBDeu() > currentScore) {
-                    try {
-                        this.currentGraph = thread.getCurrentGraph();
-                        flag = true;
-                    } catch (InterruptedException ex) {}
-                    System.out.println("  FESFusion -> THREAD, " + thread.getScoreBDeu());
-                    this.currentGraph = new Dag_n(this.currentGraph);
-                    return (Dag_n) this.currentGraph;
-                }
-            }*/
+            }
         }
         
         try {

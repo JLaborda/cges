@@ -10,7 +10,7 @@ import java.util.ArrayList;
 // IDEAS para el futuro
 public abstract class Stage {
 
-    protected Problem problem;
+    protected final Problem problem;
 
     Graph currentGraph;
 
@@ -31,6 +31,7 @@ public abstract class Stage {
     }
 
 
+    @SuppressWarnings("UnusedReturnValue")
     public abstract boolean run() throws InterruptedException;
 
 

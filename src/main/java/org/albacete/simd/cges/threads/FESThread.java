@@ -1,6 +1,5 @@
 package org.albacete.simd.cges.threads;
 
-import consensusBN.PowerSet;
 import consensusBN.PowerSetFabric;
 import consensusBN.SubSet;
 import edu.cmu.tetrad.graph.*;
@@ -13,7 +12,6 @@ import java.util.*;
 
 import java.util.stream.Collectors;
 
-@SuppressWarnings("DuplicatedCode")
 public class FESThread extends GESThread {
 
     private static int threadCounter = 1;
@@ -31,7 +29,7 @@ public class FESThread extends GESThread {
      * @param subset subset of edges the fes stage will try to add to the
      * resulting graph
      * @param maxIt maximum number of iterations allowed in the fes stage
-     * @param speedUp
+     * @param speedUp reduces the number of edges to check in the stages if true.
      */
     public FESThread(Problem problem, Graph initialDag, Set<Edge> subset, int maxIt, boolean speedUp, boolean update, boolean parallel) {
         this(problem, subset, maxIt, speedUp, update, parallel);
@@ -46,7 +44,7 @@ public class FESThread extends GESThread {
      * @param subset subset of edges the fes stage will try to add to the
      * resulting graph
      * @param maxIt maximum number of iterations allowed in the fes stage
-     * @param speedUp
+     * @param speedUp reduces the number of edges to check in the stages if true.
      */
     public FESThread(Problem problem, Set<Edge> subset, int maxIt, boolean speedUp, boolean update, boolean parallel) {
         this.problem = problem;
@@ -64,7 +62,7 @@ public class FESThread extends GESThread {
     //==========================PUBLIC METHODS==========================//
     @Override
     /*
-      Run method from {@link Thread Thread} interface. The method executes the {@link #search()} search} method to add
+      Run method from {@link Thread} interface. The method executes the {@link #search()} search} method to add
       edges to the initial graph.
      */
     public void run() {
@@ -91,7 +89,7 @@ public class FESThread extends GESThread {
             //buildIndexing(graph);
 
             // Method 1-- original.
-            double scoreInitial = scoreDag(graph);
+            double scoreInitial = scoreGraph(graph);
 
             // Do backward search.
             fes(graph, scoreInitial);
@@ -99,15 +97,15 @@ public class FESThread extends GESThread {
             long endTime = System.currentTimeMillis();
             this.elapsedTime = endTime - startTime;
 
-            double newScore = scoreDag(graph);
-            System.out.println(" [" + getId() + "] FES New Score: " + newScore + ", Initial Score: " + scoreInitial);
+            double newScore = scoreGraph(graph);
+            Utils.println(" [" + getId() + "] FES New Score: " + newScore + ", Initial Score: " + scoreInitial);
             // If we improve the score, return the new graph
             if (newScore > scoreInitial) {
                 this.modelBDeu = newScore;
                 this.flag = true;
                 return graph;
             } else {
-                //System.out.println("   [" + getId() + "] ELSE");
+                //Utils.println("   [" + getId() + "] ELSE");
                 this.modelBDeu = scoreInitial;
                 this.flag = false;
                 return this.initialDag;
@@ -124,20 +122,18 @@ public class FESThread extends GESThread {
      * @param score The score in the state prior to the forward equivalence
      * search
      * @return the score in the state after the FES method. Note that the graph
-     * is changed as a side-effect to its state after the forward equivalence
+     * is changed as a side effect to its state after the forward equivalence
      * search.
      */
+    @SuppressWarnings("UnusedReturnValue")
     private double fes(Graph graph, double score) {
-        //System.out.println("** FORWARD EQUIVALENCE SEARCH");
+        //Utils.println("** FORWARD EQUIVALENCE SEARCH");
         double bestScore = score;
         double bestInsert;
 
-        //x_i = null;
-        //y_i = null;
-        //t_0 = null;
         iterations = 0;
         
-        //System.out.println("Initial Score = " + nf.format(bestScore));
+        //Utils.println("Initial Score = " + nf.format(bestScore));
         // Calling fs to calculate best edge to add.
         enlaces = S;
         bestInsert = fs(graph);
@@ -146,7 +142,7 @@ public class FESThread extends GESThread {
             bestScore = bestInsert;
 
             // Inserting edge
-            System.out.println("Thread " + getId() + " inserting: (" + x_i + ", " + y_i + ", " + t_0 + "), score: " + bestScore);
+            Utils.println("Thread " + getId() + " inserting: (" + x_i + ", " + y_i + ", " + t_0 + "), score: " + bestScore);
             insert(x_i, y_i, t_0, graph);
 
             // Checking cycles?
@@ -159,16 +155,11 @@ public class FESThread extends GESThread {
                 rebuildPattern(graph);
             
             // Printing score
-            /*if (!t_0.isEmpty()) {
-                System.out.println("[" + getId() + "] Score: " + nf.format(bestScore) + " (+" + nf.format(bestInsert - score) + ")\tOperator: " + graph.getEdge(x_i, y_i) + " " + t_0);
-            } else {
-                System.out.println("[" + getId() + "] Score: " + nf.format(bestScore) + " (+" + nf.format(bestInsert - score) + ")\tOperator: " + graph.getEdge(x_i, y_i));
-            }*/
             bestScore = bestInsert;
 
             // Checking that the maximum number of edges has not been reached
             if (getMaxNumEdges() != -1 && graph.getNumEdges() >= getMaxNumEdges()) {
-                //System.out.println("Maximum edges reached");
+                //Utils.println("Maximum edges reached");
                 break;
             }
 
@@ -190,34 +181,16 @@ public class FESThread extends GESThread {
      * @param graph The graph in the state prior to the forward equivalence
      * search.
      * @return the score in the state after the forward equivalence search. Note
-     * that the graph is changed as a side-effect to its state after the forward
+     * that the graph is changed as a side effect to its state after the forward
      * equivalence search.
      */
     private double fs(Graph graph) {
-        //       System.out.println("** FORWARD EQUIVALENCE SEARCH");
-        //       System.out.println("Initial Score = " + nf.format(bestScore));
 
         PowerSetFabric.setMode(PowerSetFabric.MODE_FES);
 
         x_i = y_i = null;
         t_0 = null;
 
-        /*EdgeSearch[] scores = new EdgeSearch[S.size()];
-        List<Edge> edges = new ArrayList<>(S);
-
-        Arrays.parallelSetAll(scores, e -> {
-            return scoreEdge(graph, edges.get(e), initialScore);
-        });
-
-        EdgeSearch max = Collections.max(Arrays.asList(scores));
-
-        if (max.score > initialScore) {
-            x_i = max.edge.getNode1();
-            y_i = max.edge.getNode2();
-            t_0 = max.hSubset;
-        }
-        */
-        
         Set<EdgeSearch> newScores;
         if (parallel)
             newScores = enlaces.parallelStream()
@@ -265,8 +238,6 @@ public class FESThread extends GESThread {
     }
 
     private void removeEdgesNotNeighbors(Graph graph, Set<Node> process) {
-        int tam;
-        tam = process.size();
         process.add(x_i);
         process.add(y_i);
 
@@ -279,7 +250,7 @@ public class FESThread extends GESThread {
             Node y = edge.getNode2();
             return !process.contains(x) && !process.contains(y);
         });
-        //System.out.println("TAMAÑO DE enlaces: " + enlaces.size() + ", S: " + S.size() + ". \t Process: " + process.size()  + ", revert: " + tam);
+        //Utils.println("TAMAÑO DE enlaces: " + enlaces.size() + ", S: " + S.size() + ". \t Process: " + process.size()  + ", revert: " + tam);
     }
 
     private Set<Node> revertToCPDAG(Graph graph) {
@@ -298,7 +269,7 @@ public class FESThread extends GESThread {
 
             SubSet tSubset = new SubSet();
             double insertEval = insertEval(_x, _y, tSubset, graph, problem);
-            //System.out.println("InsertEval: " + insertEval);
+            //Utils.println("InsertEval: " + insertEval);
             if (insertEval > 0) {
                 List<Node> naYXT = new LinkedList<>(tSubset);
                 List<Node> naYX = findNaYX(_x, _y, graph);
@@ -379,7 +350,7 @@ public class FESThread extends GESThread {
                     if (greedyScore > insertEval) {
                         insertEval = greedyScore;
                     }
-                    //System.out.println("InsertEval: " + insertEval);
+                    //Utils.println("InsertEval: " + insertEval);
                     return new EdgeSearch(insertEval, tSubset, edge);
 
                 }
@@ -389,244 +360,7 @@ public class FESThread extends GESThread {
 
     }
 
-    /**
-     * Forward search. Finds the best possible edge to be added into the current
-     * graph and returns its score.
-     *
-     * @param graph The graph in the state prior to the forward equivalence
-     * search.
-     * @param score The score in the state prior to the forward equivalence
-     * search
-     * @return the score in the state after the forward equivalence search. Note
-     * that the graph is changed as a side-effect to its state after the forward
-     * equivalence search.
-     */
-    private double fs2(Graph graph, double score) {
-        //       System.out.println("** FORWARD EQUIVALENCE SEARCH");
-        //       System.out.println("Initial Score = " + nf.format(bestScore));
 
-// ------ Searching for the best FES ---
-        double bestScore = score;
-        PowerSetFabric.setMode(PowerSetFabric.MODE_FES);
-        x_i = null;
-        y_i = null;
-        t_0 = null;
-
-        List<Edge> edges = new ArrayList<>(enlaces);
-
-        for (Edge edge : edges) {
-
-            //Checking time
-            /*if(isTimeout()) {
-                System.out.println("Timeout in FESTHREAD id: " + getId());
-                break;
-            }*/
-            Node _x = Edges.getDirectedEdgeTail(edge);
-            Node _y = Edges.getDirectedEdgeHead(edge);
-
-            if (graph.isAdjacentTo(_x, _y)) {
-                continue;
-            }
-// ---------------------------- Checking and evaluating an edge between _x and _y-----------
-            List<Node> tNeighbors = getSubsetOfNeighbors(_x, _y, graph);
-//            PowerSet tSubsets = PowerSetFabric.getPowerSet(_x, _y, tNeighbors);
-
-            SubSet tSubset = new SubSet();
-            double insertEval = insertEval(_x, _y, tSubset, graph, problem);
-            double evalScore = score + insertEval;
-            if (evalScore <= score) {
-                continue;
-            }
-
-            if (!(evalScore > bestScore && evalScore > score)) {
-                continue;
-            }
-
-            List<Node> naYXT = new LinkedList<>(tSubset);
-            List<Node> naYX = findNaYX(_x, _y, graph);
-            naYXT.addAll(naYX);
-
-            // START TEST 1
-            if (tSubset.firstTest == SubSet.TEST_NOT_EVALUATED) {
-                if (!isClique(naYXT, graph)) {
-                    continue;
-                }
-            } else if (tSubset.firstTest == SubSet.TEST_FALSE) {
-                continue;
-            }
-            // END TEST 1
-
-            // START TEST 2
-            if (tSubset.secondTest == SubSet.TEST_NOT_EVALUATED) {
-                if (!isSemiDirectedBlocked(_x, _y, naYXT, graph, new HashSet<>())) {
-                    continue;
-                }
-            } else if (tSubset.secondTest == SubSet.TEST_FALSE) { // This can't happen
-                continue;
-            }
-
-            double greedyScore = evalScore;
-            int bestNodeIndex;
-            Node bestNode = null;
-            int subsetTsize = 0;
-
-            do {
-                bestNodeIndex = -1;
-                for (int k = 0; k < tNeighbors.size(); k++) {
-                    Node node = tNeighbors.get(k);
-                    SubSet newT = new SubSet(tSubset);
-                    newT.add(node);
-                    insertEval = insertEval(_x, _y, newT, graph, problem);
-                    evalScore = score + insertEval;
-
-                    if (evalScore <= greedyScore) {
-                        continue;
-                    }
-
-                    naYXT = new LinkedList<>(newT);
-                    naYXT.addAll(naYX);
-
-                    // START TEST 1
-                    if (tSubset.firstTest == SubSet.TEST_NOT_EVALUATED) {
-                        if (!isClique(naYXT, graph)) {
-                            continue;
-                        }
-                    } else if (tSubset.firstTest == SubSet.TEST_FALSE) {
-                        continue;
-                    }
-                    // END TEST 1
-
-//		            // START TEST 2
-                    if (tSubset.secondTest == SubSet.TEST_NOT_EVALUATED) {
-                        if (!isSemiDirectedBlocked(_x, _y, naYXT, graph, new HashSet<>())) {
-                            continue;
-                        }
-                    } else if (tSubset.secondTest == SubSet.TEST_FALSE) { // This can't happen
-                        continue;
-                    }
-
-                    bestNodeIndex = k;
-                    bestNode = node;
-                    greedyScore = evalScore;
-                }
-                if (bestNodeIndex != -1) {
-                    tSubset.add(bestNode);
-                    tNeighbors.remove(bestNodeIndex);
-                    subsetTsize++;
-                }
-
-            } while ((bestNodeIndex != -1) && (subsetTsize <= 1));
-
-            if (greedyScore > bestScore) {
-                bestScore = greedyScore;
-                x_i = _x;
-                y_i = _y;
-                t_0 = tSubset;
-            }
-
-            //.......................... an edge is evaluated until here.
-        }
-
-        return bestScore;
-
-    }
-    
-    private double fes2(Graph graph, double score) {
-        System.out.println("** FORWARD EQUIVALENCE SEARCH (FES)");
-        double bestScore = score;
-        System.out.println("Initial Score = " + nf.format(bestScore));
-        PowerSetFabric.setMode(PowerSetFabric.MODE_FES);
-        Node x = null;
-        Node y = null;
-        Set<Node> t = new HashSet<>();
-
-        do {
-            List<Node> nodes = graph.getNodes();
-
-            for (int i = 0; i < nodes.size(); i++) {
-                Node _x = nodes.get(i);
-
-                for (Node _y : nodes) {
-                    if (_x == _y) {
-                        continue;
-                    }
-
-                    if (graph.isAdjacentTo(_x, _y)) {
-                        continue;
-                    }
-
-                    List<Node> tNeighbors = getSubsetOfNeighbors(_x, _y, graph);
-                    
-                    //List<Set<Node>> tSubsets = powerSet(tNeighbors);
-                    PowerSet tSubsets= PowerSetFabric.getPowerSet(_x,_y,tNeighbors);
-
-                    while(tSubsets.hasMoreElements()) {
-                            SubSet tSubset=tSubsets.nextElement();
-                            
-                        double insertEval = insertEval(_x,_y, tSubset, graph, problem);
-                        double evalScore = score + insertEval;
-
-                        if (!(evalScore > bestScore && evalScore > score)) {
-                            continue;
-                        }
-
-                        List<Node> naYXT = new LinkedList<>(tSubset);
-                        naYXT.addAll(findNaYX(_x,_y, graph));
-                        
-                        // INICIO TEST 1
-                        if(tSubset.firstTest==SubSet.TEST_NOT_EVALUATED) {
-                            if (!isClique(naYXT, graph)) {
-//                                       tSubsets.firstTest(false); // Si falla para T entonces falla para cualquier T' | T' contiene T
-                            continue;
-                            }
-                        }
-                        else if (tSubset.firstTest==SubSet.TEST_FALSE) {
-                            continue;
-                       }
-                        // FIN TEST 1
-                        
-                        // INICIO TEST 2
-                        if(tSubset.secondTest==SubSet.TEST_NOT_EVALUATED) {
-                            if (!isSemiDirectedBlocked(_x, _y, naYXT, graph, new HashSet<>())) {
-                            continue;
-                            }
-                            //else {
-//                                       tSubsets.secondTest(true);  // Si pasa para T entonces pasa para cualquier T' | T' contiene T
-                            //}
-                        }
-                        else if (tSubset.secondTest==SubSet.TEST_FALSE) { // No puede ocurrir
-                            //System.out.println("ERROR");
-                            continue;
-                        }
-                        // FIN TEST 2
-
-                        bestScore = evalScore;
-                        x=_x;
-                        y=_y;
-                        t=tSubset;
-
-//                        System.out.println("Best score = " + bestScore);
-                    }
-                }
-            }
-
-            if (x != null) {
-                insert(x,y,t, graph);
-//                Edge prevEdge=graph.getEdge(x, y);
-                rebuildPattern(graph);
-                if (!t.isEmpty())
-                            System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestScore-score) +")\tOperator: " + graph.getEdge(x, y) + " " + t);
-                else
-                            System.out.println("Score: " + nf.format(bestScore) + " (+" + nf.format(bestScore-score) +")\tOperator: " + graph.getEdge(x, y));
-                score = bestScore;
-
-                if (getMaxNumEdges() != -1 && graph.getNumEdges() > getMaxNumEdges()) {
-                    break;
-                }
-            }
-        } while (x != null);
-        return score;
-    }
 
 
 }

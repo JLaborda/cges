@@ -3,11 +3,8 @@ package org.albacete.simd.cges.threads;
 import edu.cmu.tetrad.data.DataSet;
 import edu.cmu.tetrad.graph.*;
 import org.albacete.simd.cges.Resources;
-import org.albacete.simd.cges.framework.BackwardStage;
-import org.albacete.simd.cges.framework.ForwardStage;
 import org.albacete.simd.cges.utils.Problem;
 import org.albacete.simd.cges.utils.Utils;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.*;
@@ -33,11 +30,11 @@ public class BESThreadTest {
      */
     final Node xray = dataset.getVariable("Xray");
     /**
-     * Variable Dysponea
+     * Variable Dyspnoea
      */
     final Node dyspnoea = dataset.getVariable("Dyspnoea");
     /**
-     * Variabe Cancer
+     * Variable Cancer
      */
     final Node cancer = dataset.getVariable("Cancer");
     /**
@@ -58,7 +55,7 @@ public class BESThreadTest {
      */
     final Set<Edge> subset2 = new HashSet<>();
 
-    Problem problem;
+    final Problem problem;
 
 
     /**
@@ -131,7 +128,6 @@ public class BESThreadTest {
 
     /**
      * Checks that the constructor works perfectly
-     * @result  Both constructors create a ThBES object.
      * @throws InterruptedException Exception caused by thread interruption
      */
     @Test
@@ -149,7 +145,6 @@ public class BESThreadTest {
 
     /**
      * Checks that the BES stage works as expected
-     * @result All edges are in the expected result.
      * @throws InterruptedException Interruption caused by external forces.
      */
     @Test
@@ -168,30 +163,19 @@ public class BESThreadTest {
         double scoreFusionGraph = GESThread.scoreGraph(fusionGraph, problem);
 
         BESThread thread1 = new BESThread(problem, fusionGraph, subset1);
-/*
-        List<Edge> expected = new ArrayList<>();
-        expected.add(new Edge(cancer,xray,Endpoint.TAIL, Endpoint.ARROW));
-        expected.add(new Edge(pollution,cancer,Endpoint.TAIL, Endpoint.ARROW));
-        expected.add(new Edge(smoker,cancer,Endpoint.TAIL, Endpoint.ARROW));
-        expected.add(new Edge(smoker,pollution,Endpoint.TAIL, Endpoint.ARROW));
-        expected.add(new Edge(xray,dyspnoea,Endpoint.TAIL, Endpoint.ARROW));
-*/
-        // Act
+// Act
         thread1.run();
         Graph g1 = thread1.getCurrentGraph();
 
         // Getting dag
-        Dag_n gdag1 = new Dag_n(removeInconsistencies(g1));
+        Dag_n dag1 = new Dag_n(removeInconsistencies(g1));
 
-        //System.out.println("ThBES");
-        //System.out.println(gdag1);
-
-        double scoreBES = GESThread.scoreGraph(gdag1, problem);
+        double scoreBES = GESThread.scoreGraph(dag1, problem);
 
 
         // Asserting
-       assertNotNull(gdag1);
-       assertEquals(gdag1.getNodes().size(),5);
+       assertNotNull(dag1);
+       assertEquals(dag1.getNodes().size(),5);
        assertTrue(scoreBES >= scoreFusionGraph);
 
     }

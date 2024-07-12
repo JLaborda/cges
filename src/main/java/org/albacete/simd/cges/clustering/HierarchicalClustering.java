@@ -349,5 +349,21 @@ public class HierarchicalClustering extends Clustering{
         return edgeDistribution;
     }
 
+    public void setJoint(boolean joint) {
+        isJoint = joint;
+    }
+
+    public void setParallel(boolean parallel) {
+        isParallel = parallel;
+    }
+
+    public boolean isJoint(){
+        return isJoint;
+    }
+
+    public boolean isParallel(){
+        return isParallel;
+    }
+
 
 }
