@@ -4,7 +4,7 @@
 # CGES
 Circular/Ring Greedy Equivalence Search (CGES or rGES) is a distributed structural learning algorithm for Bayesian Networks developed by Jorge Daniel Laborda, Pablo Torrijos, José M. Puerta and José A. Gámez.
 This repository contains the code implementation of the algorithm described in the research article titled [A Ring-Based Distributed Algorithm for
-Learning High-Dimensional Bayesian Networks](https://link.springer.com/chapter/10.1007/978-3-031-45608-4_10). This algorithm focuses on structural learning of Bayesian Networks in high-dimensional domains, aiming to reduce complexity and improve efficiency. It is limited to discrete problems.
+Learning High-Dimensional Bayesian Networks](https://link.springer.com/chapter/10.1007/978-3-031-45608-4_10) and has been later expanded and published in the IJAR paper [Distributed fusion-based algorithms for learning high-dimensional Bayesian Networks: Testing ring and star topologies](https://doi.org/10.1016/j.ijar.2024.109302). This algorithm focuses on structural learning of Bayesian Networks in high-dimensional domains, aiming to reduce complexity and improve efficiency. It is limited to discrete problems.
 
 ## Table of Contents
 - [Introduction](#introduction)
